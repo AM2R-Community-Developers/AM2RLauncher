@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Abort" xml:space="preserve">
+    <value>ANNULLA</value>
+  </data>
+  <data name="AddNewMod" xml:space="preserve">
+    <value>AGGIUNGI UNA NUOVA MOD</value>
+  </data>
+  <data name="AddNewModToolTip" xml:space="preserve">
+    <value>Seleziona una mod da installare.</value>
+  </data>
+  <data name="ApkButtonDisabledToolTip" xml:space="preserve">
+    <value>Impossibile creare APK.</value>
+  </data>
+  <data name="ApkButtonEnabledToolTip" xml:space="preserve">
+    <value>Crea un APK per </value>
+  </data>
+  <data name="ArchiveNotes" xml:space="preserve">
+    <value>Questo è un archivio di un Aggiornamento Comunità installato in precedenza. Non può essere reinstallato e si rimuoverà da solo se i file di gioco saranno cancellati. Condivide i salvataggi con gli Aggiornamenti Comunità, quindi assicurati di creare un backup dei tuoi salvataggi prima di usare questo profilo!</value>
+  </data>
+  <data name="Author" xml:space="preserve">
+    <value>Autore/i:</value>
+  </data>
+  <data name="AutoUpdate" xml:space="preserve">
+    <value>Aggiorna automaticamente AM2R e il AM2RLauncher</value>
+  </data>
+  <data name="ChangelogTab" xml:space="preserve">
+    <value>Registro dei cambiamenti</value>
+  </data>
+  <data name="CloseOnCloningText" xml:space="preserve">
+    <value>Sei sicuro di voler annullare? Questo annullerà tutti i tuoi progressi!</value>
+  </data>
+  <data name="CloseOnInstallingText" xml:space="preserve">
+    <value>Spiacenti, non puoi chiudere mentre è in corso l'installazione! Aspetta che finisca.</value>
+  </data>
+  <data name="CorruptPatchData" xml:space="preserve">
+    <value>È stato riscontrato un errore con la tua cartella con i dati della patch. Ë stata cancellata, perfavore riscaricala.</value>
+  </data>
+  <data name="CreateAPK" xml:space="preserve">
+    <value>CREA APK</value>
+  </data>
+  <data name="CreatingAPK" xml:space="preserve">
+    <value>CREAZIONE APK</value>
+  </data>
+  <data name="CurrentProfile" xml:space="preserve">
+    <value>Profilo corrente:</value>
+  </data>
+  <data name="CustomEnvVarLabel" xml:space="preserve">
+    <value>Inserisci variabili personalizzate dell'ambiente di gioco:</value>
+  </data>
+  <data name="CustomMirrorCheck" xml:space="preserve">
+    <value>Usa un mirror di download personalizzato.</value>
+  </data>
+  <data name="DeleteModButtonCantDelete" xml:space="preserve">
+    <value>Impossibile cancellare $NAME.</value>
+  </data>
+  <data name="DeleteModButtonSuccess" xml:space="preserve">
+    <value>$NAME è stato cancellato con successo!</value>
+  </data>
+  <data name="DeleteModButtonText" xml:space="preserve">
+    <value>CANCELLA MOD</value>
+  </data>
+  <data name="DeleteModButtonToolTip" xml:space="preserve">
+    <value>Cancella #NAME.</value>
+  </data>
+  <data name="DeleteModWarning" xml:space="preserve">
+    <value>Questo cancellerà tutti i file per $NAME. Sei sicuro di voler continuare?</value>
+  </data>
+  <data name="DiscordToolTip" xml:space="preserve">
+    <value>Il Discord ufficiale di AM2R</value>
+  </data>
+  <data name="Download" xml:space="preserve">
+    <value>DOWNLOAD</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>IN DOWNLOAD</value>
+  </data>
+  <data name="DownloadSource" xml:space="preserve">
+    <value>Sorgente di download:</value>
+  </data>
+  <data name="ErrorWindowTitle" xml:space="preserve">
+    <value>Errore</value>
+  </data>
+  <data name="GithubToolTip" xml:space="preserve">
+    <value>La pagina GitHub della Community di sviluppo</value>
+  </data>
+  <data name="HighQualityAndroid" xml:space="preserve">
+    <value>Usa la musica di alta qualità quando applichi la patch per Android</value>
+  </data>
+  <data name="HighQualityPC" xml:space="preserve">
+    <value>Usa la musica di alta qualità quando applichi la patch per PC</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>INSTALLA</value>
+  </data>
+  <data name="Installing" xml:space="preserve">
+    <value>INSTALLAZIONE</value>
+  </data>
+  <data name="InternetConnectionDrop" xml:space="preserve">
+    <value>Impossibile connettersi a internet! Riprova più tardi!</value>
+  </data>
+  <data name="JavaNotFound" xml:space="preserve">
+    <value>Java non trovato! Impossibile generare un APK senza un'installazione Java. Perfavore assicurati che Java sia installato e aggiunto al PATH.</value>
+  </data>
+  <data name="LanguageNotice" xml:space="preserve">
+    <value>Lingua del Launcher: (richiede un riavvio per il cambio)</value>
+  </data>
+  <data name="LauncherSettingsTab" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="MirrorGithubText" xml:space="preserve">
+    <value>GitHub (Primario)</value>
+  </data>
+  <data name="MirrorGitlabText" xml:space="preserve">
+    <value>GitLab (Mirror)</value>
+  </data>
+  <data name="ModIsAlreadyInstalledMessage" xml:space="preserve">
+    <value>$NAME è già installata!</value>
+  </data>
+  <data name="ModIsForWrongOS" xml:space="preserve">
+    <value>$NAME non può essere installato! È per $OS. Scarica la versione $CURRENTOS se esiste, o chiedi agli autori della mod di crearne una.</value>
+  </data>
+  <data name="ModIsInvalidMessage" xml:space="preserve">
+    <value>$NAME è una mod non valida!</value>
+  </data>
+  <data name="ModSuccessfullyInstalledMessage" xml:space="preserve">
+    <value>$NAME è stata aggiunta con successo! Vai alla Tab Gioca per installarla!</value>
+  </data>
+  <data name="NewsTab" xml:space="preserve">
+    <value>Notizie</value>
+  </data>
+  <data name="NoInternetConnection" xml:space="preserve">
+    <value>Impossibile connettersi a internet! Potrai giocare comunque al gioco, ma gli aggiornamenti non avverranno finchè il launcher non è riavviato e la connessione a internet avrà successo.</value>
+  </data>
+  <data name="OpenSaveFolder" xml:space="preserve">
+    <value>APRI CARTELLA SALVATAGGIO PROFILO</value>
+  </data>
+  <data name="OpenSaveFolderToolTip" xml:space="preserve">
+    <value>Apre la Cartella dove i file di salvataggio sono presenti per $NAME.</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>GIOCA</value>
+  </data>
+  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+    <value>Download in corso. . .</value>
+  </data>
+  <data name="PlayButtonDownloadToolTip" xml:space="preserve">
+    <value>Scarica i file di patch necessari.</value>
+  </data>
+  <data name="PlayButtonInstallingToolTip" xml:space="preserve">
+    <value>Installazione in corso. . .</value>
+  </data>
+  <data name="PlayButtonInstallToolTip" xml:space="preserve">
+    <value>Installa </value>
+  </data>
+  <data name="PlayButtonPlayingToolTip" xml:space="preserve">
+    <value>Stai già giocando!</value>
+  </data>
+  <data name="PlayButtonPlayToolTip" xml:space="preserve">
+    <value>Gioca </value>
+  </data>
+  <data name="PlayButtonSelect11ToolTip" xml:space="preserve">
+    <value>Seleziona il tuo AM2R_1.1.zip</value>
+  </data>
+  <data name="Playing" xml:space="preserve">
+    <value>IN ESECUZIONE</value>
+  </data>
+  <data name="PlayTab" xml:space="preserve">
+    <value>Gioca</value>
+  </data>
+  <data name="ProfileDebugCheckBox" xml:space="preserve">
+    <value>Crea registri di debug del gioco</value>
+  </data>
+  <data name="ProfileNotes" xml:space="preserve">
+    <value>Note di profilo:
+</value>
+  </data>
+  <data name="ProfileSettingsTab" xml:space="preserve">
+    <value>Impostazioni mod</value>
+  </data>
+  <data name="ProgressbarProgress" xml:space="preserve">
+    <value>Progressi: </value>
+  </data>
+  <data name="RedditToolTip" xml:space="preserve">
+    <value>Il Subreddit ufficiale di AM2R</value>
+  </data>
+  <data name="SaveLocationWarning" xml:space="preserve">
+    <value>Attenzione: Questo profilo usa la locazione di salvataggio predefinita! Questo potrebbe corrompere i tuoi dati di salvataggio - assicurati di creare un backup.</value>
+  </data>
+  <data name="Select11" xml:space="preserve">
+    <value>SELEZIONA AM2R_1.1.zip</value>
+  </data>
+  <data name="Select11FileDialog" xml:space="preserve">
+    <value>Seleziona AM2R_1.1.zip</value>
+  </data>
+  <data name="SelectModFileDialog" xml:space="preserve">
+    <value>Seleziona la tua Mod</value>
+  </data>
+  <data name="SuccessWindowTitle" xml:space="preserve">
+    <value>Successo</value>
+  </data>
+  <data name="SystemLanguage" xml:space="preserve">
+    <value>Lingua di sistema</value>
+  </data>
+  <data name="TrayButtonShow" xml:space="preserve">
+    <value>Mostra Launcher</value>
+  </data>
+  <data name="UnauthorizedAccessMessage" xml:space="preserve">
+    <value>Impossibile accedere alla Cartella per scaricare l'aggiornamento! Prova a spostare il programma, o a disattivare gli aggiornamenti automatici.</value>
+  </data>
+  <data name="UnhandledException" xml:space="preserve">
+    <value>Un'eccezione inaspettata è occorsa nella tua Applicazione.</value>
+  </data>
+  <data name="UpdateMod" xml:space="preserve">
+    <value>Seleziona aggiornamento Mod</value>
+  </data>
+  <data name="UpdateModButtonText" xml:space="preserve">
+    <value>AGGIORNAMENTO MOD</value>
+  </data>
+  <data name="UpdateModButtonToolTip" xml:space="preserve">
+    <value>Seleziona un zip per aggiornare $NAME.</value>
+  </data>
+  <data name="UpdateModButtonWrongMod" xml:space="preserve">
+    <value>Impossibile aggiornare $NAME con $SELECT. Aggiungi invece $SELECT come nuova mod!</value>
+  </data>
+  <data name="UpdateModWarning" xml:space="preserve">
+    <value>Questo sostituirà tutti i file per $NAME con la versione nuova selezionata. Sei sicuro di voler continuare?</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>Versione: </value>
+  </data>
+  <data name="WarningWindowOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="WarningWindowText" xml:space="preserve">
+    <value>Il AM2RLauncher NON PUÒ validare i link mirror personalizzati.
+Se qualcuno ti sta dicendo di incollare un link in questo campo, potrebbero voler infettare il tuo computer.
+Procedi con cautela.</value>
+  </data>
+  <data name="WarningWindowTitle" xml:space="preserve">
+    <value>ATTENZIONE</value>
+  </data>
+  <data name="XdeltaNotFound" xml:space="preserve">
+    <value>Xdelta non trovato! Non puoi installare Profili senza di esso. Perfavore installa xdelta3 dal tuo manager di pacchetti locale.</value>
+  </data>
+  <data name="YoutubeToolTip" xml:space="preserve">
+    <value>Il Canale Youtube della Community di sviluppo</value>
+  </data>
+  <data name="ZipArchiveText" xml:space="preserve">
+    <value>Archivi Zip (.zip)</value>
+  </data>
+  <data name="ZipIsNotAM2R11" xml:space="preserve">
+    <value>Il Zip selezionato non è AM2R 1.1! Perfavore scegli un altro file Zip.</value>
+  </data>
+</root>

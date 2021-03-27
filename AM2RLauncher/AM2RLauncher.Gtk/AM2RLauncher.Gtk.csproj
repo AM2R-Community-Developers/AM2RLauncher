@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <ApplicationIcon>icon64.ico</ApplicationIcon> 
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AM2RLauncher\AM2RLauncher.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Eto.Platform.Gtk" Version="2.5.10" />
+  </ItemGroup>
+	
+</Project>

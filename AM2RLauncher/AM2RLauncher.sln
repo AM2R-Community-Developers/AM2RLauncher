@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher", "AM2RLauncher\AM2RLauncher.csproj", "{9B67055C-5AEF-4F83-AFE0-38E600183C9F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Gtk", "AM2RLauncher.Gtk\AM2RLauncher.Gtk.csproj", "{0A619FA8-61B4-48C6-9461-21B3FE137D03}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Wpf", "AM2RLauncher.Wpf\AM2RLauncher.Wpf.csproj", "{8A162932-BAA3-429A-84C4-B93A1C85DDE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F6A6677C-BAAB-43EC-A289-E7AB0A61E0C8}
+	EndGlobalSection
+EndGlobal
