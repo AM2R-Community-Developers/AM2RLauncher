@@ -89,15 +89,7 @@ namespace AM2RLauncher
                 string onlineVersion = realUri.AbsoluteUri.Substring(realUri.AbsoluteUri.LastIndexOf('/') + 1);
                 string onlineVersionForCompare = onlineVersion.Replace(".", "");
 
-                bool isCurrentVersionOutdated = true;
-                for (int i = 0; i < onlineVersionForCompare.Length; i++)
-                {
-                    if (char.GetNumericValue(version[i]) > char.GetNumericValue(onlineVersionForCompare[i]))
-                    {
-                        isCurrentVersionOutdated = false;
-                        break;
-                    }
-                }
+                bool isCurrentVersionOutdated = int.Parse(version) < int.Parse(onlineVersionForCompare);
 
                 if (isCurrentVersionOutdated)
                 {
