@@ -61,6 +61,7 @@ namespace AM2RLauncher
             "Overcommitting to April Fool's since 2018.",
             "Also try Metroid II: Return of Samus!",
             "Also try Metroid: Samus Returns!",
+            "Also try Prime 2D!",
             "Trust me, it's an 'unintentional feature.'",
             "Coming soon to a PC near you!",
             "This ain't your parents' Metroid 2!",
