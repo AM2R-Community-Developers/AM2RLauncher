@@ -641,9 +641,11 @@ namespace AM2RLauncher
 
                     ProcessStartInfo proc = new ProcessStartInfo();
 
-                    proc.WorkingDirectory = Environment.CurrentDirectory;
-                    proc.FileName = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe";
+                    proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                    proc.FileName = proc.WorkingDirectory + "/AM2R.exe";
                     proc.Arguments = arguments;
+
+                    log.Info("CWD of Profile is " + proc.WorkingDirectory);
 
                     using (var p = Process.Start(proc))
                     {
@@ -694,9 +696,11 @@ namespace AM2RLauncher
                         }
                     }
 
-                    startInfo.WorkingDirectory = Environment.CurrentDirectory;
                     startInfo.UseShellExecute = false;
-                    startInfo.FileName = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage";
+                    startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                    startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
+
+                    log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
 
                     log.Info("Launching game with following variables: ");
                     foreach(System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)

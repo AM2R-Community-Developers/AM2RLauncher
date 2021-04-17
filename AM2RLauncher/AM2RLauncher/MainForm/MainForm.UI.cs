@@ -166,6 +166,7 @@ namespace AM2RLauncher
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
             Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
+            log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             //Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
