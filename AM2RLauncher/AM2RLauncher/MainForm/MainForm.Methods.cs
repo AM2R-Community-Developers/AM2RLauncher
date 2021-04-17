@@ -611,7 +611,7 @@ namespace AM2RLauncher
                 {
                     // sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
                     string arguments = "";
-                    string savePath = profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"));
+                    string savePath = profile.SaveLocation.ToLower().Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"));
                     string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 
                     // Game logging
@@ -639,11 +639,16 @@ namespace AM2RLauncher
                         arguments = "-debugoutput \"" + savePath + "/logs/" + profile.Name + ".txt\" -output \"" + savePath + "/logs/" + profile.Name + ".txt\"";
                     }
 
-                    Process proc = Process.Start(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe", arguments);
-                    using (proc)
+                    ProcessStartInfo proc = new ProcessStartInfo();
+
+                    proc.WorkingDirectory = Environment.CurrentDirectory;
+                    proc.FileName = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe";
+                    proc.Arguments = arguments;
+
+                    using (var p = Process.Start(proc))
                     {
-                        SetForegroundWindow(proc.MainWindowHandle);
-                        proc.WaitForExit();
+                        SetForegroundWindow(p.MainWindowHandle);
+                        p.WaitForExit();
                     }
                 }
                 else if (Platform.IsGtk)
@@ -689,6 +694,7 @@ namespace AM2RLauncher
                         }
                     }
 
+                    startInfo.WorkingDirectory = Environment.CurrentDirectory;
                     startInfo.UseShellExecute = false;
                     startInfo.FileName = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage";
 

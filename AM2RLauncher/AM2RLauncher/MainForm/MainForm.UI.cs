@@ -139,7 +139,7 @@ namespace AM2RLauncher
             // We're basically using it to key a thread and scan for other instances of that tag.
             Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
 
-            if(!singleInstance)
+            if (!singleInstance)
             {
                 // If on Windows, set the original app to the foreground window to prevent confusion
                 if (Platform.IsWinForms)
@@ -158,12 +158,14 @@ namespace AM2RLauncher
             }
 
 
-            
+
 
             log.Info("Mutex check passed. Entering main thread.");
             log.Info("Current Launcher Version: " + VERSION);
             log.Info("Current Platform-ID is: " + Platform.ID);
 
+            // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
+            Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
 
             //Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
@@ -210,7 +212,7 @@ namespace AM2RLauncher
 
             // Load colors
             colGreen = Color.FromArgb(142, 188, 35);
-            colRed = Color.FromArgb(188,10,35);
+            colRed = Color.FromArgb(188, 10, 35);
             colInactive = Color.FromArgb(109, 109, 109);
             colBGNoAlpha = Color.FromArgb(10, 10, 10);
             colBG = Color.FromArgb(10, 10, 10, 80);
@@ -487,7 +489,7 @@ namespace AM2RLauncher
             };
 
 
-            if(Platform.IsGtk && !isInternetThere)
+            if (Platform.IsGtk && !isInternetThere)
             {
                 changelogPage.Content = new TableLayout
                 {
@@ -539,13 +541,18 @@ namespace AM2RLauncher
                 BackgroundColor = colBGNoAlpha,
             };
             if (Platform.IsGtk)
-                languageDropDown = new DropDown {};
+                languageDropDown = new DropDown { };
 
             languageDropDown.Items.AddRange(languageList);
 
             var tmpLanguage = CrossPlatformOperations.ReadFromConfig("Language");
-            languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.Where(x => x.Text.Equals(tmpLanguage)).First());
+            languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.Where(x => x.Text.Equals(tmpLanguage)).FirstOrDefault());
 
+            if (languageDropDown.SelectedIndex == -1)
+            {
+                log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
+                languageDropDown.SelectedIndex = 0;
+            }
 
             // autoUpdate checkbox
             autoUpdateCheck = new CheckBox
