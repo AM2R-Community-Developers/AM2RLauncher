@@ -611,7 +611,7 @@ namespace AM2RLauncher
                 {
                     // sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
                     string arguments = "";
-                    string savePath = profile.SaveLocation.ToLower().Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"));
+                    string savePath = profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"));
                     string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 
                     // Game logging
