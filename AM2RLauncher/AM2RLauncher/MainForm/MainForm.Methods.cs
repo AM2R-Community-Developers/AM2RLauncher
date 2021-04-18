@@ -1093,7 +1093,7 @@ namespace AM2RLauncher
         /// <param name="destDirName">Full Path to the Directory you want to copy to. If the Directory does not exist, it will be created.</param>
         /// <param name="overwriteFiles">Specify if Files should be overwritten or not</param>
         /// <param name="copySubDirs">Specify if you want to copy Sub-Directories as well.</param>
-        private static void DirectoryCopy(string sourceDirName, string destDirName, bool overwriteFiles = true, bool copySubDirs = true)
+        public static void DirectoryCopy(string sourceDirName, string destDirName, bool overwriteFiles = true, bool copySubDirs = true)
         {
             // Get the subdirectories for the specified directory.
             DirectoryInfo dir = new DirectoryInfo(sourceDirName);
