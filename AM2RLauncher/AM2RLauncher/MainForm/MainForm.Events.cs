@@ -591,8 +591,8 @@ namespace AM2RLauncher
         {
             if (IsProfileIndexValid())
             {
-                log.Info("User opened the save directory for profile " + profileList[profileIndex.Value].Name + ", which is " + profileList[profileIndex.Value].SaveLocation);
-                CrossPlatformOperations.OpenFolder(profileList[profileIndex.Value].SaveLocation);
+                log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+                CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
             }
         }
 
