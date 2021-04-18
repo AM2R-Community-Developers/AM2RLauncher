@@ -282,7 +282,14 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk)
             {
-                using (Process proc = Process.Start("xdelta3", arguments))
+                ProcessStartInfo parameters = new ProcessStartInfo
+                {
+                    FileName = "xdelta3",
+                    Arguments = arguments,
+                    WorkingDirectory = CURRENTPATH
+                };
+
+                using (Process proc = Process.Start(parameters))
                 {
                     proc.WaitForExit();
                 }
