@@ -132,9 +132,13 @@ namespace AM2RLauncher
 
                     foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                     {
-                        log.Info("Moving " + tmpUpdatePath + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
-                        File.Copy(tmpUpdatePath +  file.FullName, CrossPlatformOperations.CURRENTPATH + "/" + file.Name, true);
+                        log.Info("Moving " +  file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
+                        File.Copy(file.FullName, CrossPlatformOperations.CURRENTPATH + "/" + file.Name, true);
                     }
+                    // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
+                    if (currentPlatform.IsWinForms)
+                        MainForm.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
+                    
                     Directory.Delete(tmpUpdatePath, true);
 
                     CrossPlatformOperations.CopyOldConfigToNewConfig();
