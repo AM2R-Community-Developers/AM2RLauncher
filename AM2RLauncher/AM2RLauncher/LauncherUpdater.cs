@@ -93,7 +93,7 @@ namespace AM2RLauncher
 
                 if (isCurrentVersionOutdated)
                 {
-                    log.Info("Current version (" + VERSION + ") is outdated! Initiating update.");
+                    log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
                     string tmpUpdatePath = CrossPlatformOperations.CURRENTPATH + "/tmpupdate/";
                     string zipPath = CrossPlatformOperations.CURRENTPATH + "/launcher.zip";
@@ -120,16 +120,20 @@ namespace AM2RLauncher
                         return;
                     }
 
-                    Directory.CreateDirectory(tmpUpdatePath);
+                    if(!Directory.Exists(tmpUpdatePath))        // just in case it exists already
+                        Directory.CreateDirectory(tmpUpdatePath);
 
                     ZipFile.ExtractToDirectory(zipPath, tmpUpdatePath);
+                    log.Info("Updates successfully extracted to " + tmpUpdatePath);
+
                     File.Delete(zipPath);
-                    File.Move(CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
+                    File.Move(CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
                     if (currentPlatform.IsWinForms) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
 
                     foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                     {
-                        File.Copy(file.FullName, CrossPlatformOperations.CURRENTPATH + "/" + file.Name, true);
+                        log.Info("Moving " + tmpUpdatePath + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
+                        File.Copy(tmpUpdatePath +  file.FullName, CrossPlatformOperations.CURRENTPATH + "/" + file.Name, true);
                     }
                     Directory.Delete(tmpUpdatePath, true);
 
