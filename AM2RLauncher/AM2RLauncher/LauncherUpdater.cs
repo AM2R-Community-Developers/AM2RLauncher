@@ -87,9 +87,19 @@ namespace AM2RLauncher
 
                 Uri realUri = response.ResponseUri;
                 string onlineVersion = realUri.AbsoluteUri.Substring(realUri.AbsoluteUri.LastIndexOf('/') + 1);
-                string onlineVersionForCompare = onlineVersion.Replace(".", "");
+                bool isCurrentVersionOutdated = false;
 
-                bool isCurrentVersionOutdated = int.Parse(version) < int.Parse(onlineVersionForCompare);
+                string[] localVersionArray = VERSION.Split('.');
+                string[] onlineVersionArray = onlineVersion.Split('.');
+
+                for (int i = 0; i < localVersionArray.Length; i++)
+                {
+                    if (int.Parse(onlineVersionArray[i]) > int.Parse(localVersionArray[i]))
+                    {
+                        isCurrentVersionOutdated = true;
+                        break;
+                    }
+                }
 
                 if (isCurrentVersionOutdated)
                 {
