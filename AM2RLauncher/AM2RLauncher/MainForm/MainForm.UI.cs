@@ -536,6 +536,7 @@ namespace AM2RLauncher
                 "Español",
                 "Français",
                 "Italiano",
+                "Português",
                 "Русский",
                 "日本語"
             };
