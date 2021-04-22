@@ -239,6 +239,10 @@ namespace AM2RLauncher
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
             ClientSize = new Size(int.Parse(CrossPlatformOperations.ReadFromConfig("Width")), int.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
+            if (ClientSize.Width < 500)
+                ClientSize = new Size(500, ClientSize.Height);
+            if (ClientSize.Height < 400)
+                ClientSize = new Size(ClientSize.Width, 400);
             log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
             if (bool.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
