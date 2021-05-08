@@ -360,6 +360,9 @@ namespace AM2RLauncher
 
                     this.ShowInTaskbar = false;
                     trayIndicator.Visible = true;
+                    WindowState windowStateBeforeLaunching = this.WindowState;
+                    if (windowStateBeforeLaunching == WindowState.Maximized)
+                        this.WindowState = WindowState.Normal;
                     Minimize();
 
                     await Task.Run(() => RunGame());
@@ -368,6 +371,8 @@ namespace AM2RLauncher
                     trayIndicator.Visible = false;
                     Show();
                     BringToFront();
+                    if (windowStateBeforeLaunching == WindowState.Maximized)
+                        Maximize();
 
                     SetPlayButtonState(UpdateState.Play);
 
@@ -964,8 +969,8 @@ namespace AM2RLauncher
         {
             log.Info("Attempting to close MainForm!");
 
-            CrossPlatformOperations.WriteToConfig("Width", Size.Width);
-            CrossPlatformOperations.WriteToConfig("Height", Size.Height);
+            CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
+            CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
             CrossPlatformOperations.WriteToConfig("IsMaximized", (this.WindowState == WindowState.Maximized));
 
             if (updateState == UpdateState.Downloading)
