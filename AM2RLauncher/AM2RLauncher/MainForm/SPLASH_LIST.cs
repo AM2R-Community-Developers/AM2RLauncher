@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AM2RLauncher
 {
-    class SPLASH
+    class Splash
     {
         public static readonly string[] SPLASH_LIST =
         {

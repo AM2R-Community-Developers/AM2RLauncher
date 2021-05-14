@@ -163,7 +163,7 @@ namespace AM2RLauncher
             // Custom splash texts
             Random rng = new Random();
             // Some fanciness so we can have Gtk-only quips, because Gtk visuals are lame.
-            string splash = SPLASH.SPLASH_LIST[rng.Next(0, SPLASH.SPLASH_LIST.Length - (Platform.IsGtk ? 0 : 13))];
+            string splash = Splash.SPLASH_LIST[rng.Next(0, Splash.SPLASH_LIST.Length - (Platform.IsGtk ? 0 : 13))];
             log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps
