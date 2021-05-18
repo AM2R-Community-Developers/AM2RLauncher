@@ -217,6 +217,7 @@ namespace AM2RLauncher
             colInactive = Color.FromArgb(109, 109, 109);
             colBGNoAlpha = Color.FromArgb(10, 10, 10);
             colBG = Color.FromArgb(10, 10, 10, 80);
+            if (Platform.IsGtk) colBG = colBGNoAlpha;   // XORG can't display alpha anyway, and Wayland breaks with it.
             colBGHover = Color.FromArgb(17, 28, 13);
 
             Font smallButtonFont = new Font(SystemFont.Default, 10);
