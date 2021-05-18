@@ -119,9 +119,6 @@ namespace AM2RLauncher
                 Environment.Exit(0);
             }
 
-
-
-
             log.Info("Mutex check passed. Entering main thread.");
             log.Info("Current Launcher Version: " + VERSION);
             log.Info("Current Platform-ID is: " + Platform.ID);
@@ -161,9 +158,8 @@ namespace AM2RLauncher
             }
 
             // Custom splash texts
-            Random rng = new Random();
-            // Some fanciness so we can have Gtk-only quips, because Gtk visuals are lame.
-            string splash = Splash.SPLASH_LIST[rng.Next(0, Splash.SPLASH_LIST.Length - (Platform.IsGtk ? 0 : 13))];
+            var Splash = new Splash() ;
+            string splash = Splash.GetSplash();
             log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps

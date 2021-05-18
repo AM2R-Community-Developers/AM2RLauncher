@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Eto;
+using System;
 
 namespace AM2RLauncher
 {
     class Splash
     {
-        public static readonly string[] SPLASH_LIST =
+        // Splash strings
+        readonly string[] splashList =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -45,5 +45,13 @@ namespace AM2RLauncher
             "Was a mouse really that expensive, i3 users!?",
             "Imagine using non-free software."
         };
+
+        // Get random splash string
+        public string GetSplash()
+        {
+            Random rng = new Random();
+            string splashString = splashList[rng.Next(0, splashList.Length - (Platform.IsGtk ? 0 : 13))];
+            return splashString;
+        }
     }
 }
