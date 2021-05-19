@@ -193,7 +193,7 @@
     <value>DESCARGANDO</value>
   </data>
   <data name="DownloadSource" xml:space="preserve">
-    <value>Descargando fuente:</value>
+    <value>Fuente de descarga:</value>
   </data>
   <data name="ErrorWindowTitle" xml:space="preserve">
     <value>Error</value>
