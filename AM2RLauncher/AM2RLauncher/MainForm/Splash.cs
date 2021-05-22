@@ -1,12 +1,14 @@
 ﻿using Eto;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AM2RLauncher
 {
     class Splash
     {
-        // Splash strings
-        readonly string[] splashList =
+        // Cross-Platform splash strings
+        readonly string[] generalSplash =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -30,7 +32,11 @@ namespace AM2RLauncher
             "Reject C++, return to ABSTRACTION",
             "C# is just C++++ with Windows support.",
             "Use of the Launcher has now been authorized!",
-            // GTK splashes begin here
+        };
+
+        // Linux only splash strings
+        readonly string[] linuxSplash =
+        {
             "Sorry this is ugly, but at least it works.",
             "GTK + QT = 💣",
             "I hope you use Arch, btw",
@@ -46,11 +52,22 @@ namespace AM2RLauncher
             "Imagine using non-free software."
         };
 
-        // Get random splash string
+        /// <summary>
+        /// Get random splash string
+        /// Checks if platform is using GTK, and gets splash text accordingly
+        /// </summary>
+
         public string GetSplash()
         {
+            string[] combinedSplash;
             Random rng = new Random();
-            string splashString = splashList[rng.Next(0, splashList.Length - (Platform.IsGtk ? 0 : 13))];
+
+            if (Platform.Instance.IsGtk) 
+                combinedSplash = generalSplash.Concat(linuxSplash).ToArray();
+            else 
+                combinedSplash = generalSplash;
+
+            string splashString = combinedSplash[rng.Next(0, combinedSplash.Length)];
             return splashString;
         }
     }
