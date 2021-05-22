@@ -158,7 +158,6 @@ namespace AM2RLauncher
             }
 
             // Custom splash texts
-            var Splash = new Splash();
             string splash = Splash.GetSplash();
             log.Info("Randomly chosen splash: " + splash);
 

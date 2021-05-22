@@ -5,10 +5,15 @@ using System.Linq;
 
 namespace AM2RLauncher
 {
-    class Splash
+    /// <summary>
+    /// Class only for providing Splashes
+    /// </summary>
+    static class Splash
     {
-        // Cross-Platform splash strings
-        readonly string[] generalSplash =
+        /// <summary>
+        /// Cross-Platform splash strings
+        /// </summary>
+        static readonly string[] generalSplash =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -34,8 +39,10 @@ namespace AM2RLauncher
             "Use of the Launcher has now been authorized!",
         };
 
-        // Linux only splash strings
-        readonly string[] linuxSplash =
+        /// <summary>
+        /// Linux only splash strings
+        /// </summary>
+        static readonly string[] linuxSplash =
         {
             "Sorry this is ugly, but at least it works.",
             "GTK + QT = 💣",
@@ -53,11 +60,10 @@ namespace AM2RLauncher
         };
 
         /// <summary>
-        /// Get random splash string
-        /// Checks if platform is using GTK, and gets splash text accordingly
+        /// Get a random splash string, according to the current OS.
         /// </summary>
-
-        public string GetSplash()
+        /// <returns>The randomly chosen splash as a <see cref="string"/>.</returns>
+        static public string GetSplash()
         {
             string[] combinedSplash;
             Random rng = new Random();
