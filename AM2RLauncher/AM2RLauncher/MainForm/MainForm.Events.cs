@@ -204,7 +204,7 @@ namespace AM2RLauncher
                         }
                         else
                         {
-                            log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
+                            log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                             MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
                                 DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
