@@ -19,7 +19,7 @@ namespace AM2RLauncher
     public class LauncherUpdater
     {
         /// <summary>The Version that identifies this current release.</summary>
-        static readonly public string VERSION = "2.0.1";
+        static readonly public string VERSION = "2.1.0";
 
         /// <summary>The current Running platform.</summary>
         static readonly private Platform currentPlatform = Platform.Instance;   //needs to be declared here as well, because I can't access the one from eto
