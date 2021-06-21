@@ -401,8 +401,9 @@ namespace AM2RLauncher
             UpdateProgressBar(100);
             log.Info("Successfully installed profile " + profile.Name + ".");
 
-            // This is just for visuals because the average end user will ask why it doesn't go to the end otherwise.
-            Thread.Sleep(1000);
+            // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
+            if(Platform.IsWinForms)
+                Thread.Sleep(1000);
         }
 
         /// <summary>
