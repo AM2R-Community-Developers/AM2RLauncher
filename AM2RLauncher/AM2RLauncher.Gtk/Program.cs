@@ -22,8 +22,19 @@ namespace AM2RLauncher.Gtk
         [STAThread]
         public static void Main(string[] args)
         {
+
+            string localAM2RPath = Environment.GetEnvironmentVariable("HOME") + "/.local/share/AM2RLauncher";
+
+            // Make sure first, ~/.local/share exists
+            if (!Directory.Exists(localAM2RPath))
+                Directory.CreateDirectory(localAM2RPath);
+
+            // Now, see if log4netConfig exists, if not write it again.
+            if (!File.Exists(localAM2RPath + "/log4net.config"))
+                File.WriteAllText(localAM2RPath + "/log4net.config", Properties.Resources.log4netContents);
+
             // Configure logger
-            XmlConfigurator.Configure(new FileInfo(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) + "/log4net.config"));
+            XmlConfigurator.Configure(new FileInfo(localAM2RPath + "/log4net.config"));
 
             try
             {

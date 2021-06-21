@@ -303,6 +303,8 @@ namespace AM2RLauncher
                 exe = "AM2R";
             }
 
+            log.Info("Attempting to patch in " + profilePath);
+
             if (Platform.IsWinForms)
             {
                 // Patch game executable

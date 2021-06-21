@@ -22,9 +22,9 @@ namespace AM2RLauncher
         readonly private static Platform currentPlatform = Platform.Instance;
 
         /// <summary>
-        /// Current Path where the Launcher is located.
+        /// Current Path where the Launcher is located. For Linux this is redirected to ~/.local/share/AM2RLauncher, in order to be more compliant to the XDG Base Directory Specification.
         /// </summary>
-        static readonly public string CURRENTPATH = currentPlatform.IsWinForms ? Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+        static readonly public string CURRENTPATH = currentPlatform.IsWinForms ? Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) : Environment.GetEnvironmentVariable("HOME") + "/.local/share/AM2RLauncher";
 
         /// <summary>
         /// Name of the Launcher executable.
