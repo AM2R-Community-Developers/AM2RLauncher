@@ -95,7 +95,7 @@ namespace AM2RLauncher
                     return null;  
 
                 //this uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
-                return launcherConfig[property] != null ? launcherConfig[property].ToString() : null;
+                return launcherConfig[property]?.ToString();
             }
             return null;
         }
@@ -192,16 +192,21 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Opens <paramref name="path"/> in a file explorer.
+        /// Opens <paramref name="path"/> in a file explorer. Creates the directory if it doesn't exist.
         /// </summary>
         /// <param name="path">Path to open.</param>
         public static void OpenFolder(string path)
         {
-            if (currentPlatform.IsWinForms) // We have to replace forward slashes with backslashes here because explorer.exe is picky...
+            // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
+            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\") : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+            if (!Directory.Exists(realPath))
+                Directory.CreateDirectory(realPath);
+
+            if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
-                Process.Start("explorer.exe", Environment.ExpandEnvironmentVariables(path).Replace("/", "\\"));
+                Process.Start("explorer.exe", realPath);
             else if (currentPlatform.IsGtk)
-                Process.Start("xdg-open", path.Replace("~", Environment.GetEnvironmentVariable("HOME")));
+                Process.Start("xdg-open", realPath);
         }
 
         /// <summary>
