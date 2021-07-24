@@ -10,7 +10,6 @@ Linux needs the following dependencies installed:
 
 - [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0)
 - `xdelta3` 
-- `libappindicator3` 
 - `gtk3`
 - `libappindicator3`
 - `webkitgtk`
