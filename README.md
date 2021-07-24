@@ -6,7 +6,17 @@ A front-end application that simplifies installing the latest AM2R-Community-Upd
 
 ## Dependencies
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
-Linux needs the [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0), `xdelta3` and `libappindicator3` installed. Refer to your local package manager for Instructions.  
+Linux needs the following dependencies installed:
+
+- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0)
+- `xdelta3` 
+- `libappindicator3` 
+- `gtk3`
+- `libappindicator3`
+- `webkitgtk`
+- `openssl`
+- `fuse2`
+Refer to your local package manager for Instructions.  
 Optionally, for APK creation any Java runtime is needed. 
 
 ## Downloads
