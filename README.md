@@ -16,6 +16,7 @@ Linux needs the following dependencies installed:
 - `webkitgtk`
 - `openssl`
 - `fuse2`
+
 Refer to your local package manager for Instructions.  
 Optionally, for APK creation any Java runtime is needed. 
 
