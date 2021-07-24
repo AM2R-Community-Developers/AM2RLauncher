@@ -543,16 +543,12 @@ namespace AM2RLauncher
             };
 
             // create game debug logs
-            profileDebugLogCheck = null;
-            if (Platform.IsWinForms)
+            profileDebugLogCheck = new CheckBox
             {
-                profileDebugLogCheck = new CheckBox
-                {
-                    Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
-                    Text = Language.Text.ProfileDebugCheckBox,
-                    TextColor = colGreen
-                };
-            }
+                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
+                Text = Language.Text.ProfileDebugCheckBox,
+                TextColor = colGreen
+            };
 
             // custom environment variables label
             customEnvVarLabel = new Label();

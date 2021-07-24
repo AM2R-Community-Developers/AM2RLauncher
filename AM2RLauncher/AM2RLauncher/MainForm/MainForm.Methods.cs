@@ -608,30 +608,30 @@ namespace AM2RLauncher
             {
                 ProfileXML profile = profileList[profileIndex.Value];
 
+                // These are used on both windows and linux for game logging
+                string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA")) : profile.SaveLocation.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+                DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
+                string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+
                 log.Info("Launching game profile " + profile.Name + ".");
 
                 if (Platform.IsWinForms)
                 {
                     // sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
                     string arguments = "";
-                    string savePath = profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"));
-                    string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 
                     // Game logging
                     if ((bool)profileDebugLogCheck.Checked)
                     {
                         log.Info("Performing logging setup for profile " + profile.Name + ".");
 
-                        if (!Directory.Exists(savePath + "/logs/"))
-                            Directory.CreateDirectory(savePath + "/logs");
+                        if (!Directory.Exists(logDir.FullName))
+                            Directory.CreateDirectory(logDir.FullName);
 
-                        DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
+                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                            RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
 
-
-                        if (File.Exists(savePath + "/logs/" + profile.Name + ".txt"))
-                            RecursiveRollover(savePath + "/logs/" + profile.Name + ".txt", 5);
-
-                        StreamWriter stream = File.AppendText(savePath + "/logs/" + profile.Name + ".txt");
+                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
                         stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
 
@@ -639,7 +639,7 @@ namespace AM2RLauncher
 
                         stream.Close();
 
-                        arguments = "-debugoutput \"" + savePath + "/logs/" + profile.Name + ".txt\" -output \"" + savePath + "/logs/" + profile.Name + ".txt\"";
+                        arguments = "-debugoutput \"" + logDir.FullName + "/" + profile.Name + ".txt\" -output \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
                     }
 
                     ProcessStartInfo proc = new ProcessStartInfo();
@@ -699,6 +699,9 @@ namespace AM2RLauncher
                         }
                     }
 
+                    // IF we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
+                    string terminalOutput = null;
+
                     startInfo.UseShellExecute = false;
                     startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
                     startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
@@ -711,10 +714,49 @@ namespace AM2RLauncher
                         log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
                     }
 
-                    using (var p = Process.Start(startInfo))
+                    using (Process p = new Process())
                     {
+                        p.StartInfo = startInfo;
+                        if ((bool)profileDebugLogCheck.Checked)
+                        {
+                            p.StartInfo.RedirectStandardOutput = true;
+                            p.OutputDataReceived += new DataReceivedEventHandler((sender, e) => { terminalOutput += e.Data + "\n"; });
+
+                            p.StartInfo.RedirectStandardError = true;
+                            p.ErrorDataReceived += new DataReceivedEventHandler((sender, e) => { terminalOutput += e.Data + "\n"; });
+                        }
+
+                        p.Start();
+
+                        p.BeginOutputReadLine();
+                        p.BeginErrorReadLine();
+
                         p.WaitForExit();
                     }
+
+                    if (terminalOutput != null)
+                    {
+                        log.Info("Performed logging setup for profile " + profile.Name + ".");
+
+                        if (!Directory.Exists(logDir.FullName))
+                            Directory.CreateDirectory(logDir.FullName);
+
+                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                            RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+
+                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
+
+                        // write general info
+                        stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
+
+                        //write what was in the terminal
+                        stream.WriteLine(terminalOutput);
+
+                        stream.Flush();
+
+                        stream.Close();
+                    }
+
                 }
 
                 log.Info("Profile " + profile.Name + " process exited.");
