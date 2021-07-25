@@ -215,40 +215,79 @@ namespace AM2RLauncher
         /// <returns><see langword="true"/> if it is installed, <see langword="false"/> if not.</returns>
         public static bool IsJavaInstalled()
         {
+            string process = null;
+            string arguments = null;
+
             if (currentPlatform.IsWinForms)
             {
-                string process = "cmd.exe",
-                       arguments = "/C java -version";
-                ProcessStartInfo javaStart = new ProcessStartInfo();
-                javaStart.FileName = process;
-                javaStart.Arguments = arguments;
-                javaStart.UseShellExecute = false;
-                javaStart.CreateNoWindow = true;
-
-
-                Process java = new Process();
-
-                java.StartInfo = javaStart;
-
-                //this is primarily for linux, but could be happening on windows as well
-                try
-                {
-                    java.Start();
-
-                    java.WaitForExit();
-                }
-                catch (System.ComponentModel.Win32Exception)
-                {
-                    return false;
-                }
-
-                return java.ExitCode == 0;
+                process = "cmd.exe";
+                arguments = "/C java -version";
             }
             else if (currentPlatform.IsGtk)
             {
-                return true;            // sorry linux users, either Eto, .net or GTK is dumb.
+                process = "java";
+                arguments = "-version";
             }
-            return false;
+
+            ProcessStartInfo javaStart = new ProcessStartInfo();
+            javaStart.FileName = process;
+            javaStart.Arguments = arguments;
+            javaStart.UseShellExecute = false;
+            javaStart.CreateNoWindow = true;
+
+
+            Process java = new Process();
+
+            java.StartInfo = javaStart;
+
+            //this is primarily for linux, but could be happening on windows as well
+            try
+            {
+                java.Start();
+
+                java.WaitForExit();
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                return false;
+            }
+
+            return java.ExitCode == 0;
+            
+        }
+
+        /// <summary>
+        /// Checks if command-line xdelta is installed on non-Windows systems.
+        /// </summary>
+        /// <returns><see langword="true"/> if it is installed, <see langword="false"/> if not.</returns>
+        public static bool CheckIfXdeltaIsInstalled()
+        {
+            string process = "xdelta3";
+            string arguments = "-V";      
+
+            ProcessStartInfo xdeltaStart = new ProcessStartInfo();
+            xdeltaStart.FileName = process;
+            xdeltaStart.Arguments = arguments;
+            xdeltaStart.UseShellExecute = false;
+            xdeltaStart.CreateNoWindow = true;
+
+
+            Process xdelta = new Process();
+
+            xdelta.StartInfo = xdeltaStart;
+
+            try
+            {
+                xdelta.Start();
+
+                xdelta.WaitForExit();
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                return false;
+            }
+
+            return xdelta.ExitCode == 0;
         }
 
         /// <summary>

@@ -251,6 +251,19 @@ namespace AM2RLauncher
         {
             log.Info("Installing profile " + profile.Name + "...");
 
+            // check if xdelta is installed on linux, by searching all folders in PATH
+            if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            {
+                Application.Instance.Invoke(new Action(() =>
+                {
+                    MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                }));
+                SetPlayButtonState(UpdateState.Install);
+                UpdateStateMachine();
+                log.Error("Xdelta not found. Aborting installing a profile...");
+                return;
+            }
+
             string profilesHomePath = CrossPlatformOperations.CURRENTPATH + "/Profiles";
             string profilePath = profilesHomePath + "/" + profile.Name;
 
@@ -420,11 +433,30 @@ namespace AM2RLauncher
                 // Check for java, exit safely with a warning if not found!
                 if (!CrossPlatformOperations.IsJavaInstalled())
                 {
-                    MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                    //message box show needs to be done on main thread
+                    Application.Instance.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                    }));
                     SetApkButtonState(ApkButtonState.Create);
                     UpdateStateMachine();
                     log.Error("Java not found! Aborting Android APK creation.");
                     return;
+                }
+
+                // check if xdelta is installed on linux, by searching all folders in PATH
+                if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+                {   
+                    //message box show needs to be done on main thread
+                    Application.Instance.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                    }));
+                    SetApkButtonState(ApkButtonState.Create);
+                    UpdateStateMachine();
+                    log.Error("Xdelta not found. Aborting Android APK creation...");
+                    return;
+
                 }
 
                 log.Debug("java installed!");
