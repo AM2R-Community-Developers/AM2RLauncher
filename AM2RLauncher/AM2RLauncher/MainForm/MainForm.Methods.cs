@@ -1107,13 +1107,13 @@ namespace AM2RLauncher
         /// Checks if a Zip file is a valid AM2R_1.1 zip.
         /// </summary>
         /// <param name="zipPath">Full Path to the Zip file to check.</param>
-        /// <returns><see langword="true"/> if the Zip file is a valid AM2R_1.1 zip, <see langword="false"/> if not. </returns>
-        private bool CheckIfZipIsAM2R11(string zipPath)
+        /// <returns><see langword="0"/> if the zip file is a valid AM2R_1.1 zip <br></br>
+        /// <see langword="-1"/> if the zip does not contain AM2R.exe <br></br>
+        /// <see langword="-2"/> if the zip does not contain a valid D3D dll <br></br>
+        /// <see langword="-3"/> if the zip does not contain a valid data.win file</returns>
+        private IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
         {
-            bool doesExeExist = false;
-            bool isD3dDllCorrect = false;
             const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
-            bool isDataWinCorrect = false;
             const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
 
             string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
@@ -1122,34 +1122,35 @@ namespace AM2RLauncher
             ZipFile.ExtractToDirectory(zipPath, tmpPath);
 
             // check if exe exists
-            if (File.Exists(tmpPath + "/AM2R.exe"))
-                doesExeExist = true;
+            if (!File.Exists(tmpPath + "/AM2R.exe"))
+                return IsZipAM2R11ReturnCodes.MissingAM2RExe;
 
             // check if d3d.dll exists, then check the hash of d3d.dll
-            if (File.Exists(tmpPath + "/D3DX9_43.dll") && CalculateMD5(tmpPath + "/D3DX9_43.dll") == d3dHash)
-                isD3dDllCorrect = true;
+            if (CalculateMD5(tmpPath + "/D3DX9_43.dll") != d3dHash)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
 
             // check if data.win exists and check its hash
-            if (File.Exists(tmpPath + "/data.win") && CalculateMD5(tmpPath + "/data.win") == dataWinHash)
-                isDataWinCorrect = true;
+            if (CalculateMD5(tmpPath + "/data.win") != dataWinHash)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
 
             // clean up
             Directory.Delete(tmpPath, true);
 
-            // if everything is true, return true
-            if (doesExeExist && isD3dDllCorrect && isDataWinCorrect)
-                return true;
-
-            return false;
+            // if we didn't exist before, everything is fine
+            return IsZipAM2R11ReturnCodes.Successful;
         }
 
         /// <summary>
         /// Calculates an MD5 hash from a given file.
         /// </summary>
         /// <param name="filename">Full Path to the file whose MD5 hash is supposed to be calculated.</param>
-        /// <returns>The MD5 hash as a <see cref="string"/>.</returns>
+        /// <returns>The MD5 hash as a <see cref="string"/>, empty string if file does not exist.</returns>
         private string CalculateMD5(string filename)
         {
+            // Check if File exists first
+            if (!File.Exists(filename))
+                return "";
+
             using (var stream = File.OpenRead(filename))
             {
                 using (var md5 = MD5.Create())

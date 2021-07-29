@@ -282,11 +282,11 @@ namespace AM2RLauncher
                     {
                         if (Directory.Exists(fileFinder.FileName)) return; // this can happen on linux, and maybe windows as well
 
-
-                        if(!CheckIfZipIsAM2R11(fileFinder.FileName))
+                        IsZipAM2R11ReturnCodes errorCode = CheckIfZipIsAM2R11(fileFinder.FileName);
+                        if (errorCode != IsZipAM2R11ReturnCodes.Successful)
                         {
-                            log.Error("User tried to input invalid AM2R_11.zip file. Cancelling import.");
-                            MessageBox.Show(Language.Text.ZipIsNotAM2R11, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                            log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
+                            MessageBox.Show(Language.Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                             return;
                         }
 

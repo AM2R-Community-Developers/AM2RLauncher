@@ -48,6 +48,17 @@ namespace AM2RLauncher
             Creating
         }
 
+        /// <summary>
+        /// An enum, that has possible return codes for <see cref="CheckIfZipIsAM2R11(string)"./>
+        /// </summary>
+        enum IsZipAM2R11ReturnCodes
+        {
+            Successful,
+            MissingAM2RExe,
+            MissingOrInvalidD3DX9_43Dll,
+            MissingOrInvalidDataWin
+        }
+
         // Splashes
         /// <summary>
         /// A <see cref="string"/>-<see cref="Array"/> of custom splashes.
