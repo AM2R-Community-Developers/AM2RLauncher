@@ -1144,7 +1144,7 @@ namespace AM2RLauncher
             // clean up
             Directory.Delete(tmpPath, true);
 
-            // if we didn't exist before, everything is fine
+            // if we didn't exit before, everything is fine
             return IsZipAM2R11ReturnCodes.Successful;
         }
 
