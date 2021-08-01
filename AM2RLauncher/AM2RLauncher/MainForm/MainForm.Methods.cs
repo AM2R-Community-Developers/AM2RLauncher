@@ -1118,8 +1118,16 @@ namespace AM2RLauncher
 
             string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
 
+            // clean up in case folder exists already
+            if (Directory.Exists(tmpPath))
+                Directory.Delete(tmpPath, true);
+
             //extract zip to tmp path first
             ZipFile.ExtractToDirectory(zipPath, tmpPath);
+
+            // If the game is packed into a subfolder, throw error for that
+            if (Directory.GetDirectories(tmpPath).Length == 1 && new DirectoryInfo(Directory.GetDirectories(tmpPath).First()).Name != "lang")
+                return IsZipAM2R11ReturnCodes.GameIsInASubfolder;
 
             // check if exe exists
             if (!File.Exists(tmpPath + "/AM2R.exe"))

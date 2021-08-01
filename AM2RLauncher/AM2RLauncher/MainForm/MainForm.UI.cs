@@ -56,7 +56,8 @@ namespace AM2RLauncher
             Successful,
             MissingAM2RExe,
             MissingOrInvalidD3DX9_43Dll,
-            MissingOrInvalidDataWin
+            MissingOrInvalidDataWin,
+            GameIsInASubfolder
         }
 
         // Splashes
