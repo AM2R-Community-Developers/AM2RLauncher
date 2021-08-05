@@ -30,12 +30,20 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Checks if AM2R 1.1 has been installed already, aka if the AM2R 1.1 Zip exists.
+        /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
         /// </summary>
         /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
         private bool Is11Installed()
         {
-            return File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+            var returnCode = CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+            // Check if it's valid, if not log it, rename it and silently leave
+            if (returnCode != IsZipAM2R11ReturnCodes.Successful)
+            {
+                log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
+                RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -799,8 +807,8 @@ namespace AM2RLauncher
         /// Performs recursive rollover on a set of log files.
         /// </summary>
         /// <param name="logFile">The log file to begin the rollover from.</param>
-        /// <param name="max">The maximum amount of log files to retain.</param>
-        private void RecursiveRollover(string logFile, int max)
+        /// <param name="max">The maximum amount of log files to retain. Default is int.MaxValue, in other words, never delete files.</param>
+        private void RecursiveRollover(string logFile, int max = int.MaxValue)
         {
             int index = 1;
             char endChar = logFile[logFile.Length - 1];
