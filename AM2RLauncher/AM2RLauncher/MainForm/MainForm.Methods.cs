@@ -12,9 +12,9 @@ using System.Linq;
 using Eto.Drawing;
 using System.Xml.Serialization;
 using AM2RLauncher.XML;
-using System.Security.Cryptography;
 using System.Net.NetworkInformation;
 using System.Net;
+using AM2RLauncher.Helpers;
 
 namespace AM2RLauncher
 {
@@ -40,7 +40,7 @@ namespace AM2RLauncher
             if (returnCode != IsZipAM2R11ReturnCodes.Successful)
             {
                 log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
-                RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+                HelperMethods.RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
                 return false;
             }
             return true;
@@ -68,28 +68,6 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Checks if we currently have an internet connection, by pinging the am2r website.
-        /// </summary>
-        /// <returns></returns>
-        private static bool IsConnectedToInternet()
-        {
-            log.Info("Checking internet connection...");
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
-            HttpWebResponse response = null;
-            try
-            {
-                response = (HttpWebResponse)request.GetResponse();
-            }
-            catch (WebException)
-            {
-                log.Info("Internet connection failed.");
-                return false;
-            }
-            log.Info("Internet connection established!");
-            return true;
-        }
-
-        /// <summary>
         /// Git Pulls from the repository.
         /// </summary>
         private void PullPatchData()
@@ -104,7 +82,7 @@ namespace AM2RLauncher
                         {
                             // Directory exists, but seems corrupted, we delete it and prompt the user to download it again.
                             MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                            DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                             throw new UserCancelledException();
                         }
 
@@ -143,7 +121,7 @@ namespace AM2RLauncher
             // Delete folder in Mods
             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
             {
-                DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
+                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
             }
 
             // Delete the zip file in Mods
@@ -156,7 +134,7 @@ namespace AM2RLauncher
             // Delete folder in Profiles
             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
             {
-                DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
             }
 
             if (reloadProfileList)
@@ -362,11 +340,11 @@ namespace AM2RLauncher
             log.Info("xdelta patch(es) applied.");
 
             // Install new datafiles
-            DirectoryCopy(dataPath + "/files_to_copy", profilePath);
+            HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", profilePath);
 
             // HQ music
             if (!profile.UsesCustomMusic && (bool)hqMusicPCCheck.Checked)
-                DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", profilePath);
+                HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", profilePath);
             
 
             // Linux post-process
@@ -381,14 +359,14 @@ namespace AM2RLauncher
                         File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
 
                 //Copy AppImage template to here
-                DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
+                HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
 
                 // safety checks, in case the folders don't exist
                 Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/");
                 Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/assets/");
 
                 // copy game assets to the appimageDir
-                DirectoryCopy(assetsPath, profilePath + "/AM2R.AppDir/usr/bin/assets/");
+                HelperMethods.DirectoryCopy(assetsPath, profilePath + "/AM2R.AppDir/usr/bin/assets/");
                 File.Copy(profilePath + "/" + exe, profilePath + "/AM2R.AppDir/usr/bin/" + exe);
 
                 UpdateProgressBar(66);
@@ -531,11 +509,11 @@ namespace AM2RLauncher
                 ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", workingDir);
 
                 // New datafiles
-                DirectoryCopy(dataPath + "/files_to_copy", workingDir);
+                HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", workingDir);
 
                 // HQ music
                 if (hqMusicAndroidCheck.Checked == true)
-                    DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
+                    HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
 
                 // Add AM2R.ini
                 // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
@@ -631,7 +609,7 @@ namespace AM2RLauncher
                 UpdateProgressBar(100);
                 log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
 
-                DeleteDirectory(tempDir);
+                HelperMethods.DeleteDirectory(tempDir);
 
                 CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH);
 
@@ -669,7 +647,7 @@ namespace AM2RLauncher
                             Directory.CreateDirectory(logDir.FullName);
 
                         if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
-                            RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
 
                         StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
@@ -782,7 +760,7 @@ namespace AM2RLauncher
                             Directory.CreateDirectory(logDir.FullName);
 
                         if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
-                            RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
 
                         StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
@@ -801,41 +779,6 @@ namespace AM2RLauncher
 
                 log.Info("Profile " + profile.Name + " process exited.");
             }
-        }
-
-        /// <summary>
-        /// Performs recursive rollover on a set of log files.
-        /// </summary>
-        /// <param name="logFile">The log file to begin the rollover from.</param>
-        /// <param name="max">The maximum amount of log files to retain. Default is int.MaxValue, in other words, never delete files.</param>
-        private void RecursiveRollover(string logFile, int max = int.MaxValue)
-        {
-            int index = 1;
-            char endChar = logFile[logFile.Length - 1];
-            string fileName;
-
-            // If not the original file, set the new index and get the new fileName.
-            if (endChar != 't')
-            {
-                index = int.Parse(endChar.ToString()) + 1;
-                fileName = logFile.Remove(logFile.Length - 1) + index;
-            }
-            else // Otherwise, if the original file, just set fileName to log.txt.1.
-                fileName = logFile + ".1";
-
-            // If new name already exists, run the rollover algorithm on it!
-            if (File.Exists(fileName))
-            {
-                RecursiveRollover(fileName, max);
-            }
-
-            // If index is less than max, rename file.
-            if (index < max)
-            {
-                File.Move(logFile, fileName);
-            }
-            else // Otherwise, delete the file.
-                File.Delete(logFile);
         }
 
         /// <summary>
@@ -1142,11 +1085,11 @@ namespace AM2RLauncher
                 return IsZipAM2R11ReturnCodes.MissingAM2RExe;
 
             // check if d3d.dll exists, then check the hash of d3d.dll
-            if (CalculateMD5(tmpPath + "/D3DX9_43.dll") != d3dHash)
+            if (HelperMethods.CalculateMD5(tmpPath + "/D3DX9_43.dll") != d3dHash)
                 return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
 
             // check if data.win exists and check its hash
-            if (CalculateMD5(tmpPath + "/data.win") != dataWinHash)
+            if (HelperMethods.CalculateMD5(tmpPath + "/data.win") != dataWinHash)
                 return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
 
             // clean up
@@ -1156,99 +1099,27 @@ namespace AM2RLauncher
             return IsZipAM2R11ReturnCodes.Successful;
         }
 
-        /// <summary>
-        /// Calculates an MD5 hash from a given file.
-        /// </summary>
-        /// <param name="filename">Full Path to the file whose MD5 hash is supposed to be calculated.</param>
-        /// <returns>The MD5 hash as a <see cref="string"/>, empty string if file does not exist.</returns>
-        private string CalculateMD5(string filename)
-        {
-            // Check if File exists first
-            if (!File.Exists(filename))
-                return "";
-
-            using (var stream = File.OpenRead(filename))
-            {
-                using (var md5 = MD5.Create())
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
-        }
-
-
-        // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-        // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
-        /// <summary>
-        /// This copies the contents of a specified Directory recursively to another Directory.
-        /// </summary>
-        /// <param name="sourceDirName">Full Path to the Directory that will be recursively copied.</param>
-        /// <param name="destDirName">Full Path to the Directory you want to copy to. If the Directory does not exist, it will be created.</param>
-        /// <param name="overwriteFiles">Specify if Files should be overwritten or not</param>
-        /// <param name="copySubDirs">Specify if you want to copy Sub-Directories as well.</param>
-        public static void DirectoryCopy(string sourceDirName, string destDirName, bool overwriteFiles = true, bool copySubDirs = true)
-        {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    "Source directory does not exist or could not be found: "
-                    + sourceDirName);
-            }
-
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            // If the destination directory doesn't exist, create it.       
-            Directory.CreateDirectory(destDirName);
-
-            // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string tempPath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(tempPath, overwriteFiles);
-            }
-
-            // If copying subdirectories, copy them and their contents to new location.
-            if (copySubDirs)
-            {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string tempPath = Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, tempPath, overwriteFiles, copySubDirs);
-                }
-            }
-        }
-
 
         /// <summary>
-        /// This is a custom method, that deletes a Directory. The reason this is used, instead of <see cref="Directory.Delete(string)"/>,
-        /// is because this one sets the attributes of all files to be deletable, while <see cref="Directory.Delete(string)"/> does not do that on it's own.
-        /// It's needed, because sometimes there are read-only files being generated, that would normally need more code in order to reset the attributes.<br/>
-        /// Note, that this method acts recursively.
+        /// Checks if we currently have an internet connection, by pinging github.
         /// </summary>
-        /// <param name="targetDir">The directory to delete.</param>
-        private void DeleteDirectory(string targetDir)
+        /// <returns></returns>
+        private static bool IsConnectedToInternet()
         {
-            if (!Directory.Exists(targetDir)) return;
-
-            File.SetAttributes(targetDir, FileAttributes.Normal);
-
-            foreach (string file in Directory.GetFiles(targetDir))
+            log.Info("Checking internet connection...");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
+            HttpWebResponse response = null;
+            try
             {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
+                response = (HttpWebResponse)request.GetResponse();
             }
-
-            foreach (string dir in Directory.GetDirectories(targetDir))
+            catch (WebException)
             {
-                DeleteDirectory(dir);
+                log.Info("Internet connection failed.");
+                return false;
             }
-
-            Directory.Delete(targetDir, false);
+            log.Info("Internet connection established!");
+            return true;
         }
     }
 }

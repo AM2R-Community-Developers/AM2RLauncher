@@ -10,6 +10,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using log4net;
+using AM2RLauncher.Helpers;
 
 namespace AM2RLauncher
 {
@@ -147,7 +148,7 @@ namespace AM2RLauncher
                     }
                     // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms)
-                        MainForm.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
+                        HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
                     
                     Directory.Delete(tmpUpdatePath, true);
 

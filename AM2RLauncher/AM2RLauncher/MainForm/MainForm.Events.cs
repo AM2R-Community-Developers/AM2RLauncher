@@ -20,6 +20,7 @@ using System.Net;
 using System.IO.Compression;
 
 using AM2RLauncher.XML;
+using AM2RLauncher.Helpers;
 
 namespace AM2RLauncher
 {
@@ -62,7 +63,7 @@ namespace AM2RLauncher
                     {
                         log.Error("Druid PatchData corruption occurred!");
                         MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                        DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                        HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         return;
                     }
                 }
@@ -128,7 +129,7 @@ namespace AM2RLauncher
                             }
                             else
                             {
-                                DeleteDirectory(profileArchivePath);
+                                HelperMethods.DeleteDirectory(profileArchivePath);
                                 log.Info("Cancelling archival! User-defined archive in Mods already exists.");
                             }
 
@@ -136,7 +137,7 @@ namespace AM2RLauncher
                         }
                         else // If our desired rename already exists, it's probably a user archive... so we just delete the folder and move on with installation of the new version.
                         {
-                            DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
+                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
                             log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
                         }
 
@@ -185,7 +186,7 @@ namespace AM2RLauncher
                     try
                     {
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
-                            DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
 
                         await Task.Run(() => Repository.Clone(currentMirror, CrossPlatformOperations.CURRENTPATH + "/PatchData", c));
                     }
@@ -207,7 +208,7 @@ namespace AM2RLauncher
                             log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                             MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
-                                DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         }
                         successful = false;
                     }
@@ -217,7 +218,7 @@ namespace AM2RLauncher
                         MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
 
                         if(Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
-                            DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         successful = false;
                     }
 
@@ -558,7 +559,7 @@ namespace AM2RLauncher
                     log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
 
                     MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME",profile.Name).Replace("$OS",profile.OperatingSystem).Replace("$CURRENTOS",currentOS), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    DeleteDirectory(modsDir + "/" + extractedName);
+                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     return;
                 }
 
@@ -567,7 +568,7 @@ namespace AM2RLauncher
                 {
                     log.Error(profile.Name + " is already installed.");
                     MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
-                    DeleteDirectory(modsDir + "/" + extractedName);
+                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     return;
                 }
 
@@ -944,7 +945,7 @@ namespace AM2RLauncher
                 if (abort)
                 {
                     // file cleanup
-                    DeleteDirectory(modsDir + "/" + extractedName);
+                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     LoadProfiles();
                     return;
                 }
