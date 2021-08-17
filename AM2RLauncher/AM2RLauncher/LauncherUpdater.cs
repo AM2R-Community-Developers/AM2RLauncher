@@ -20,7 +20,7 @@ namespace AM2RLauncher
     public class LauncherUpdater
     {
         /// <summary>The Version that identifies this current release.</summary>
-        static readonly public string VERSION = "2.1.0";
+        static readonly public string VERSION = "2.1.1";
 
         /// <summary>The current Running platform.</summary>
         static readonly private Platform currentPlatform = Platform.Instance;   //needs to be declared here as well, because I can't access the one from eto
@@ -136,10 +136,7 @@ namespace AM2RLauncher
                         return;
                     }
 
-                    if (Directory.Exists(tmpUpdatePath))        //auto-updating issue fixes
-                        Directory.Delete(tmpUpdatePath);
-
-                    if (!Directory.Exists(tmpUpdatePath))        // just in case it exists already
+                    if(!Directory.Exists(tmpUpdatePath))        // just in case it exists already
                         Directory.CreateDirectory(tmpUpdatePath);
 
                     ZipFile.ExtractToDirectory(zipPath, tmpUpdatePath);
