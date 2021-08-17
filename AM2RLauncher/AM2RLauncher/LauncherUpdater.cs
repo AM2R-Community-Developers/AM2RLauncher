@@ -57,6 +57,11 @@ namespace AM2RLauncher
                 log.Info(CrossPlatformOperations.LAUNCHERNAME + ".oldCfg detected. Removing file.");
                 File.Delete(oldConfigPath);
             }
+            if (currentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/oldLib"))
+            {
+                log.Info("Old lib folder detected, removing folder.");
+                Directory.Delete(CrossPlatformOperations.CURRENTPATH + "/oldLib", true);
+            }
 
             //check settings if autoUpdate is set to true
             bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdate"));
@@ -148,7 +153,10 @@ namespace AM2RLauncher
                     }
                     // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms)
+                    {
+                        Directory.Move(CrossPlatformOperations.CURRENTPATH + "/lib", CrossPlatformOperations.CURRENTPATH + "/oldLib");
                         HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
+                    }
                     
                     Directory.Delete(tmpUpdatePath, true);
 
