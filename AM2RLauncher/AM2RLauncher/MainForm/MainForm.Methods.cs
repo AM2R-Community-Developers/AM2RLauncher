@@ -35,6 +35,8 @@ namespace AM2RLauncher
         /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
         private bool Is11Installed()
         {
+            // return safely if file doesn't exist
+            if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")) return false;
             var returnCode = CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
             // Check if it's valid, if not log it, rename it and silently leave
             if (returnCode != IsZipAM2R11ReturnCodes.Successful)
@@ -1058,10 +1060,7 @@ namespace AM2RLauncher
         /// Checks if a Zip file is a valid AM2R_1.1 zip.
         /// </summary>
         /// <param name="zipPath">Full Path to the Zip file to check.</param>
-        /// <returns><see langword="0"/> if the zip file is a valid AM2R_1.1 zip <br></br>
-        /// <see langword="-1"/> if the zip does not contain AM2R.exe <br></br>
-        /// <see langword="-2"/> if the zip does not contain a valid D3D dll <br></br>
-        /// <see langword="-3"/> if the zip does not contain a valid data.win file</returns>
+        /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result
         private IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
         {
             const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
