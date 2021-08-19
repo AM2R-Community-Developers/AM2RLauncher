@@ -73,45 +73,45 @@ namespace AM2RLauncher
         /// Git Pulls from the repository.
         /// </summary>
         private void PullPatchData()
+        {
+            log.Info("Attempting to pull repository " + currentMirror + "...");
+            using (var repo = new Repository(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
+            {
+                // Permanently undo commits not pushed to remote
+                Branch originMaster = repo.Branches["origin/master"];
+
+                if (originMaster == null)
                 {
-                    log.Info("Attempting to pull repository " + currentMirror + "...");
-                    using (var repo = new Repository(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
-                    {
-                        // Permanently undo commits not pushed to remote
-                        Branch originMaster = repo.Branches["origin/master"];
-
-                        if (originMaster == null)
-                        {
-                            // Directory exists, but seems corrupted, we delete it and prompt the user to download it again.
-                            MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
-                            throw new UserCancelledException();
-                        }
-
-                        repo.Reset(ResetMode.Hard, originMaster.Tip);
-
-                        // Credential information to fetch
-
-                        PullOptions options = new PullOptions();
-                        options.FetchOptions = new FetchOptions();
-                        options.FetchOptions.OnTransferProgress += TransferProgressHandlerMethod;
-
-                        // User information to create a merge commit
-                        var signature = new Signature("null", "null", DateTimeOffset.Now);
-
-                        // Pull
-                        try
-                        {
-                            Commands.Pull(repo, signature, options);
-                        }
-                        catch
-                        {
-                            log.Info("Repository pull attempt failed!");
-                            return;
-                        }
-                    }
-                    log.Info("Repository pulled successfully.");
+                    // Directory exists, but seems corrupted, we delete it and prompt the user to download it again.
+                    MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                    throw new UserCancelledException();
                 }
+
+                repo.Reset(ResetMode.Hard, originMaster.Tip);
+
+                // Credential information to fetch
+
+                PullOptions options = new PullOptions();
+                options.FetchOptions = new FetchOptions();
+                options.FetchOptions.OnTransferProgress += TransferProgressHandlerMethod;
+
+                // User information to create a merge commit
+                var signature = new Signature("null", "null", DateTimeOffset.Now);
+
+                // Pull
+                try
+                {
+                    Commands.Pull(repo, signature, options);
+                }
+                catch
+                {
+                    log.Info("Repository pull attempt failed!");
+                    return;
+                }
+            }
+            log.Info("Repository pulled successfully.");
+        }
 
         /// <summary>
         /// Deletes the given <paramref name="profile"/>. Reloads the <see cref="profileList"/> if <paramref name="reloadProfileList"/> is true.
@@ -229,6 +229,10 @@ namespace AM2RLauncher
             settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
             log.Info("Profiles loaded.");
+
+            // refresh the author and version label on the main tab
+            profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+            profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
         }
 
         /// <summary>

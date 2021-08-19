@@ -53,10 +53,13 @@ namespace AM2RLauncher
 
                 SetPlayButtonState(UpdateState.Downloading);
 
+                progressBar.Visible = true;
+                progressLabel.Visible = true;
+                progressBar.Value = 0;
+
                 // Try to pull first.
                 try
                 {
-                    progressBar.Visible = true;
                     await Task.Run(() => PullPatchData());
 
                     // thank you druid, for this case that should never happen
@@ -95,6 +98,7 @@ namespace AM2RLauncher
                 finally
                 {
                     progressBar.Visible = false;
+                    progressLabel.Visible = false;
                     LoadProfiles();
                 }
 
@@ -810,9 +814,21 @@ namespace AM2RLauncher
         /// </summary>
         private void CustomMirrorTextBoxLostFocus(object sender, EventArgs e)
         {
-            CrossPlatformOperations.WriteToConfig("CustomMirrorText", customMirrorTextBox.Text);
 
             currentMirror = customMirrorTextBox.Text;
+            CrossPlatformOperations.WriteToConfig("CustomMirrorText", currentMirror);
+
+            log.Info("Overwriting mirror in gitconfig.");
+
+            //check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
+            string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
+            if (!File.Exists(gitConfigPath)) return;
+            string gitConfig = File.ReadAllText(gitConfigPath);
+            Regex gitURLRegex = new Regex("https://.*\\.git");
+            Match match = gitURLRegex.Match(gitConfig);
+            gitConfig = gitConfig.Replace(match.Value, currentMirror);
+            File.WriteAllText(gitConfigPath, gitConfig);
+
             log.Info("Custom Mirror has been set to " + currentMirror + ".");
         }
 
