@@ -56,6 +56,7 @@ namespace AM2RLauncher
                 // Try to pull first.
                 try
                 {
+                    progressBar.Visible = true;
                     await Task.Run(() => PullPatchData());
 
                     // thank you druid, for this case that should never happen
@@ -91,8 +92,11 @@ namespace AM2RLauncher
                     log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                     MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
-
-                
+                finally
+                {
+                    progressBar.Visible = false;
+                    LoadProfiles();
+                }
 
                 // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
                 // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
