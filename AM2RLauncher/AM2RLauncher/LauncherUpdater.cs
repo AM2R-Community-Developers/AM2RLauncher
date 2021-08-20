@@ -29,6 +29,7 @@ namespace AM2RLauncher
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         static readonly private string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
+        /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
         static readonly private string updatePath = currentPlatform.IsWinForms ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
 
         // Load reference to logger
