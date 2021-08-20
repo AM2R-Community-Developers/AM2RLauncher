@@ -29,6 +29,8 @@ namespace AM2RLauncher
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         static readonly private string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
+        static readonly private string updatePath = currentPlatform.IsWinForms ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+
         // Load reference to logger
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
@@ -134,6 +136,12 @@ namespace AM2RLauncher
                     string tmpUpdatePath = CrossPlatformOperations.CURRENTPATH + "/tmpupdate/";
                     string zipPath = CrossPlatformOperations.CURRENTPATH + "/launcher.zip";
 
+                    // Clean tmpupdate
+                    if (Directory.Exists(tmpUpdatePath))
+                        Directory.Delete(tmpUpdatePath);
+                    if (!Directory.Exists(tmpUpdatePath))
+                        Directory.CreateDirectory(tmpUpdatePath);
+
                     try
                     { 
                         using (var client = new WebClient())
@@ -156,20 +164,17 @@ namespace AM2RLauncher
                         return;
                     }
 
-                    if(!Directory.Exists(tmpUpdatePath))        // just in case it exists already
-                        Directory.CreateDirectory(tmpUpdatePath);
-
                     ZipFile.ExtractToDirectory(zipPath, tmpUpdatePath);
                     log.Info("Updates successfully extracted to " + tmpUpdatePath);
 
                     File.Delete(zipPath);
-                    File.Move(CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
+                    File.Move(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
                     if (currentPlatform.IsWinForms) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
 
                     foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                     {
                         log.Info("Moving " +  file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
-                        File.Copy(file.FullName, CrossPlatformOperations.CURRENTPATH + "/" + file.Name, true);
+                        File.Copy(file.FullName, updatePath + "/" + file.Name, true);
                     }
                     // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
@@ -205,7 +210,7 @@ namespace AM2RLauncher
 
                     if (currentPlatform.IsGtk) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
 
-                    System.Diagnostics.Process.Start(CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME);
+                    System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
                     Environment.Exit(0);
                 }
             }
