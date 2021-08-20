@@ -63,6 +63,26 @@ namespace AM2RLauncher
                 Directory.Delete(CrossPlatformOperations.CURRENTPATH + "/oldLib", true);
             }
 
+            // Clean up old update libs
+            if (currentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
+            {
+                foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
+                {
+                    if (file.Name.EndsWith(".bak"))
+                        file.Delete();
+                }
+
+                // Do the same for each subdir
+                foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
+                {
+                    foreach (FileInfo file in dir.GetFiles())
+                    {
+                        if (file.Name.EndsWith(".bak"))
+                            file.Delete();
+                    }
+                }
+            }
+
             //check settings if autoUpdate is set to true
             bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdate"));
 
@@ -154,7 +174,26 @@ namespace AM2RLauncher
                     // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms)
                     {
-                        Directory.Move(CrossPlatformOperations.CURRENTPATH + "/lib", CrossPlatformOperations.CURRENTPATH + "/oldLib");
+                        // Directory.Move(CrossPlatformOperations.CURRENTPATH + "/lib", CrossPlatformOperations.CURRENTPATH + "/oldLib");
+                        // So, because Windows behavior is dumb...
+
+                        // Rename all files in lib to *.bak
+                        foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
+                        {
+                            file.CopyTo(file.Directory + file.Name + ".bak");
+                        }
+
+                        // Do the same for each subdir
+                        foreach(DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
+                        {
+                            foreach (FileInfo file in dir.GetFiles())
+                            {
+                                file.CopyTo(file.Directory + file.Name + ".bak");
+                            }
+                        }
+
+                        // Yes, the above calls could be recursive. No, I can't be bothered to make them as such.
+
                         HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
                     }
                     
