@@ -106,15 +106,15 @@ namespace AM2RLauncher.Helpers
         /// Performs recursive rollover on a set of log files.
         /// </summary>
         /// <param name="logFile">The log file to begin the rollover from.</param>
-        /// <param name="max">The maximum amount of log files to retain. Default is int.MaxValue, in other words, never delete files.</param>
-        public static void RecursiveRollover(string logFile, int max = int.MaxValue)
+        /// <param name="max">The maximum amount of log files to retain. Default is 9, as that's the highest digit.</param>
+        public static void RecursiveRollover(string logFile, int max = 9)
         {
             int index = 1;
             char endChar = logFile[logFile.Length - 1];
             string fileName;
 
             // If not the original file, set the new index and get the new fileName.
-            if (endChar != 't')
+            if (char.IsNumber(endChar))
             {
                 index = int.Parse(endChar.ToString()) + 1;
                 fileName = logFile.Remove(logFile.Length - 1) + index;
