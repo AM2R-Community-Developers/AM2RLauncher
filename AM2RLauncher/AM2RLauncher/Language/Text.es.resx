@@ -326,7 +326,7 @@
     <value>¡Imposible acceder a la Carpeta para descargar la actualización! Considera mover el programa, o desactivar actualizaciones automáticas.</value>
   </data>
   <data name="UnhandledException" xml:space="preserve">
-    <value>Una Excepción Inesperado ha ocurrido con la Aplicación.</value>
+    <value>Un Error Inesperado ha ocurrido en la Aplicación.</value>
   </data>
   <data name="UpdateMod" xml:space="preserve">
     <value>Selecciona Actualización del Mod</value>
