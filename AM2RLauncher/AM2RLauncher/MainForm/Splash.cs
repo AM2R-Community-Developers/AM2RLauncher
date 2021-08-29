@@ -37,6 +37,7 @@ namespace AM2RLauncher
             "Reject C++, return to ABSTRACTION",
             "C# is just C++++ with Windows support.",
             "Use of the Launcher has now been authorized!",
+            "Oh? So you're patching me?"
         };
 
         /// <summary>
