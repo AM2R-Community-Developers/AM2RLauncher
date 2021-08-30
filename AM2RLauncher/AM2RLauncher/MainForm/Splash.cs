@@ -37,7 +37,9 @@ namespace AM2RLauncher
             "Reject C++, return to ABSTRACTION",
             "C# is just C++++ with Windows support.",
             "Use of the Launcher has now been authorized!",
-            "Oh? So you're patching me?"
+            "Oh? So you're patching me?",
+            "I, Gawron Giovana, have a dream.",
+            "Oooh weee ooo, I look just like an Omega" 
         };
 
         /// <summary>
@@ -57,7 +59,8 @@ namespace AM2RLauncher
             "Go compile your own girlfriend. This one doesn't count, she's out of your league.",
             "Year 3115, NVIDIA still doesn't support Wayland.",
             "Was a mouse really that expensive, i3 users!?",
-            "Imagine using non-free software."
+            "Imagine using non-free software.",
+            "What if... we used a non-FOSS OS? Haha just kidding... Unless?"
         };
 
         /// <summary>
