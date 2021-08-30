@@ -38,11 +38,8 @@ namespace AM2RLauncher
             "C# is just C++++ with Windows support.",
             "Use of the Launcher has now been authorized!",
             "Oh? So you're patching me?",
-            "Oi Josuke! I used ZA HANDO to erase the broken pipe!",
             "I, Gawron Giovana, have a dream.",
-            "Oooh weee ooo, I look just like an Omega"
-        
-            
+            "Oooh weee ooo, I look just like an Omega" 
         };
 
         /// <summary>
@@ -63,8 +60,7 @@ namespace AM2RLauncher
             "Year 3115, NVIDIA still doesn't support Wayland.",
             "Was a mouse really that expensive, i3 users!?",
             "Imagine using non-free software.",
-            "What if you used a non FOSS OS? Haha jk jk... Unless?"
-            
+            "What if... we used a non-FOSS OS? Haha just kidding... Unless?"
         };
 
         /// <summary>
