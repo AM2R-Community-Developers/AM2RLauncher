@@ -964,6 +964,8 @@ namespace AM2RLauncher
 
                 settingsProfileLabel.TextColor = colGreen;
                 settingsProfileDropDown.Enabled = enabled;
+                profileButton.Enabled = enabled;
+                profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
                 saveButton.Enabled = enabled;
                 saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
                 updateModButton.Enabled = enabled;

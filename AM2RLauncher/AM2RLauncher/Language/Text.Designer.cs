@@ -466,6 +466,24 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die OPEN PROFILE FOLDER ähnelt.
+        /// </summary>
+        public static string OpenProfileFolder {
+            get {
+                return ResourceManager.GetString("OpenProfileFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Opens the folder where game files are located for $NAME. ähnelt.
+        /// </summary>
+        public static string OpenProfileFolderToolTip {
+            get {
+                return ResourceManager.GetString("OpenProfileFolderToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die OPEN PROFILE SAVE FOLDER ähnelt.
         /// </summary>
         public static string OpenSaveFolder {
@@ -475,7 +493,7 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Opens the Folder where save files are located for $NAME. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Opens the folder where save files are located for $NAME. ähnelt.
         /// </summary>
         public static string OpenSaveFolderToolTip {
             get {

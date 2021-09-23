@@ -252,6 +252,12 @@
   <data name="NoInternetConnection" xml:space="preserve">
     <value>Internetverbindung konnte nicht hergestellt werden! AM2R kann weiterhin gespielt werden, aber Aktualisierungen können erst stattfinden nachdem der Launcher neugestartet wurde und sich mit dem Internet verbunden hat.</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>ÖFFNE PROFILORDNER</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>Ordner mit den Spieldateien für $NAME öffnen.</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>ÖFFNE PROFILSPEICHERORDNER</value>
   </data>

@@ -600,6 +600,18 @@ namespace AM2RLauncher
         }
 
         /// <summary>
+        /// This opens the game files directory for the current profile.
+        /// </summary>
+        private void ProfilesButtonClickEvent(object sender, EventArgs e)
+        {
+            if (IsProfileIndexValid())
+            {
+                log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+                CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
+            }
+        }
+
+        /// <summary>
         /// This opens the save directory for the current profile.
         /// </summary>
         private void SaveButtonClickEvent(object sender, EventArgs e)
@@ -633,6 +645,11 @@ namespace AM2RLauncher
                 updateModButton.Enabled = true;
                 updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
             }
+
+            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
+            profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+            saveButton.Enabled = true;
+            saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
 
             if (!(settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0))
             {

@@ -252,6 +252,12 @@
   <data name="NoInternetConnection" xml:space="preserve">
     <value>Не удалось установить интернет-соединение! Вы можете играть, но обновления не будут происходить пока лаунчера не будет перезапущен с рабочим интернет-соединением.</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>ОТКРЫТЬ ПАПКУ ПРОФИЛЯ</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>Открывает папку с файлами игры, принадлежащими профилю $NAME.</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>ОТКРЫТЬ СОХРАНЕНИЯ ПРОФИЛЯ</value>
   </data>
@@ -292,7 +298,7 @@
     <value>Создать лог-файлы для дебага</value>
   </data>
   <data name="ProfileNotes" xml:space="preserve">
-    <value>Пометки о профиле:</value>
+    <value>Заметки профиля:</value>
   </data>
   <data name="ProfileSettingsTab" xml:space="preserve">
     <value>Настройки модификаций</value>

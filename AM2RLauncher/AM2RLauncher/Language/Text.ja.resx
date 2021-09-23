@@ -252,6 +252,12 @@
   <data name="NoInternetConnection" xml:space="preserve">
     <value>インターネットに接続できませんでした。ゲームは引き続きプレイできますが、ランチャーを再起動して接続できるようになるまで更新は行われません</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>プロファイルのあるフォルダーを開く</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>$NAMEのセーブファイルがあるフォルダーを開きます</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>プロファイルのあるフォルダーを開く</value>
   </data>

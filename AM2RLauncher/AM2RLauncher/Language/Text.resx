@@ -252,11 +252,17 @@
   <data name="NoInternetConnection" xml:space="preserve">
     <value>Couldn't establish an internet connection! You can still play the game, but updates will not occur until the launcher is restarted and can connect to the internet.</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>OPEN PROFILE FOLDER</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>Opens the folder where game files are located for $NAME.</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>OPEN PROFILE SAVE FOLDER</value>
   </data>
   <data name="OpenSaveFolderToolTip" xml:space="preserve">
-    <value>Opens the Folder where save files are located for $NAME.</value>
+    <value>Opens the folder where save files are located for $NAME.</value>
   </data>
   <data name="Play" xml:space="preserve">
     <value>PLAY</value>

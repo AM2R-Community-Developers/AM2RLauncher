@@ -684,6 +684,19 @@ namespace AM2RLauncher
 
             settingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
 
+            profileButton = new ColorButton
+            {
+                ToolTip = null,
+                Text = Language.Text.OpenProfileFolder,
+                Font = smallButtonFont,
+                Height = 30,
+                Width = 275,
+                TextColor = colGreen,
+                BackgroundColor = colBG,
+                FrameColor = colGreen,
+                BackgroundColorHover = colBGHover
+            };
+
             saveButton = new ColorButton
             {
                 ToolTip = null,
@@ -736,7 +749,7 @@ namespace AM2RLauncher
 
             profileLayout.BeginHorizontal();
             profileLayout.AddSpace();
-            profileLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, settingsProfileDropDown, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
+            profileLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, settingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
             profileLayout.AddSpace();
 
             profilePage = new TabPage
@@ -786,7 +799,8 @@ namespace AM2RLauncher
             customMirrorTextBox.LostFocus += CustomMirrorTextBoxLostFocus;
             mirrorDropDown.SelectedIndexChanged += MirrorDropDownSelectedIndexChanged;
             profileLayout.LoadComplete += ProfileLayoutLoadComplete;
-            addModButton.Click += AddModButtonClicked; 
+            addModButton.Click += AddModButtonClicked;
+            profileButton.Click += ProfilesButtonClickEvent;
             saveButton.Click += SaveButtonClickEvent;
             settingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
             deleteModButton.Click += DeleteModButtonClicked;
@@ -860,6 +874,8 @@ namespace AM2RLauncher
         private ColorButton apkButton;
         /// <summary>A <see cref="ColorButton"/> that is used to add mods.</summary>
         private ColorButton addModButton;
+        /// <summary>A <see cref="ColorButton"/> that will open the game files directory for the selected mod.</summary>
+        private ColorButton profileButton;
         /// <summary>A <see cref="ColorButton"/> that will open the save directory for the selected mod.</summary>
         private ColorButton saveButton;
         /// <summary>A <see cref="ColorButton"/> that is used to update a mod</summary>

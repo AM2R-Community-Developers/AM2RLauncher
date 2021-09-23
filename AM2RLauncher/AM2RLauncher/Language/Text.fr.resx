@@ -254,6 +254,12 @@ ce profil !</value>
   <data name="NoInternetConnection" xml:space="preserve">
     <value>Impossible d'établir une connexion Internet ! Vous pouvez toujours jouer au jeu, mais les mises à jour ne seront pas effectuées tant que le launcher n'aura pas été redémarré avec un accès Internet.</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>OUVRIR DOSSIER DE SAUVEGARDE</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>Ouvre le dossier où se trouvent les fichiers de sauvegarde pour $NAME.</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>OUVRIR DOSSIER DE SAUVEGARDE</value>
   </data>

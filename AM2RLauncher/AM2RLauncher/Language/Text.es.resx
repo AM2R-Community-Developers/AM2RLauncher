@@ -252,6 +252,12 @@
   <data name="NoInternetConnection" xml:space="preserve">
     <value>¡No se puede establecer conexión a internet! Aún puedes jugar al juego, pero no se actualizará hasta que el Launcher sea reiniciado y pueda conectarse a internet.</value>
   </data>
+  <data name="OpenProfileFolder" xml:space="preserve">
+    <value>ABRIR CARPETA DEL PERFIL</value>
+  </data>
+  <data name="OpenProfileFolderToolTip" xml:space="preserve">
+    <value>Abre la carpeta donde se encuentran los datos del perfil $NAME.</value>
+  </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>ABRIR CARPETA DE DATOS DEL PERFIL</value>
   </data>
