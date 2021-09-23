@@ -97,7 +97,7 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Create an APK for  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Create an APK for $NAME ähnelt.
         /// </summary>
         public static string ApkButtonEnabledToolTip {
             get {
@@ -538,7 +538,7 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Install  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Install $NAME ähnelt.
         /// </summary>
         public static string PlayButtonInstallToolTip {
             get {
@@ -601,8 +601,7 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Profile notes:
-        /// ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Profile notes: ähnelt.
         /// </summary>
         public static string ProfileNotes {
             get {
@@ -620,7 +619,7 @@ namespace AM2RLauncher.Language {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Progress:  ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Progress: ähnelt.
         /// </summary>
         public static string ProgressbarProgress {
             get {

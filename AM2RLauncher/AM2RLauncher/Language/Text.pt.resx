@@ -130,7 +130,7 @@
     <value>Não é possível criar um APK.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>Criar um APK para </value>
+    <value>Criar um APK para $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>Isto é um arquivo de uma Atualização da Comunidade instalada previamente. Não é possível reinstalá-la e ela será removida automaticamente quando seus arquivos de jogo forem deletados. Os arquivos de save são compartilhados com a Atualização da Comunidade que está instalada no momento, então faça um backup de seus saves antes de executar este perfil!</value>
@@ -277,7 +277,7 @@
     <value>Instalando…</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Instalar </value>
+    <value>Instalar $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>O jogo já está rodando!</value>

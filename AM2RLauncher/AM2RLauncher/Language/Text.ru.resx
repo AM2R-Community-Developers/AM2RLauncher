@@ -130,7 +130,7 @@
     <value>Не удалось создать APK-файл</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>Создать APK-файл для </value>
+    <value>Создать APK-файл для $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>Этот архив содержит ранее установленное обновление сообщества. Оно не может быть переустановлено и автоматически удалится при удалении файлов игры. Оно имеет общие файлы сохранения с текущим обновлением сообщества, поэтому не забудьте создать копию сохранений перед запуском!</value>
@@ -277,7 +277,7 @@
     <value>Устанавливается...</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Установить </value>
+    <value>Установить $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>Игра уже идёт!</value>
@@ -304,7 +304,7 @@
     <value>Настройки модификаций</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>Прогресс: </value>
+    <value>Прогресс:</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>Официальный сабреддит для AM2R</value>

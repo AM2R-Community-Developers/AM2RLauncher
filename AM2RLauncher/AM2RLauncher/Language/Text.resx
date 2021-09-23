@@ -130,7 +130,7 @@
     <value>Can't create an APK.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>Create an APK for </value>
+    <value>Create an APK for $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>This is an archive of a previously installed Community Update. It cannot be re-installed and will remove itself if its game files are deleted. It shares saves with the currently installed Community Updates, so be sure to create a backup of your saves before running this profile!</value>
@@ -277,7 +277,7 @@
     <value>Currently installing. . .</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Install </value>
+    <value>Install $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>Currently already playing!</value>
@@ -298,14 +298,13 @@
     <value>Create game debug logs</value>
   </data>
   <data name="ProfileNotes" xml:space="preserve">
-    <value>Profile notes:
-</value>
+    <value>Profile notes:</value>
   </data>
   <data name="ProfileSettingsTab" xml:space="preserve">
     <value>Mod Settings</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>Progress: </value>
+    <value>Progress:</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>The Official AM2R Subreddit</value>

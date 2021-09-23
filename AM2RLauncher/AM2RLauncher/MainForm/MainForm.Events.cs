@@ -413,7 +413,7 @@ namespace AM2RLauncher
             {
                 progressBar.MinValue = 0;
                 progressBar.MaxValue = transferProgress.TotalObjects;
-                progressLabel.Text = Language.Text.ProgressbarProgress + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
+                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
                 if (currentGitObject < transferProgress.ReceivedObjects)
                 {
                     currentGitObject = transferProgress.ReceivedObjects;
@@ -654,7 +654,7 @@ namespace AM2RLauncher
             if (!(settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0))
             {
                 profileNotesTextArea.TextColor = colGreen;
-                profileNotesTextArea.Text = Language.Text.ProfileNotes + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
+                profileNotesTextArea.Text = Language.Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
             }
         }
 

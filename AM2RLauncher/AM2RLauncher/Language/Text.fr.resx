@@ -130,7 +130,7 @@
     <value>Impossible de créer un APK.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>Créer un APK pour </value>
+    <value>Créer un APK pour $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>Il s'agit d'une archive d'une mise à jour communautaire précédemment installée. Elle ne peut pas être réinstallée et se supprimera d'elle-même si ses fichiers de jeu sont supprimés. Elle partage des sauvegardes avec la mise à jour actuellement installée,
@@ -279,7 +279,7 @@ ce profil !</value>
     <value>Installation en cours...</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Installer </value>
+    <value>Installer $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>Déjà en train de jouer !</value>
@@ -306,7 +306,7 @@ ce profil !</value>
     <value>Paramètres du mod</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>Progression : </value>
+    <value>Progression :</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>Le subreddit AM2R officiel</value>

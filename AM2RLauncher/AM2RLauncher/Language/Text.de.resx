@@ -130,7 +130,7 @@
     <value>APK konnte nicht erstellt werden.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>APK erstellen für </value>
+    <value>APK erstellen für $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>Dies ist ein Archiv eines vorher installierten Community-Updates. Es kann nicht erneut installiert werden und wird automatisch entfernt wenn die archivierten Spieldaten gelöscht werden. Die Speicherstände sind allerdings weiterhin die aktuellen, bitte sicherheitshalber ein Backup anlegen vor dem benutzen dieses Profils!</value>
@@ -283,7 +283,7 @@
     <value>Spiel läuft bereits!</value>
   </data>
   <data name="PlayButtonPlayToolTip" xml:space="preserve">
-    <value>Starte </value>
+    <value>Starte $NAME</value>
   </data>
   <data name="PlayButtonSelect11ToolTip" xml:space="preserve">
     <value>Bitte AM2R_1.1.zip auswählen</value>
@@ -298,14 +298,13 @@
     <value>Debug-Logs während des Spielens erstellen.</value>
   </data>
   <data name="ProfileNotes" xml:space="preserve">
-    <value>Profilnotizen:
-</value>
+    <value>Profilnotizen:</value>
   </data>
   <data name="ProfileSettingsTab" xml:space="preserve">
     <value>Mod-Einstellungen</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>Fortschritt: </value>
+    <value>Fortschritt:</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>Der offizielle AM2R Subreddit</value>

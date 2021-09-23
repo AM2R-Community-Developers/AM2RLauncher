@@ -130,7 +130,7 @@
     <value>No se puede crear un APK.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>Crear un APK para </value>
+    <value>Crear un APK para $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>Esto es una copia de la Actualización de la Comunidad instalada previamente. No puede ser reinstalada y se eliminará automáticamente si se borran sus archivos de juego. Comparte las partidas guardadas con la Actualización de la Comunidad instalada actualmente, ¡así que asegúrate de crear una copia de seguridad de tus partidas antes de ejecutar este perfil!</value>
@@ -256,7 +256,7 @@
     <value>ABRIR CARPETA DEL PERFIL</value>
   </data>
   <data name="OpenProfileFolderToolTip" xml:space="preserve">
-    <value>Abre la carpeta donde se encuentran los datos del perfil $NAME.</value>
+    <value>Abre la carpeta donde se encuentran los archivos del perfil $NAME.</value>
   </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>ABRIR CARPETA DE DATOS DEL PERFIL</value>
@@ -277,7 +277,7 @@
     <value>Instalación en proceso...</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Instalar </value>
+    <value>Instalar $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>¡Ya hay una partida en proceso!</value>
@@ -298,14 +298,13 @@
     <value>Crear registros de depuración de juego (Debug logs)</value>
   </data>
   <data name="ProfileNotes" xml:space="preserve">
-    <value>Anotaciones del Perfil:
-</value>
+    <value>Anotaciones del Perfil:</value>
   </data>
   <data name="ProfileSettingsTab" xml:space="preserve">
     <value>Opciones de mods</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>Progreso: </value>
+    <value>Progreso:</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>Subreddit oficial de AM2R</value>

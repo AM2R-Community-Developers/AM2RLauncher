@@ -130,7 +130,7 @@
     <value>APKを作成できません</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
-    <value>次のAPKを作成します： </value>
+    <value>次のAPKを作成します： $NAME</value>
   </data>
   <data name="ArchiveNotes" xml:space="preserve">
     <value>これは以前インストールされたCommunity Updateのアーカイブです。再インストールはできませんし、ゲームファイルが削除されると自動的に削除されます。現在インストールされているCommunity Updateとセーブデータを共有しているため、このプロファイルを実行する前に必ずセーブデータのバックアップを作成してください</value>
@@ -277,7 +277,7 @@
     <value>只今インストール中…</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>これをインストール： </value>
+    <value>これをインストール： $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>現在ゲームプレイ中です！</value>
@@ -298,14 +298,13 @@
     <value>ゲームデバッグログの作成</value>
   </data>
   <data name="ProfileNotes" xml:space="preserve">
-    <value>プロファイルの注釈：
-</value>
+    <value>プロファイルの注釈：</value>
   </data>
   <data name="ProfileSettingsTab" xml:space="preserve">
     <value>MOD設定</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
-    <value>進捗状況： </value>
+    <value>進捗状況：</value>
   </data>
   <data name="RedditToolTip" xml:space="preserve">
     <value>The Official AM2R (サブレディット)</value>
