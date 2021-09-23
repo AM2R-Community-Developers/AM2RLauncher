@@ -530,11 +530,20 @@ namespace AM2RLauncher
                 languageDropDown.SelectedIndex = 0;
             }
 
-            // autoUpdate checkbox
-            autoUpdateCheck = new CheckBox
+            // autoUpdateAM2R checkbox
+            autoUpdateAM2RCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdate")),
-                Text = Language.Text.AutoUpdate,
+                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
+                Text = Language.Text.AutoUpdateAM2R,
+                TextColor = colGreen
+            };
+
+
+            // autoUpdateLauncher checkbox
+            autoUpdateLauncherCheck = new CheckBox
+            {
+                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
+                Text = Language.Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
 
@@ -623,7 +632,7 @@ namespace AM2RLauncher
 
             settingsLayout.BeginHorizontal();
             settingsLayout.AddSpace();
-            settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateCheck, hqMusicPCCheck, hqMusicAndroidCheck, (Control)profileDebugLogCheck ?? new Label(), customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
+            settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, (Control)profileDebugLogCheck ?? new Label(), customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
             settingsLayout.AddSpace();
 
             TabPage settingsPage = new TabPage
@@ -763,7 +772,8 @@ namespace AM2RLauncher
             showButton.Click += ShowButtonClick;
             profileDropDown.SelectedIndexChanged += ProfileDropDownSelectedIndexChanged;
             languageDropDown.SelectedIndexChanged += LanguageDropDownSelectedIndexChanged;
-            autoUpdateCheck.CheckedChanged += AutoUpdateCheckChanged;
+            autoUpdateAM2RCheck.CheckedChanged += AutoUpdateAM2RCheckChanged;
+            autoUpdateLauncherCheck.CheckedChanged += AutoUpdateLauncherCheckChanged;
             hqMusicAndroidCheck.CheckedChanged += HqMusicAndroidCheckChanged;
             hqMusicPCCheck.CheckedChanged += HqMusicPCCheckChanged;
             customMirrorCheck.CheckedChanged += CustomMirrorCheckChanged;
@@ -885,7 +895,9 @@ namespace AM2RLauncher
 
 
         /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update or not.</summary>
-        private CheckBox autoUpdateCheck;
+        private CheckBox autoUpdateAM2RCheck;
+        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update or not.</summary>
+        private CheckBox autoUpdateLauncherCheck;
         /// <summary>A <see cref="CheckBox"/>, that indicates wether to use a custom mirror or not.</summary>
         private CheckBox customMirrorCheck;
         /// <summary>A <see cref="CheckBox"/>, that indicates wether to use HQ Music when patching to PC or not.</summary>

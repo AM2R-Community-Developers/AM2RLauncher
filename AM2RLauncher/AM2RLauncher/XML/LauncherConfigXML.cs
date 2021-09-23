@@ -15,9 +15,13 @@ namespace AM2RLauncher.XML
     [XmlRoot("settings")]
     public class LauncherConfigXML
     {
-        /// <summary>Indicates wether or not to auto-update the Launcher. Used for <see cref="MainForm.autoUpdateCheck"/></summary>
-        [XmlAttribute("AutoUpdate")]
-        public bool AutoUpdate
+        /// <summary>Indicates wether or not to auto-update the Launcher. Used for <see cref="MainForm.autoUpdateAM2RCheck"/></summary>
+        [XmlAttribute("AutoUpdateAM2R")]
+        public bool AutoUpdateAM2R
+        { get; set; }
+        /// <summary>Indicates wether or not to auto-update the Launcher. Used for <see cref="MainForm.autoUpdateLauncherCheck"/></summary>
+        [XmlAttribute("AutoUpdateLauncher")]
+        public bool AutoUpdateLauncher
         { get; set; }
         /// <summary>Indicates the Language of the Launcher. Used for <see cref="MainForm.languageDropDown"/></summary>
         [XmlAttribute("Language")]
@@ -98,7 +102,8 @@ namespace AM2RLauncher.XML
 		/// </summary>
         public LauncherConfigXML()
         {
-            AutoUpdate = true;
+            AutoUpdateAM2R = true;
+            AutoUpdateLauncher = true;
             Language = "Default";
             MusicHQPC = true;
             MusicHQAndroid = false;
@@ -116,7 +121,8 @@ namespace AM2RLauncher.XML
         /// <summary>
         /// Creates a <see cref="LauncherConfigXML"/> with custom attributes.
         /// </summary>
-        /// <param name="autoUpdate">Paramater that indicates if <see cref="MainForm.autoUpdateCheck"/> is enabled or not.</param>
+        /// <param name="autoUpdateAM2R">Paramater that indicates if <see cref="MainForm.autoUpdateAM2RCheck"/> is enabled or not.</param>
+        /// <param name="autoUpdateLauncher">Paramater that indicates if <see cref="MainForm.autoUpdateLauncherCheck"/> is enabled or not.</param>
         /// <param name="language">Parameter that indicates the language of the launcher.</param>
         /// <param name="musicHQPC">Parameter that indicates if <see cref="MainForm.hqMusicPCCheck"/> is enabled or not.</param>
         /// <param name="musicHQAndroid">Parameter that indicates if <see cref="MainForm.hqMusicAndroidCheck"/> is enabled or not.</param>
@@ -128,11 +134,12 @@ namespace AM2RLauncher.XML
         /// <param name="width">Parameter that indicates the width of <see cref="MainForm"/>.</param>
         /// <param name="height">Parameter that indicates the height of <see cref="MainForm"/>.</param>
         /// <param name="isMaximized">Parameter that indicates if <see cref="MainForm"/> has been set to fullscreen or not.</param>
-        public LauncherConfigXML(bool autoUpdate, string language, bool musicHQPC, bool musicHQAndroid,
+        public LauncherConfigXML(bool autoUpdateAM2R, bool autoUpdateLauncher, string language, bool musicHQPC, bool musicHQAndroid,
                                  string profileIndex, int mirrorIndex, string customEnvVar, bool customMirrorEnabled,
                                  string customMirrorText, int width, int height, bool isMaximized)
         {
-            AutoUpdate = autoUpdate;
+            AutoUpdateAM2R = autoUpdateAM2R;
+            AutoUpdateLauncher = autoUpdateLauncher;
             Language = language;
             MusicHQPC = musicHQPC;
             MusicHQAndroid = musicHQAndroid;

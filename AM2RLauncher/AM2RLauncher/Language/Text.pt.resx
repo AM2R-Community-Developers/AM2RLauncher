@@ -138,8 +138,11 @@
   <data name="Author" xml:space="preserve">
     <value>Autor(es):</value>
   </data>
-  <data name="AutoUpdate" xml:space="preserve">
-    <value>Atualizar AM2R e o AM2RLauncher automaticamente</value>
+  <data name="AutoUpdateAM2R" xml:space="preserve">
+    <value>Atualizar AM2R automaticamente</value>
+  </data>
+  <data name="AutoUpdateAM2RLauncher" xml:space="preserve">
+    <value>Atualizar AM2RLauncher automaticamente</value>
   </data>
   <data name="ChangelogTab" xml:space="preserve">
     <value>Mudanças</value>

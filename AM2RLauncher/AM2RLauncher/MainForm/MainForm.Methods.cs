@@ -335,6 +335,7 @@ namespace AM2RLauncher
                 //these are not needed by linux at all, so we delete them
                 File.Delete(profilePath + "/data.win");
                 File.Delete(profilePath + "/AM2R.exe");
+                File.Delete(profilePath + "/D3DX9_43.dll");
 
                 // Move exe one directory out
                 File.Move(profilePath + "/" + exe, profilePath.Substring(0, profilePath.LastIndexOf("/")) + "/" + exe);

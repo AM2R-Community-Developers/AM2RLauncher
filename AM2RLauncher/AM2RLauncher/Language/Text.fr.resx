@@ -140,8 +140,11 @@ ce profil !</value>
   <data name="Author" xml:space="preserve">
     <value>Auteur(s) :</value>
   </data>
-  <data name="AutoUpdate" xml:space="preserve">
-    <value>Mettre à jour AM2R et AM2RLauncher automatiquement.</value>
+  <data name="AutoUpdateAM2R" xml:space="preserve">
+    <value>Mettre à jour AM2R automatiquement.</value>
+  </data>
+  <data name="AutoUpdateLauncher" xml:space="preserve">
+    <value>Mettre à jour AM2RLauncher automatiquement.</value>
   </data>
   <data name="ChangelogTab" xml:space="preserve">
     <value>Journal des modifications</value>

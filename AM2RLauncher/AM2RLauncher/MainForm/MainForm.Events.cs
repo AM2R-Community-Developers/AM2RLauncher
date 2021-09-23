@@ -47,10 +47,9 @@ namespace AM2RLauncher
         /// </summary>
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
-            if (IsPatchDataCloned())
+            LoadProfiles();
+            if (IsPatchDataCloned() && (bool)autoUpdateAM2RCheck.Checked)
             {
-                LoadProfiles();
-
                 SetPlayButtonState(UpdateState.Downloading);
 
                 progressBar.Visible = true;
@@ -78,7 +77,7 @@ namespace AM2RLauncher
                     if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
                         ex.Message.ToLower().Contains("failed to resolve address"))
                     {
-                        if (!(bool)autoUpdateCheck.Checked)
+                        if (!(bool)autoUpdateAM2RCheck.Checked)
                         {
                             log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
                             MessageBox.Show(Language.Text.InternetConnectionDrop, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
@@ -148,6 +147,8 @@ namespace AM2RLauncher
                             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
                             log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
                         }
+
+                        profileDropDown.SelectedIndex = 0;
 
                         LoadProfiles();
 
@@ -740,11 +741,18 @@ namespace AM2RLauncher
             else CrossPlatformOperations.WriteToConfig("Language", languageDropDown.Items[languageDropDown.SelectedIndex].Text);
         }
 
-        /// <summary>Gets called when <see cref="autoUpdateCheck"/> gets clicked and writes its new value to the config.</summary>
-        private void AutoUpdateCheckChanged(object sender, EventArgs e)
+        /// <summary>Gets called when <see cref="autoUpdateAM2RCheck"/> gets clicked and writes its new value to the config.</summary>
+        private void AutoUpdateAM2RCheckChanged(object sender, EventArgs e)
         {
-            log.Info("Auto Update has been set to " + autoUpdateCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("AutoUpdate", (bool)autoUpdateCheck.Checked);
+            log.Info("Auto Update AM2R has been set to " + autoUpdateAM2RCheck.Checked + ".");
+            CrossPlatformOperations.WriteToConfig("AutoUpdateAM2R", (bool)autoUpdateAM2RCheck.Checked);
+        }
+
+        /// <summary>Gets called when <see cref="autoUpdateLauncherCheck"/> gets clicked and writes its new value to the config.</summary>
+        private void AutoUpdateLauncherCheckChanged(object sender, EventArgs e)
+        {
+            log.Info("Auto Update Launcher has been set to " + autoUpdateAM2RCheck.Checked + ".");
+            CrossPlatformOperations.WriteToConfig("AutoUpdateLauncher", (bool)autoUpdateAM2RCheck.Checked);
         }
 
         /// <summary>Gets called when <see cref="customMirrorCheck"/> gets clicked, displays a warning <see cref="MessageBox"/>

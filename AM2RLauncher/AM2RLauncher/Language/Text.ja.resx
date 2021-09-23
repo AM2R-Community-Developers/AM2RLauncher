@@ -138,8 +138,11 @@
   <data name="Author" xml:space="preserve">
     <value>制作者：</value>
   </data>
-  <data name="AutoUpdate" xml:space="preserve">
-    <value>AM2RとAM2RLauncherを自動でアップデートする</value>
+  <data name="AutoUpdateAM2R" xml:space="preserve">
+    <value>AM2Rを自動でアップデートする</value>
+  </data>
+  <data name="AutoUpdateAM2RLauncher" xml:space="preserve">
+    <value>AM2RLauncherを自動でアップデートする</value>
   </data>
   <data name="ChangelogTab" xml:space="preserve">
     <value>更新履歴</value>

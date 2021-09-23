@@ -86,12 +86,12 @@ namespace AM2RLauncher
                 }
             }
 
-            //check settings if autoUpdate is set to true
-            bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdate"));
+            //check settings if autoUpdateLauncher is set to true
+            bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher"));
 
             if (autoUpdate)
             {
-                log.Info("AutoUpdate set to true!");
+                log.Info("AutoUpdate Launcher set to true!");
 
                 //this is supposed to fix the updater throwing an exception on windows 7 and earlier(?)
                 //see this for information: https://stackoverflow.com/questions/2859790/the-request-was-aborted-could-not-create-ssl-tls-secure-channel and https://stackoverflow.com/a/50977774
@@ -217,7 +217,7 @@ namespace AM2RLauncher
             }
             else
             {
-                log.Info("AutoUpdate set to false. Exiting update check.");
+                log.Info("AutoUpdate Launcher set to false. Exiting update check.");
             }
         }
     }
