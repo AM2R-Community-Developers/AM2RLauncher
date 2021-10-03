@@ -253,16 +253,16 @@
     <value>Impossibile connettersi a internet! Potrai giocare comunque al gioco, ma gli aggiornamenti non avverranno finchè il launcher non è riavviato e la connessione a internet avrà successo.</value>
   </data>
   <data name="OpenProfileFolder" xml:space="preserve">
-    <value>APRI CARTELLA SALVATAGGIO PROFILO</value>
+    <value>APRI CARTELLA PROFILO</value>
   </data>
   <data name="OpenProfileFolderToolTip" xml:space="preserve">
-    <value>Apre la Cartella dove i file di salvataggio sono presenti per $NAME.</value>
+    <value>Apre la cartella dove si trovano i file di gioco per $NAME</value>
   </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>APRI CARTELLA SALVATAGGIO PROFILO</value>
   </data>
   <data name="OpenSaveFolderToolTip" xml:space="preserve">
-    <value>Apre la Cartella dove i file di salvataggio sono presenti per $NAME.</value>
+    <value>Apre la Cartella dove i file di salvataggio sono presenti per $NAME</value>
   </data>
   <data name="Play" xml:space="preserve">
     <value>GIOCA</value>

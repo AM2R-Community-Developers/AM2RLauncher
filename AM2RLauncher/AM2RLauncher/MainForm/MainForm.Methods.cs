@@ -231,8 +231,13 @@ namespace AM2RLauncher
             log.Info("Profiles loaded.");
 
             // refresh the author and version label on the main tab
-            profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-            profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+            if (profileList.Count > 0)
+            {
+                profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+                profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+            }
+
+            UpdateStateMachine();
         }
 
         /// <summary>

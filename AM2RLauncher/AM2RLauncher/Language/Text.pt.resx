@@ -253,10 +253,10 @@
     <value>Não foi possível estabelecer uma conexão com a Internet! Você ainda pode jogar, mas atualizações não vão ocorrer até que o launcher seja reiniciado e se conecte a internet.</value>
   </data>
   <data name="OpenProfileFolder" xml:space="preserve">
-    <value>ABRIR PASTA DE SAVES DO PERFIL</value>
+    <value>ABRIR PASTA DO PERFIL</value>
   </data>
   <data name="OpenProfileFolderToolTip" xml:space="preserve">
-    <value>Abre a pasta onde se encontram os saves para $NAME</value>
+    <value>Abre a pasta onde se encontram os arquivos de jogo para $NAME</value>
   </data>
   <data name="OpenSaveFolder" xml:space="preserve">
     <value>ABRIR PASTA DE SAVES DO PERFIL</value>

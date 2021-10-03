@@ -262,7 +262,7 @@
     <value>ABRIR CARPETA DE DATOS DEL PERFIL</value>
   </data>
   <data name="OpenSaveFolderToolTip" xml:space="preserve">
-    <value>Abre la Carpeta donde se guardan los datos de $NAME</value>
+    <value>Abre la Carpeta donde se guardan las partidas de $NAME</value>
   </data>
   <data name="Play" xml:space="preserve">
     <value>JUGAR</value>
