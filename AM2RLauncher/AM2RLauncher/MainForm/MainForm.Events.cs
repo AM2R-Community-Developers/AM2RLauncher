@@ -290,7 +290,12 @@ namespace AM2RLauncher
 
                     if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
                     {
-                        if (Directory.Exists(fileFinder.FileName)) return; // this can happen on linux, and maybe windows as well
+                        if (Directory.Exists(fileFinder.FileName))
+                        {
+                            // this can happen on linux, and maybe windows as well
+                            log.Error("User selected a Directory. Cancelling import.");
+                            return;
+                        }
 
                         IsZipAM2R11ReturnCodes errorCode = CheckIfZipIsAM2R11(fileFinder.FileName);
                         if (errorCode != IsZipAM2R11ReturnCodes.Successful)
@@ -408,14 +413,14 @@ namespace AM2RLauncher
             if (isGitProcessGettingCancelled) return false;
 
             // This needs to be in an Invoke, in order to access the variables from the main thread
-            // Otherwise this wil throw a runtime exception
+            // Otherwise this will throw a runtime exception
             Application.Instance.Invoke(new Action(() =>
             {
                 progressBar.MinValue = 0;
                 progressBar.MaxValue = transferProgress.TotalObjects;
-                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
                 if (currentGitObject < transferProgress.ReceivedObjects)
                 {
+                    progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
                     currentGitObject = transferProgress.ReceivedObjects;
                     progressBar.Value = transferProgress.ReceivedObjects;
                     
