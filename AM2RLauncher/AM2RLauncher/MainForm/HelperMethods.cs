@@ -1,6 +1,8 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,6 +10,12 @@ namespace AM2RLauncher.Helpers
 {
     static class HelperMethods
     {
+        // Load reference to logger
+        /// <summary>
+        /// Our log object, that handles logging the current execution to a file.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+
         // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
         /// <summary>
@@ -135,6 +143,28 @@ namespace AM2RLauncher.Helpers
             }
             else // Otherwise, delete the file.
                 File.Delete(logFile);
+        }
+
+        /// <summary>
+        /// Checks if we currently have an internet connection, by pinging github.
+        /// </summary>
+        /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
+        public static bool IsConnectedToInternet()
+        {
+            log.Info("Checking internet connection...");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
+            HttpWebResponse response = null;
+            try
+            {
+                response = (HttpWebResponse)request.GetResponse();
+            }
+            catch (WebException)
+            {
+                log.Info("Internet connection failed.");
+                return false;
+            }
+            log.Info("Internet connection established!");
+            return true;
         }
     }
 }

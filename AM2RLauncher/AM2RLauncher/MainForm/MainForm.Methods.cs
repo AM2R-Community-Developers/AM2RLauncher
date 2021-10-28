@@ -1124,28 +1124,5 @@ namespace AM2RLauncher
             // if we didn't exit before, everything is fine
             return IsZipAM2R11ReturnCodes.Successful;
         }
-
-
-        /// <summary>
-        /// Checks if we currently have an internet connection, by pinging github.
-        /// </summary>
-        /// <returns></returns>
-        private static bool IsConnectedToInternet()
-        {
-            log.Info("Checking internet connection...");
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
-            HttpWebResponse response = null;
-            try
-            {
-                response = (HttpWebResponse)request.GetResponse();
-            }
-            catch (WebException)
-            {
-                log.Info("Internet connection failed.");
-                return false;
-            }
-            log.Info("Internet connection established!");
-            return true;
-        }
     }
 }

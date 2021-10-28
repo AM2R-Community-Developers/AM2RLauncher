@@ -101,7 +101,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Indicates whether or not we have established an internet connection.
         /// </summary>
-        readonly static private bool isInternetThere = IsConnectedToInternet();
+        readonly static private bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
 
         public MainForm()
         {
