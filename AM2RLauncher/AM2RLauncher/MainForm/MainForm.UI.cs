@@ -11,6 +11,7 @@ using System.Globalization;
 using AM2RLauncher.XML;
 using log4net;
 using log4net.Config;
+using System.Text.RegularExpressions;
 
 namespace AM2RLauncher
 {
@@ -134,10 +135,24 @@ namespace AM2RLauncher
             log.Info("Mutex check passed. Entering main thread.");
             log.Info("Current Launcher Version: " + VERSION);
             log.Info("Current Platform-ID is: " + Platform.ID);
+            // Log distro and version (if it exists)
+            if (Platform.IsGtk)
+            {
+                string osRelease = "";
+                osRelease = File.ReadAllText("/etc/os-release");
+                Regex lineRegex = new Regex(".*=.*");
+                var results = lineRegex.Matches(osRelease).Cast<Match>();
+                var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
+                log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
+                          (version == null ? "" : " " + version.Value.Substring(8).Replace("\"","")));
+            }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
             Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
             log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
+
+            // But log actual folder location nonetheless
+            log.Info("Actual Launcher location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 
             //Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
