@@ -181,8 +181,8 @@ namespace AM2RLauncher
                         ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
                         if (prof.Installable == true || IsProfileInstalled(prof)) // Safety check for non-installable profiles
                         {
-                            profileList.Add(Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml")));
-                            profileList[profileList.Count - 1].DataPath = "/Mods/" + dir.Name;
+                            prof.DataPath = "/Mods/" + dir.Name;
+                            profileList.Add(prof);
                         }
                         else if (!IsProfileInstalled(prof)) // if not installable and isn't installed, remove it
                         {
@@ -1077,6 +1077,7 @@ namespace AM2RLauncher
         {
             const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
             const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
+            const string am2rHash = "15253f7a66d6ea3feef004ebbee9b438";
 
             string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
 
@@ -1084,24 +1085,38 @@ namespace AM2RLauncher
             if (Directory.Exists(tmpPath))
                 Directory.Delete(tmpPath, true);
 
-            //extract zip to tmp path first
-            ZipFile.ExtractToDirectory(zipPath, tmpPath);
+            Directory.CreateDirectory(tmpPath);
 
-            // If the game is packed into a subfolder, throw error for that
-            if (Directory.GetDirectories(tmpPath).Length == 1 && new DirectoryInfo(Directory.GetDirectories(tmpPath).First()).Name != "lang")
+            //open archive
+            ZipArchive am2rZip = ZipFile.OpenRead(zipPath);
+
+            // Check if exe exists anywhere
+            ZipArchiveEntry am2rExe = am2rZip.Entries.FirstOrDefault(x => x.FullName.Contains("AM2R.exe"));
+            if (am2rExe == null)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
+            // Check if it's not in a subfolder. if it'd be in a subfolder, fullname would be "folder/AM2R.exe"
+            if (am2rExe.FullName != "AM2R.exe")
                 return IsZipAM2R11ReturnCodes.GameIsInASubfolder;
+            // Check validity
+            am2rExe.ExtractToFile(tmpPath + "/" + am2rExe.FullName);
+            if (HelperMethods.CalculateMD5(tmpPath + "/" + am2rExe.FullName) != am2rHash)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
 
-            // check if exe exists
-            if (!File.Exists(tmpPath + "/AM2R.exe"))
-                return IsZipAM2R11ReturnCodes.MissingAM2RExe;
-
-            // check if d3d.dll exists, then check the hash of d3d.dll
-            if (HelperMethods.CalculateMD5(tmpPath + "/D3DX9_43.dll") != d3dHash)
-                return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
-
-            // check if data.win exists and check its hash
-            if (HelperMethods.CalculateMD5(tmpPath + "/data.win") != dataWinHash)
+            // Check if data.win exists / is valid
+            ZipArchiveEntry dataWin = am2rZip.Entries.FirstOrDefault(x => x.FullName == "data.win");
+            if (dataWin == null)
                 return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+            dataWin.ExtractToFile(tmpPath + "/" + dataWin.FullName);
+            if (HelperMethods.CalculateMD5(tmpPath + "/" + dataWin.FullName) != dataWinHash)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+
+            // Check if d3d.dll exists / is valid
+            ZipArchiveEntry d3dx = am2rZip.Entries.FirstOrDefault(x => x.FullName == "D3DX9_43.dll");
+            if (d3dx == null)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
+            d3dx.ExtractToFile(tmpPath + "/" + d3dx.FullName);
+            if (HelperMethods.CalculateMD5(tmpPath + "/" + d3dx.FullName) != d3dHash)
+                return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
 
             // clean up
             Directory.Delete(tmpPath, true);

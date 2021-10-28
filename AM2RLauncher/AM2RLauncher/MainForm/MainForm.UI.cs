@@ -55,7 +55,7 @@ namespace AM2RLauncher
         enum IsZipAM2R11ReturnCodes
         {
             Successful,
-            MissingAM2RExe,
+            MissingOrInvalidAM2RExe,
             MissingOrInvalidD3DX9_43Dll,
             MissingOrInvalidDataWin,
             GameIsInASubfolder
@@ -138,8 +138,7 @@ namespace AM2RLauncher
             // Log distro and version (if it exists)
             if (Platform.IsGtk)
             {
-                string osRelease = "";
-                osRelease = File.ReadAllText("/etc/os-release");
+                string osRelease = File.ReadAllText("/etc/os-release");
                 Regex lineRegex = new Regex(".*=.*");
                 var results = lineRegex.Matches(osRelease).Cast<Match>();
                 var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
