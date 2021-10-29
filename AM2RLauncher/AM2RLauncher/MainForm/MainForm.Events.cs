@@ -286,7 +286,11 @@ namespace AM2RLauncher
 
                     fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
 
-                    fileFinder.ShowDialog(this);
+                    if (fileFinder.ShowDialog(this) != DialogResult.Ok)
+                    {
+                        log.Info("User cancelled the selection.");
+                        return;
+                    }
 
                     if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
                     {
@@ -511,7 +515,11 @@ namespace AM2RLauncher
 
             fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
 
-            fileFinder.ShowDialog(this);
+            if (fileFinder.ShowDialog(this) != DialogResult.Ok)
+            {
+                log.Info("User cancelled the Mod selection.");
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
             {
@@ -753,6 +761,7 @@ namespace AM2RLauncher
             else
                 saveWarningLabel.Visible = false;
             UpdateStateMachine();
+            Console.WriteLine("end profile drop down changed");
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>
@@ -926,7 +935,11 @@ namespace AM2RLauncher
 
             fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
 
-            fileFinder.ShowDialog(this);
+            if (fileFinder.ShowDialog(this) != DialogResult.Ok)
+            {
+                log.Info("User cancelled the Mod selection.");
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
             {

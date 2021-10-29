@@ -206,7 +206,7 @@ namespace AM2RLauncher
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
                 Process.Start("explorer.exe", realPath);
             else if (currentPlatform.IsGtk)
-                Process.Start("xdg-open", realPath);
+                Process.Start("xdg-open", $"\"{realPath}\"");   //needs quotes otherwise paths with space wont open
         }
 
         /// <summary>
