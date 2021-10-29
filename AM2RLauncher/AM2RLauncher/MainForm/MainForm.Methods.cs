@@ -623,7 +623,7 @@ namespace AM2RLauncher
 
                 HelperMethods.DeleteDirectory(tempDir);
 
-                CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH);
+                CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk");
 
                 log.Info("Successfully created Android APK for profile " + profile.Name + ".");
             }

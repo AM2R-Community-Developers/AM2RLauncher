@@ -202,11 +202,32 @@ namespace AM2RLauncher
             if (!Directory.Exists(realPath))
                 Directory.CreateDirectory(realPath);
 
+            //needs quotes otherwise paths with space wont open
             if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
-                Process.Start("explorer.exe", realPath);
+                Process.Start("explorer.exe", $"/select \"{realPath}\"");
+            // linux only opens the directory bc opening and selecting a file is pain
             else if (currentPlatform.IsGtk)
-                Process.Start("xdg-open", $"\"{realPath}\"");   //needs quotes otherwise paths with space wont open
+                Process.Start("xdg-open", $"\"{realPath}\"");
+        }
+
+        /// <summary>
+        /// Opens <paramref name="path"/> and selects it in a file explorer.
+        /// </summary>
+        /// <param name="path">Path to open.</param>
+        public static void OpenFolderAndSelectFile(string path)
+        {
+            // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
+            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\") : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+            if (!File.Exists(realPath))
+                return;
+
+            //needs quotes otherwise paths with spaces wont open
+            if (currentPlatform.IsWinForms)
+                // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
+                Process.Start("explorer.exe", $"/select, \"{realPath}\"");
+            else if (currentPlatform.IsGtk)
+                Process.Start("xdg-open", $"\"{Path.GetDirectoryName(realPath)}\"");
         }
 
         /// <summary>
