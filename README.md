@@ -16,7 +16,7 @@ Linux needs the following dependencies installed:
 - `openssl`
 - `fuse2`
 
-On Arch Linux, you can install these by running:
+On Arch Linux, you can install these by running (multilib repo's are required, you can enable them in `/etc/pacman.conf`):
 
 `sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse`
 
