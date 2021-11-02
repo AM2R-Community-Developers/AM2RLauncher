@@ -16,6 +16,10 @@ Linux needs the following dependencies installed:
 - `openssl`
 - `fuse2`
 
+On Arch Linux, you can install these by running:
+
+`sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse`
+
 Refer to your local package manager for Instructions.  
 Optionally, for APK creation any Java runtime is needed. 
 
