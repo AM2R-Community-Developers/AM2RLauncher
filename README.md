@@ -16,15 +16,20 @@ Linux needs the following dependencies installed:
 - `openssl`
 - `fuse2`
 
-On Arch Linux, you can install these by running (Multilib repositories are required, you can enable them in `/etc/pacman.conf`):
+Optionally, for APK creation any Java runtime is needed.
 
-`sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse`
+### Arch Linux
+On Arch Linux, you can install these by running this:  
+(Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))
 
-Refer to your local package manager for Instructions.  
-Optionally, for APK creation any Java runtime is needed. 
+`sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse jre-openjdk`
+
+For other distros, refer to your local package manager for instructions.   
 
 ## Downloads
 Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
+
+Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exist. Install it with `makepkg -si` or use your favourite AUR helper.
 
 # Compiling Instructions:
 ## Dependencies
