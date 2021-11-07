@@ -139,10 +139,10 @@
     <value>制作者：</value>
   </data>
   <data name="AutoUpdateAM2R" xml:space="preserve">
-    <value>AM2Rを自動でアップデートする</value>
+    <value>AM2Rを自動更新する</value>
   </data>
-  <data name="AutoUpdateAM2RLauncher" xml:space="preserve">
-    <value>AM2RLauncherを自動でアップデートする</value>
+  <data name="AutoUpdateLauncher" xml:space="preserve">
+    <value>AM2RLauncherを自動更新する</value>
   </data>
   <data name="ChangelogTab" xml:space="preserve">
     <value>更新履歴</value>
@@ -253,16 +253,16 @@
     <value>インターネットに接続できませんでした。ゲームは引き続きプレイできますが、ランチャーを再起動して接続できるようになるまで更新は行われません</value>
   </data>
   <data name="OpenProfileFolder" xml:space="preserve">
-    <value>プロファイルのあるフォルダーを開く</value>
+    <value>プロファイルフォルダを開く</value>
   </data>
   <data name="OpenProfileFolderToolTip" xml:space="preserve">
-    <value>$NAMEのセーブファイルがあるフォルダーを開きます</value>
+    <value>$NAMEのゲームファイルがあるフォルダを開きます。</value>
   </data>
   <data name="OpenSaveFolder" xml:space="preserve">
-    <value>プロファイルのあるフォルダーを開く</value>
+    <value>セーブファイルフォルダを開く</value>
   </data>
   <data name="OpenSaveFolderToolTip" xml:space="preserve">
-    <value>$NAMEのセーブファイルがあるフォルダーを開きます</value>
+    <value>$NAMEのセーブファイルがあるフォルダを開きます。</value>
   </data>
   <data name="Play" xml:space="preserve">
     <value>PLAY</value>
