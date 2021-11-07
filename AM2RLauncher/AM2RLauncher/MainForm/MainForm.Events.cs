@@ -1000,7 +1000,7 @@ namespace AM2RLauncher
                 {
                     // Cancel the operation!
                     // Show message to tell user that mod could not be found, install this separately
-                    log.Error("Mod is not already installed! Cancelling mod update.");
+                    log.Error("Mod is not installed! Cancelling mod update.");
                     MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name), Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
                     abort = true;
                 }
@@ -1015,6 +1015,7 @@ namespace AM2RLauncher
 
                 log.Info("Successfully updated mod profile " + profile.Name + ".");
                 MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", currentProfile.Name), Language.Text.SuccessWindowTitle);
+                UpdateStateMachine();
             }
 
             ProfileXML currentSelectedProfile = profileList[settingsProfileDropDown.SelectedIndex];
