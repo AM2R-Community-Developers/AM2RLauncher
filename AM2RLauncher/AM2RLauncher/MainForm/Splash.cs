@@ -39,7 +39,8 @@ namespace AM2RLauncher
             "Use of the Launcher has now been authorized!",
             "Oh? So you're patching me?",
             "I, Gawron Giovana, have a dream.",
-            "Oooh weee ooo, I look just like an Omega" 
+            "Oooh weee ooo, I look just like an Omega",
+            "AH THE MOLE" 
         };
 
         /// <summary>
