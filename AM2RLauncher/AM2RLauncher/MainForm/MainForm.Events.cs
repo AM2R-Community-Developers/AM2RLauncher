@@ -195,7 +195,10 @@ namespace AM2RLauncher
                     try
                     {
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
+                        {
+                            log.Info("PatchData directory already exists, cleaning up...");
                             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                        }
 
                         await Task.Run(() => Repository.Clone(currentMirror, CrossPlatformOperations.CURRENTPATH + "/PatchData", c));
                     }
