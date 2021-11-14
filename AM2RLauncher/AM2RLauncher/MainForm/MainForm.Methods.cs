@@ -15,6 +15,7 @@ using AM2RLauncher.XML;
 using System.Net.NetworkInformation;
 using System.Net;
 using AM2RLauncher.Helpers;
+using System.Text.RegularExpressions;
 
 namespace AM2RLauncher
 {
@@ -311,7 +312,10 @@ namespace AM2RLauncher
             else if(Platform.IsGtk)
             {
                 datawin = "game.unx";
-                exe = "AM2R";
+                // use the exe name based on the desktop file in the appimage, rather than hardcoding it.
+                string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
+                exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
+                log.Info("According to AppImage desktop file, use \"" + exe + "\" as game name.");
             }
 
             log.Info("Attempting to patch in " + profilePath);
