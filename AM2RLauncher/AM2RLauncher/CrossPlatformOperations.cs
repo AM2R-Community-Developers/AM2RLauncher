@@ -66,7 +66,7 @@ namespace AM2RLauncher
         /// <returns>The value from <paramref name="property"/> as a string</returns>
         public static string ReadFromConfig(string property)
         {
-            if(currentPlatform.IsWinForms)
+            if (currentPlatform.IsWinForms)
             {
                 //we use the configuration manager in order to read `property` from the app.config and then return it
                 ConnectionStringSettings appConfig = ConfigurationManager.ConnectionStrings[property];
@@ -92,7 +92,7 @@ namespace AM2RLauncher
                 launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
 
                 if (launcherConfig[property] == null)
-                    return null;  
+                    return null;
 
                 //this uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
                 return launcherConfig[property]?.ToString();
@@ -207,7 +207,7 @@ namespace AM2RLauncher
             //needs quotes otherwise paths with space wont open
             if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
-                Process.Start("explorer.exe", $"/select \"{realPath}\"");
+                Process.Start("explorer.exe", "\"{realPath}\"");
             // linux only opens the directory bc opening and selecting a file is pain
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", $"\"{realPath}\"");
