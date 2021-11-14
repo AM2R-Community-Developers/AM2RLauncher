@@ -26,7 +26,8 @@ namespace AM2RLauncher
         /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
         private bool IsPatchDataCloned()
         {
-            return Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+            //isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
+            return Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData") && File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml");
         }
 
         /// <summary>

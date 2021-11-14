@@ -103,7 +103,7 @@ namespace AM2RLauncher
 
                 // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
                 // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
-                if (IsProfileInstalled(profileList[0]))
+                if (profileList.Count > 0 && IsProfileInstalled(profileList[0]))
                 {
                     ProfileXML currentXML = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)/profile.xml"));
 
@@ -333,7 +333,6 @@ namespace AM2RLauncher
 
                 #region Install
                 case UpdateState.Install:
-
                     progressBar.Visible = true;
                     progressBar.Value = 0;
                     SetPlayButtonState(UpdateState.Installing);
