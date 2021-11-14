@@ -819,8 +819,7 @@ namespace AM2RLauncher
             settingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
-            if(Platform.IsWinForms)
-                profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
+            profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
             if(Platform.IsGtk)
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
