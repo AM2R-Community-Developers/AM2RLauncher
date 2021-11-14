@@ -111,8 +111,10 @@ namespace AM2RLauncher
             {
                 //we use the configuration manager in order to read from the app.config, change the value and save it
                 Configuration appConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                if (appConfig == null)
+                    throw new NullReferenceException("Could not find the Config file! Please make sure it exists!");
                 ConnectionStringsSection connectionStringsSection = (ConnectionStringsSection)appConfig.GetSection("connectionStrings");
-                if(connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property].ConnectionString == null) 
+                if(connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null) 
                     throw new ArgumentException("The property " + property + " could not be found.");
                 connectionStringsSection.ConnectionStrings[property].ConnectionString = value.ToString();
                 appConfig.Save();

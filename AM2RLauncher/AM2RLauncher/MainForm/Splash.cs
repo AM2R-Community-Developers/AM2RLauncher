@@ -40,7 +40,8 @@ namespace AM2RLauncher
             "Oh? So you're patching me?",
             "I, Gawron Giovana, have a dream.",
             "Oooh weee ooo, I look just like an Omega",
-            "AH THE MOLE" 
+            "AH THE MOLE",
+            "S P I D E R B A L L"
         };
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace AM2RLauncher
             "All your Ubuntu are belong to Arch btw.",
             "Help, how do I quit vim!?",
             "The bloat isn't our fault, YoYo Games forced 1GB dependencies!",
+            "On second thought, maybe the bloat is our fault...",
             "The quieter you are, the more Metroids you can hear.",
             "What you are referring to as AM2R, is in fact, GNU/AM2R.",
             "GNOME be gone!",
@@ -61,7 +63,10 @@ namespace AM2RLauncher
             "Year 3115, NVIDIA still doesn't support Wayland.",
             "Was a mouse really that expensive, i3 users!?",
             "Imagine using non-free software.",
-            "What if... we used a non-FOSS OS? Haha just kidding... Unless?"
+            "What if... we used a non-FOSS OS? Haha just kidding... Unless?",
+            "🐧",
+            "You are already patched 🐸🕶",
+            "Yes, do as I say!",
         };
 
         /// <summary>
