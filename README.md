@@ -8,7 +8,7 @@ A front-end application that simplifies installing the latest AM2R-Community-Upd
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
 Linux needs the following dependencies installed:
 
-- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0)
+- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0) or above
 - `xdelta3` 
 - `gtk3`
 - `libappindicator3`
