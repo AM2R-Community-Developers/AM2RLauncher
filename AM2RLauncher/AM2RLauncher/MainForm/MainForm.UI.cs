@@ -522,7 +522,8 @@ namespace AM2RLauncher
                 "Italiano",
                 "Português",
                 "Русский",
-                "日本語"
+                "日本語",
+                "中文"
             };
 
             languageDropDown = new DropDown
