@@ -1,3 +1,13 @@
+## YOU MUST KNOW
+The original Launcher's address :https://github.com/AM2R-Community-Developers/AM2RLauncher
+and I just added Chinese
+The effect is shown in the figure
+![image](https://user-images.githubusercontent.com/89327487/143777115-6f8355f2-44c5-4e4f-b251-262ca324e1c4.png)
+![image](https://user-images.githubusercontent.com/89327487/143777133-7ad302c3-706b-4298-9307-269ab4ed4f6a.png)
+![image](https://user-images.githubusercontent.com/89327487/143777141-efbd3330-d8ae-4bd5-9d85-35c3ea2a3960.png)
+
+
+
 # AM2RLauncherRewrite
 This is the repository for the AM2RLauncher-Rewrite.
 
