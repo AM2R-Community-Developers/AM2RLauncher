@@ -41,7 +41,9 @@ namespace AM2RLauncher
             "I, Gawron Giovana, have a dream.",
             "Oooh weee ooo, I look just like an Omega",
             "AH THE MOLE",
-            "S P I D E R B A L L"
+            "S P I D E R B A L L",
+            "Fun is infinite with Community-Developers Inc.",
+            "You may only proceed if you wear baggy pants."
         };
 
         /// <summary>
@@ -67,6 +69,7 @@ namespace AM2RLauncher
             "🐧",
             "You are already patched 🐸🕶",
             "Yes, do as I say!",
+            "Did you find the penguin yet?"
         };
 
         /// <summary>
