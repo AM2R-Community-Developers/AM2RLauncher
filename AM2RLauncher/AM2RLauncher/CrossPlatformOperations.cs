@@ -207,7 +207,7 @@ namespace AM2RLauncher
             //needs quotes otherwise paths with space wont open
             if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
-                Process.Start("explorer.exe", "\"{realPath}\"");
+                Process.Start("explorer.exe", $"\"{realPath}\"");
             // linux only opens the directory bc opening and selecting a file is pain
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", $"\"{realPath}\"");
