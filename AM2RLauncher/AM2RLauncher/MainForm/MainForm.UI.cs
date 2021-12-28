@@ -153,7 +153,7 @@ namespace AM2RLauncher
             // But log actual folder location nonetheless
             log.Info("Actual Launcher location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
 
-            //Set the language to what User wanted or choose local language
+            // Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(c => c.NativeName.ToLower().Contains(userLanguage)).First();
@@ -164,7 +164,7 @@ namespace AM2RLauncher
             #region VARIABLE INITIALIZATION
             log.Info("Beginning UI initialization...");
 
-            // system tray indicator
+            // System tray indicator
             showButton = new ButtonMenuItem() { Text = Language.Text.TrayButtonShow };
             trayIndicator = new TrayIndicator()
             {
@@ -209,8 +209,8 @@ namespace AM2RLauncher
             // We do this as a List<Uri> so we can add more dynamically on user input... if necessary.
             mirrorList = CrossPlatformOperations.GenerateMirrorList();
 
-            //create mirror list
-            //we do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
+            // Create mirror list
+            // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
             mirrorDescriptionList = new List<ListItem>
             {
                 new ListItem { Key = mirrorList[0], Text = Language.Text.MirrorGithubText },
@@ -503,14 +503,14 @@ namespace AM2RLauncher
             // [LAUNCHER SETTINGS]
             DynamicLayout settingsLayout = new DynamicLayout();
 
-            //languageLabel
+            // LanguageLabel
             languageLabel = new Label
             {
                 Text = Language.Text.LanguageNotice,
                 TextColor = colGreen
             };
 
-            //language DropDown menu
+            // Language DropDown menu
 
             List<ListItem> languageList = new List<ListItem>()
             {
@@ -578,7 +578,7 @@ namespace AM2RLauncher
                 TextColor = colGreen
             };
 
-            // create game debug logs
+            // Create game debug logs
             profileDebugLogCheck = new CheckBox
             {
                 Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
@@ -586,9 +586,9 @@ namespace AM2RLauncher
                 TextColor = colGreen
             };
 
-            // custom environment variables label
+            // Custom environment variables label
             customEnvVarLabel = new Label();
-            if(Platform.IsGtk)
+            if (Platform.IsGtk)
             {
                 customEnvVarLabel = new Label
                 {
@@ -597,9 +597,9 @@ namespace AM2RLauncher
                 };
             }
 
-            // custom environment variables textbox
+            // Custom environment variables textbox
             customEnvVarTextBox = null;
-            if(Platform.IsGtk)
+            if (Platform.IsGtk)
             {
                 customEnvVarTextBox = new TextBox
                 {
@@ -624,7 +624,7 @@ namespace AM2RLauncher
             if (Platform.IsGtk)
                 mirrorDropDown = new DropDown { };
 
-            mirrorDropDown.Items.AddRange(mirrorDescriptionList);   //as above, find a way to get this inside the dropDown definition
+            mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
             mirrorIndex = (int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) : 0;
             mirrorDropDown.SelectedIndex =  mirrorIndex;
 
@@ -821,7 +821,7 @@ namespace AM2RLauncher
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
             profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
-            if(Platform.IsGtk)
+            if (Platform.IsGtk)
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
             newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
@@ -834,7 +834,7 @@ namespace AM2RLauncher
 
         #region CONTROL VARIABLES
 
-        //Visual studio does it like this for normal winforms projects, so I just used the same format.
+        // Visual studio does it like this for normal winforms projects, so I just used the same format.
 
         /// <summary>The tray indicator</summary>
         TrayIndicator trayIndicator;
@@ -846,7 +846,7 @@ namespace AM2RLauncher
         /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
         List<ListItem> profileNames;
 
-        //Bitmaps
+        // Bitmaps
         /// <summary>The Reddit icon.</summary>
         private Bitmap redditIcon;
         /// <summary>The Github icon.</summary>

@@ -27,7 +27,7 @@ namespace AM2RLauncher
         /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
         private bool IsPatchDataCloned()
         {
-            //isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
+            // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
             return Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData") && File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml");
         }
 
@@ -37,7 +37,7 @@ namespace AM2RLauncher
         /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
         private bool Is11Installed()
         {
-            // return safely if file doesn't exist
+            // Return safely if file doesn't exist
             if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")) return false;
             var returnCode = CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
             // Check if it's valid, if not log it, rename it and silently leave
@@ -129,9 +129,9 @@ namespace AM2RLauncher
             }
 
             // Delete the zip file in Mods
-            if(File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
+            if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
             {
-                File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal);     // for some reason, it was set at read only, so we undo that here
+                File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal); // For some reason, it was set at read only, so we undo that here
                 File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
             }
 
@@ -186,7 +186,7 @@ namespace AM2RLauncher
                             prof.DataPath = "/Mods/" + dir.Name;
                             profileList.Add(prof);
                         }
-                        else if (!IsProfileInstalled(prof)) // if not installable and isn't installed, remove it
+                        else if (!IsProfileInstalled(prof)) // If not installable and isn't installed, remove it
                         {
                             prof.DataPath = "/Mods/" + dir.Name;
                             DeleteProfile(prof, false);
@@ -205,19 +205,19 @@ namespace AM2RLauncher
                 profileDropDown.Items.Add(profile.Name);
             }
 
-            // read the value from the config
+            // Read the value from the config
             string profIndexString = CrossPlatformOperations.ReadFromConfig("ProfileIndex");
 
-            //check if either no profile was found or the setting says that the last current profile didn't exist
+            // Check if either no profile was found or the setting says that the last current profile didn't exist
             if (profileDropDown.Items.Count == 0)
                 profileIndex = null;
             else
             {
-                // we know that profiles exist at this point, so we're going to point it to 0 instead so the following code doesn't fail
+                // We know that profiles exist at this point, so we're going to point it to 0 instead so the following code doesn't fail
                 if (profIndexString == "null")
                     profIndexString = "0";
 
-                // we parse from the settings, and check if profiles got deleted from the last time the launcher has been selected. if yes, we revert the last selection to 0;
+                // We parse from the settings, and check if profiles got deleted from the last time the launcher has been selected. if yes, we revert the last selection to 0;
                 int intParseResult = Int32.Parse(profIndexString);
                 profileIndex = intParseResult;
                 if (profileIndex >= profileDropDown.Items.Count)
@@ -232,7 +232,7 @@ namespace AM2RLauncher
 
             log.Info("Profiles loaded.");
 
-            // refresh the author and version label on the main tab
+            // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
             {
                 profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
@@ -250,7 +250,7 @@ namespace AM2RLauncher
         {
             log.Info("Installing profile " + profile.Name + "...");
 
-            // check if xdelta is installed on linux, by searching all folders in PATH
+            // Check if xdelta is installed on linux, by searching all folders in PATH
             if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 Application.Instance.Invoke(new Action(() =>
@@ -312,7 +312,7 @@ namespace AM2RLauncher
             else if (Platform.IsGtk)
             {
                 datawin = "game.unx";
-                // use the exe name based on the desktop file in the appimage, rather than hardcoding it.
+                // Use the exe name based on the desktop file in the appimage, rather than hardcoding it.
                 string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
                 exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
                 log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
@@ -340,9 +340,10 @@ namespace AM2RLauncher
             {
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
-                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();    //just in case the resulting file isn't chmoddded, we do it here.
+                // Just in case the resulting file isn't chmoddded...
+                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();    
 
-                //these are not needed by linux at all, so we delete them
+                // These are not needed by linux at all, so we delete them
                 File.Delete(profilePath + "/data.win");
                 File.Delete(profilePath + "/AM2R.exe");
                 File.Delete(profilePath + "/D3DX9_43.dll");
@@ -353,7 +354,7 @@ namespace AM2RLauncher
 
             // Applied patch
             if (Platform.IsWinForms) UpdateProgressBar(66);
-            else if (Platform.IsGtk) UpdateProgressBar(44); //linux will take a bit longer, due to appimage creation
+            else if (Platform.IsGtk) UpdateProgressBar(44); // Linux will take a bit longer, due to appimage creation
             log.Info("xdelta patch(es) applied.");
 
             // Install new datafiles
@@ -372,24 +373,24 @@ namespace AM2RLauncher
 
                 // Rename all songs to lowercase
                 foreach (var file in new DirectoryInfo(assetsPath).GetFiles())
-                    if(file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
+                    if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
                         File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
 
-                //Copy AppImage template to here
+                // Copy AppImage template to here
                 HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
 
-                // safety checks, in case the folders don't exist
+                // Safety checks, in case the folders don't exist
                 Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/");
                 Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/assets/");
 
-                // copy game assets to the appimageDir
+                // Copy game assets to the appimageDir
                 HelperMethods.DirectoryCopy(assetsPath, profilePath + "/AM2R.AppDir/usr/bin/assets/");
                 File.Copy(profilePath + "/" + exe, profilePath + "/AM2R.AppDir/usr/bin/" + exe);
 
                 UpdateProgressBar(66);
                 log.Info("Gtk-specific formatting finished.");
 
-                // temp save the currentWorkingDirectory and console.error, change it to profilePath and null, call the script, and change it back.
+                // Temp save the currentWorkingDirectory and console.error, change it to profilePath and null, call the script, and change it back.
                 string workingDir = Directory.GetCurrentDirectory();
                 TextWriter cliError = Console.Error;
                 Directory.SetCurrentDirectory(profilePath);
@@ -399,7 +400,7 @@ namespace AM2RLauncher
                 Directory.SetCurrentDirectory(workingDir);
                 Console.SetError(cliError);
 
-                //Clean files
+                // Clean files
                 Directory.Delete(profilePath + "/AM2R.AppDir", true);
                 Directory.Delete(assetsPath, true);
                 File.Delete(profilePath + "/" +exe);
@@ -409,7 +410,7 @@ namespace AM2RLauncher
 
             // Copy profile.xml so we can grab data to compare for updates later!
             // tldr; check if we're in PatchData or not
-            if(new DirectoryInfo(dataPath).Parent.Name == "PatchData")
+            if (new DirectoryInfo(dataPath).Parent.Name == "PatchData")
                 File.Copy(dataPath + "/../profile.xml", profilePath + "/profile.xml");
             else File.Copy(dataPath + "/profile.xml", profilePath + "/profile.xml");
 
@@ -436,7 +437,7 @@ namespace AM2RLauncher
                 // Check for java, exit safely with a warning if not found!
                 if (!CrossPlatformOperations.IsJavaInstalled())
                 {
-                    //message box show needs to be done on main thread
+                    // Message box show needs to be done on main thread
                     Application.Instance.Invoke(new Action(() =>
                     {
                         MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
@@ -447,10 +448,10 @@ namespace AM2RLauncher
                     return;
                 }
 
-                // check if xdelta is installed on linux, by searching all folders in PATH
+                // Check if xdelta is installed on linux, by searching all folders in PATH
                 if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
                 {   
-                    //message box show needs to be done on main thread
+                    // Message box show needs to be done on main thread
                     Application.Instance.Invoke(new Action(() =>
                     {
                         MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
@@ -498,7 +499,7 @@ namespace AM2RLauncher
                 ProcessStartInfo apktoolStart = new ProcessStartInfo
                 {
                     FileName = proc,
-                    // for an explanation on the .replace look in CreateXdeltaPatch method
+                    // For an explanation on the .replace look in CreateXdeltaPatch method
                     Arguments = args + "\"" + apktoolPath.Replace(CrossPlatformOperations.CURRENTPATH + "/","../") + "\" d \"" + dataPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "/android/AM2RWrapper.apk\"",
                     WorkingDirectory = tempDir,
                     UseShellExecute = false,
@@ -653,7 +654,7 @@ namespace AM2RLauncher
 
                 if (Platform.IsWinForms)
                 {
-                    // sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
+                    // Sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
                     string arguments = "";
 
                     // Game logging
@@ -699,26 +700,26 @@ namespace AM2RLauncher
 
                     log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(customEnvVarTextBox.Text));
 
-                    if(!string.IsNullOrWhiteSpace(customEnvVarTextBox.Text))
+                    if (!string.IsNullOrWhiteSpace(customEnvVarTextBox.Text))
                     {
                         string envVars = customEnvVarTextBox.Text;
 
                         for(int i = 0; i < customEnvVarTextBox.Text.Count(f => f == '='); i++)
                         {
-                            // env var variable
+                            // Env var variable
                             string variable = envVars.Substring(0, envVars.IndexOf('='));
                             envVars = envVars.Replace(variable + "=", "");
 
-                            // this thing here is the value parser. Since values are sometimes "like this", i need to compensate for them.
+                            // This thing here is the value parser. Since values are sometimes in quotes, i need to compensate for them.
                             int valueSubstringLength = 0;
-                            if(envVars[0] != '"')               // if value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
+                            if (envVars[0] != '"')               // If value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
                             {
                                 if (envVars.IndexOf(' ') >= 0)
                                     valueSubstringLength = envVars.IndexOf(' ')+1;
                                 else
                                     valueSubstringLength = envVars.Length;
                             }
-                            else                               // if value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
+                            else                                // If value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
                             {
                                 int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"')+1);
                                 if (envVars.IndexOf(' ', secondQuoteIndex) >= 0)
@@ -726,7 +727,7 @@ namespace AM2RLauncher
                                 else
                                     valueSubstringLength = envVars.Length;
                             }
-                            // env var value
+                            // Env var value
                             string value = envVars.Substring(0, valueSubstringLength);
                             envVars = envVars.Substring(value.Length);
 
@@ -735,7 +736,7 @@ namespace AM2RLauncher
                         }
                     }
 
-                    // IF we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
+                    // If we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
                     string terminalOutput = null;
 
                     startInfo.UseShellExecute = false;
@@ -782,10 +783,10 @@ namespace AM2RLauncher
 
                         StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
-                        // write general info
+                        // Write general info
                         stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
 
-                        //write what was in the terminal
+                        // Write what was in the terminal
                         stream.WriteLine(terminalOutput);
 
                         stream.Flush();
@@ -1087,13 +1088,13 @@ namespace AM2RLauncher
 
             string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
 
-            // clean up in case folder exists already
+            // Clean up in case folder exists already
             if (Directory.Exists(tmpPath))
                 Directory.Delete(tmpPath, true);
 
             Directory.CreateDirectory(tmpPath);
 
-            //open archive
+            // Open archive
             ZipArchive am2rZip = ZipFile.OpenRead(zipPath);
 
             // Check if exe exists anywhere
@@ -1124,10 +1125,10 @@ namespace AM2RLauncher
             if (HelperMethods.CalculateMD5(tmpPath + "/" + d3dx.FullName) != d3dHash)
                 return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
 
-            // clean up
+            // Clean up
             Directory.Delete(tmpPath, true);
 
-            // if we didn't exit before, everything is fine
+            // If we didn't exit before, everything is fine
             return IsZipAM2R11ReturnCodes.Successful;
         }
     }

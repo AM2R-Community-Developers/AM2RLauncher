@@ -23,8 +23,8 @@ namespace AM2RLauncher
         static readonly public string VERSION = "2.1.2";
 
         /// <summary>The current Running platform.</summary>
-        static readonly private Platform currentPlatform = Platform.Instance;   //needs to be declared here as well, because I can't access the one from eto
-                                                                                //since it's not loaded at this point
+        static readonly private Platform currentPlatform = Platform.Instance;   // Needs to be declared here as well, because I can't access the one from eto,
+                                                                                // Since isn't loaded at this point
 
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         static readonly private string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
@@ -47,9 +47,9 @@ namespace AM2RLauncher
 
             string version = VERSION.Replace(".", "");
 
-            //update section
+            // Update section
 
-            //delete old files that have been left
+            // Clean old files that have been left
             if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak"))
             {
                 log.Info("AM2RLauncher.bak detected. Removing file.");
@@ -86,15 +86,15 @@ namespace AM2RLauncher
                 }
             }
 
-            //check settings if autoUpdateLauncher is set to true
+            // Check settings if autoUpdateLauncher is set to true
             bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher"));
 
             if (autoUpdate)
             {
                 log.Info("AutoUpdate Launcher set to true!");
 
-                //this is supposed to fix the updater throwing an exception on windows 7 and earlier(?)
-                //see this for information: https://stackoverflow.com/questions/2859790/the-request-was-aborted-could-not-create-ssl-tls-secure-channel and https://stackoverflow.com/a/50977774
+                // This is supposed to fix the updater throwing an exception on windows 7 and earlier(?)
+                // See this for information: https://stackoverflow.com/q/2859790 and https://stackoverflow.com/a/50977774
                 if (currentPlatform.IsWinForms)
                 {
                     ServicePointManager.Expect100Continue = true;
@@ -177,7 +177,7 @@ namespace AM2RLauncher
                         log.Info("Moving " +  file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
                         File.Copy(file.FullName, updatePath + "/" + file.Name, true);
                     }
-                    // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
+                    // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
                     {
                         // So, because Windows behavior is dumb...
@@ -198,8 +198,8 @@ namespace AM2RLauncher
                         }
 
                         // Yes, the above calls could be recursive. No, I can't be bothered to make them as such.
-
-                        HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
+                        if (Directory.Exists(tmpUpdatePath + "lib"))
+                            HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
                     }
                     
                     Directory.Delete(tmpUpdatePath, true);

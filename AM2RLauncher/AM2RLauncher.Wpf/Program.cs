@@ -25,7 +25,7 @@ namespace AM2RLauncher.Wpf
             // Configure logger
             XmlConfigurator.Configure(new FileInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "/log4net.config"));
 
-            //try catch in case it ever crashes before actually getting to the Eto application
+            // Try catch in case it ever crashes before actually getting to the Eto application
             try
             {
                 Application WinLauncher = new Application(Eto.Platforms.WinForms);

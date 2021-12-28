@@ -74,34 +74,34 @@ namespace AM2RLauncher
         {
             if (currentPlatform.IsWinForms)
             {
-                //we use the configuration manager in order to read `property` from the app.config and then return it
+                // We use the configuration manager in order to read `property` from the app.config and then return it
                 ConnectionStringSettings appConfig = ConfigurationManager.ConnectionStrings[property];
                 if (appConfig == null) throw new ArgumentException("The property " + property + " could not be found.");
                 return appConfig.ConnectionString;
             }
             if (currentPlatform.IsGtk)
             {
-                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
                 string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
                 string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
-                //if folder doesn't exist, create it and the config file
+                // If folder doesn't exist, create it and the config file
                 if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
                 {
                     Directory.CreateDirectory(launcherConfigPath);
                     File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
                 }
 
-                //deserialize the config xml into launcherConfig
+                // Deserialize the config xml into launcherConfig
                 launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
 
                 if (launcherConfig[property] == null)
                     return null;
 
-                //this uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
+                // This uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
                 return launcherConfig[property]?.ToString();
             }
             return null;
@@ -116,12 +116,12 @@ namespace AM2RLauncher
         {
             if (currentPlatform.IsWinForms)
             {
-                //we use the configuration manager in order to read from the app.config, change the value and save it
+                // We use the configuration manager in order to read from the app.config, change the value and save it
                 Configuration appConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 if (appConfig == null)
                     throw new NullReferenceException("Could not find the Config file! Please make sure it exists!");
                 ConnectionStringsSection connectionStringsSection = (ConnectionStringsSection)appConfig.GetSection("connectionStrings");
-                if(connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null) 
+                if (connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null) 
                     throw new ArgumentException("The property " + property + " could not be found.");
                 connectionStringsSection.ConnectionStrings[property].ConnectionString = value.ToString();
                 appConfig.Save();
@@ -129,26 +129,26 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk)
             {
-                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
                 string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
                 string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
-                //if folder doesn't exist, create it and the config file
+                // If folder doesn't exist, create it and the config file
                 if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
                 {
                     Directory.CreateDirectory(launcherConfigPath);
                     File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
                 }
-                //deserialize the config xml into launcherConfig
+                // Deserialize the config xml into launcherConfig
                 launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
 
-                //uses indexer. Look at LauncherConfigXML for more info
+                // Uses indexer. Look at LauncherConfigXML for more info
                 launcherConfig[property] = value;
 
-                //serialize back into the file
+                // Serialize back into the file
                 File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
             }
         }
@@ -158,7 +158,7 @@ namespace AM2RLauncher
         /// </summary>
         public static void CopyOldConfigToNewConfig()
         {
-            if(currentPlatform.IsWinForms)
+            if (currentPlatform.IsWinForms)
             {
                 string oldConfigPath = LAUNCHERNAME + ".oldCfg";
                 string newConfigPath = LAUNCHERNAME + ".config";
@@ -176,16 +176,16 @@ namespace AM2RLauncher
                 File.WriteAllText(newConfigPath, newConfigText);
 
             }
-            else if(currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk)
             {
-                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
                 string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
                 string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
-                //for some reason deserializing and saving back again works, not exactly sure why, but I'll take it
+                // For some reason deserializing and saving back again works, not exactly sure why, but I'll take it
                 launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
                 File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
             }
@@ -197,9 +197,9 @@ namespace AM2RLauncher
         /// <param name="url">The URL of the website to be opened.</param>
         public static void OpenURL(string url)
         {
-            if(currentPlatform.IsWinForms)
+            if (currentPlatform.IsWinForms)
                 Process.Start(url);
-            else if(currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", url);
         }
 
@@ -219,11 +219,11 @@ namespace AM2RLauncher
                 Directory.CreateDirectory(realPath);
             }
 
-            //needs quotes otherwise paths with space wont open
+            // Needs quotes otherwise paths with space wont open
             if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
                 Process.Start("explorer.exe", $"\"{realPath}\"");
-            // linux only opens the directory bc opening and selecting a file is pain
+            // Linux only opens the directory bc opening and selecting a file is pain
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", $"\"{realPath}\"");
         }
@@ -245,7 +245,7 @@ namespace AM2RLauncher
                 return;
             }
 
-            //needs quotes otherwise paths with spaces wont open
+            // Needs quotes otherwise paths with spaces wont open
             if (currentPlatform.IsWinForms)
                 // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
                 Process.Start("explorer.exe", $"/select, \"{realPath}\"");
@@ -284,7 +284,7 @@ namespace AM2RLauncher
 
             java.StartInfo = javaStart;
 
-            //this is primarily for linux, but could be happening on windows as well
+            // This is primarily for linux, but could be happening on windows as well
             try
             {
                 java.Start();
@@ -342,7 +342,7 @@ namespace AM2RLauncher
         /// <param name="output">Full Path to the output file.</param>
         public static void ApplyXdeltaPatch(string original, string patch, string output)
         {
-            // for *whatever reason* **sometimes** xdelta patching doesn't work, if output = original. So I'm fixing that here.
+            // For *whatever reason* **sometimes** xdelta patching doesn't work, if output = original. So I'm fixing that here.
             string originalOutput = output;
             if (original == output)
                 output = output += "_";
@@ -395,7 +395,7 @@ namespace AM2RLauncher
         /// Figures out what the AM2RLauncher's <see cref="CURRENTPATH"/> should be.<br/>
         /// Determination is as follows:
         /// <list type="number">
-        ///     <item><b>AM2RLAUNCHERDATA</b> environment variable is read and folders are recursively generated.</item>
+        ///     <item><b>$AM2RLAUNCHERDATA</b> environment variable is read and folders are recursively generated.</item>
         ///     <item>The current OS is checked. For Windows, the path where the executable is located will be returned.<br/>
         ///     For Linux, <b>$XDG_DATA_HOME/AM2RLauncher</b> will be returned. 
         ///     Should <b>$XDG_DATA_HOME</b> be empty, it will default to <b>$HOME/.local/share</b>.</item>

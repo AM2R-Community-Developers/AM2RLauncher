@@ -61,7 +61,7 @@ namespace AM2RLauncher
                 {
                     await Task.Run(() => PullPatchData());
 
-                    // thank you druid, for this case that should never happen
+                    // Thank you druid, for this case that should never happen
                     if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
                     {
                         log.Error("Druid PatchData corruption occurred!");
@@ -70,10 +70,10 @@ namespace AM2RLauncher
                         return;
                     }
                 }
-                catch (UserCancelledException) { }   //we deliberately cancelled this!
-                catch (LibGit2SharpException ex)    //this is for any exceptions from libgit
+                catch (UserCancelledException) { }  // We deliberately cancelled this!
+                catch (LibGit2SharpException ex)    // This is for any exceptions from libgit
                 {
-                    //libgit2sharp error messages are always in english!
+                    // Libgit2sharp error messages are always in english!
                     if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
                         ex.Message.ToLower().Contains("failed to resolve address"))
                     {
@@ -89,7 +89,7 @@ namespace AM2RLauncher
                         MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                     }
                 }
-                catch (Exception ex)             //this is if somehow any other exception might get thrown as well.
+                catch (Exception ex)                // This is if somehow any other exception might get thrown as well.
                 {
                     log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                     MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
@@ -191,7 +191,7 @@ namespace AM2RLauncher
                         OnTransferProgress = new TransferProgressHandler(TransferProgressHandlerMethod)
                     };
 
-                    // Everything after this is basically on a different thread, so the rest of the launcher isn't locked up.
+                    // Everything after this is on a different thread, so the rest of the launcher isn't locked up.
                     try
                     {
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
@@ -204,11 +204,12 @@ namespace AM2RLauncher
                     }
                     catch (UserCancelledException)
                     {
+                        // We deliberately cancelled this!
                         successful = false;
-                    }   //we deliberately cancelled this!
-                    catch (LibGit2SharpException ex)    //this is for any exceptions from libgit
+                    }
+                    catch (LibGit2SharpException ex)    // This is for any exceptions from libgit
                     {
-                        //libgit2sharp error messages are always in english!
+                        // Libgit2sharp error messages are always in english!
                         if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
                             ex.Message.ToLower().Contains("failed to resolve address"))
                         {
@@ -224,12 +225,12 @@ namespace AM2RLauncher
                         }
                         successful = false;
                     }
-                    catch(Exception ex)             //this is if somehow any other exception might get thrown as well.
+                    catch(Exception ex)             // This is if somehow any other exception might get thrown as well.
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
 
-                        if(Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
+                        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
                             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         successful = false;
                     }
@@ -268,7 +269,7 @@ namespace AM2RLauncher
                         isGitProcessGettingCancelled = true;
                     }
                     // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
-                    // but we should probably wait a bit before proceeding, since cleanup can take a while
+                    // But we should probably wait a bit before proceeding, since cleanup can take a while
                     Thread.Sleep(1000);
                     isGitProcessGettingCancelled = false;
                     break;
@@ -299,7 +300,7 @@ namespace AM2RLauncher
                     {
                         if (Directory.Exists(fileFinder.FileName))
                         {
-                            // this can happen on linux, and maybe windows as well
+                            // This can happen on linux, and maybe windows as well
                             log.Error("User selected a Directory. Cancelling import.");
                             return;
                         }
@@ -312,15 +313,15 @@ namespace AM2RLauncher
                             return;
                         }
 
-                        //if either a directory was selected or the file somehow went missing, cancel
+                        // If either a directory was selected or the file somehow went missing, cancel
                         if (!File.Exists(fileFinder.FileName))
                         {
                             log.Error("Selected AM2R_11.zip file not found! Cancelling import.");
                             break;
                         }
 
-                        //we check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
-                        if(!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip"))
+                        // We check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
+                        if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip"))
                             File.Copy(fileFinder.FileName, CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
 
                         log.Info("AM2R_11.zip successfully imported.");
@@ -346,7 +347,7 @@ namespace AM2RLauncher
 
                     await Task.Run(() =>
                     {
-                        //if the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
+                        // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
                         try
                         {
                             InstallProfile(profileList[profileIndex.Value]);
@@ -414,8 +415,8 @@ namespace AM2RLauncher
         /// </summary>
         private bool TransferProgressHandlerMethod(TransferProgress transferProgress)
         {
-            //thank you random issue on the gitlib2sharp repo!!!!
-            //also tldr; rtfm
+            // Thank you random issue on the gitlib2sharp repo!!!!
+            // Also tldr; rtfm
             if (isGitProcessGettingCancelled) return false;
 
             // This needs to be in an Invoke, in order to access the variables from the main thread
@@ -527,7 +528,7 @@ namespace AM2RLauncher
             {
                 log.Info("User selected \"" + fileFinder.FileName + "\"");
 
-                //if either a directory was selected or the file somehow went missing, cancel
+                // If either a directory was selected or the file somehow went missing, cancel
                 if (!File.Exists(fileFinder.FileName))
                 {
                     log.Error("Selected mod .zip file not found! Cancelling import.");
@@ -536,17 +537,12 @@ namespace AM2RLauncher
 
                 FileInfo modFile = new FileInfo(fileFinder.FileName);
 
-                //we check if it exists first, because it might've copied it into here while on the showDialog
-                // This is irrelevant - we don't need to copy the zip over
-                // if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name))
-                //     File.Copy(fileFinder.FileName, CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
-
                 string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
                 string extractedName = modFile.Name.Replace(".zip", "");
 
-                //extract it and see if it contains a profile.xml. If not, this is invalid
+                // Extract it and see if it contains a profile.xml. If not, this is invalid
 
-                // check first, if the directory is already there, if yes, throw a message
+                // Check first, if the directory is already there, if yes, throw a message
                 if (Directory.Exists(modsDir + "/" + extractedName))
                 {
                     ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
@@ -559,7 +555,7 @@ namespace AM2RLauncher
                 ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
                 log.Info("Imported and extracted mod .zip as " + extractedName);
 
-                // let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
+                // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
                 if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
                 {
                     log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
@@ -572,12 +568,12 @@ namespace AM2RLauncher
 
                 ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
 
-                // check if the OS versions match
-                if((Platform.IsWinForms && profile.OperatingSystem != "Windows") || (Platform.IsGtk && profile.OperatingSystem != "Linux"))
+                // Check if the OS versions match
+                if ((Platform.IsWinForms && profile.OperatingSystem != "Windows") || (Platform.IsGtk && profile.OperatingSystem != "Linux"))
                 {
                     string currentOS = "";
                     if (Platform.IsWinForms) currentOS = "Windows";
-                    else if (Platform.IsGtk) currentOS = "Linux";       ///teeeeechnically, any OS could run GTK applications as well but it'd break a lot and is thus unsupported.
+                    else if (Platform.IsGtk) currentOS = "Linux";       // Teeeeechnically, any OS could run GTK applications as well but it'd break a lot and is thus unsupported.
 
 
                     log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
@@ -588,7 +584,7 @@ namespace AM2RLauncher
                     return;
                 }
 
-                // check by *name*, if the mod was installed already
+                // Check by *name*, if the mod was installed already
                 if (profileList.Where(p => p.Name == profile.Name).FirstOrDefault() != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
                 {
                     log.Error(profile.Name + " is already installed.");
@@ -681,9 +677,9 @@ namespace AM2RLauncher
         /// </summary>
         private void ProfileLayoutLoadComplete(object sender, EventArgs e)
         {
-            // safety check
+            // Safety check
             if (settingsProfileDropDown == null) return;
-            if(settingsProfileDropDown.Items.Count == 0)
+            if (settingsProfileDropDown.Items.Count == 0)
             {
                 addModButton.Enabled = false;
                 settingsProfileLabel.TextColor = colInactive;
@@ -758,7 +754,7 @@ namespace AM2RLauncher
 
             profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex + "");       //Loj, tell me a better way to do this
+            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex + "");       // Loj, tell me a better way to do this
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
                 profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
@@ -830,12 +826,12 @@ namespace AM2RLauncher
 
             CrossPlatformOperations.WriteToConfig("MirrorIndex",mirrorDropDown.SelectedIndex);
 
-            //don't overwrite the git config while we download!!!
+            // Don't overwrite the git config while we download!!!
             if (updateState == UpdateState.Downloading) return;
 
             log.Info("Overwriting mirror in gitconfig.");
 
-            //check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
+            // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
             string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
             if (!File.Exists(gitConfigPath)) return;
             string gitConfig = File.ReadAllText(gitConfigPath);
@@ -865,7 +861,7 @@ namespace AM2RLauncher
 
             log.Info("Overwriting mirror in gitconfig.");
 
-            //check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
+            // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
             string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
             if (!File.Exists(gitConfigPath)) return;
             string gitConfig = File.ReadAllText(gitConfigPath);
@@ -952,7 +948,7 @@ namespace AM2RLauncher
             {
                 log.Info("User selected \"" + fileFinder.FileName + "\"");
 
-                //if either a directory was selected or the file somehow went missing, cancel
+                // If either a directory was selected or the file somehow went missing, cancel
                 if (!File.Exists(fileFinder.FileName))
                 {
                     log.Error("Selected mod .zip file not found! Cancelling mod update.");
@@ -964,12 +960,12 @@ namespace AM2RLauncher
                 string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
                 string extractedName = modFile.Name.Replace(".zip", "_new");
 
-                //extract it and see if it contains a profile.xml. If not, this is invalid
+                // Extract it and see if it contains a profile.xml. If not, this is invalid
 
                 // Directory doesn't exist -> extract!
                 ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
 
-                // let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
+                // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
                 if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
                 {
                     log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
@@ -979,7 +975,7 @@ namespace AM2RLauncher
                     return;
                 }
 
-                // check by *name*, if the mod was installed already
+                // Check by *name*, if the mod was installed already
                 ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
 
                 if (profileList.Where(p => p.Name == profile.Name).FirstOrDefault() != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
@@ -1016,7 +1012,7 @@ namespace AM2RLauncher
 
                 if (abort)
                 {
-                    // file cleanup
+                    // File cleanup
                     HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     LoadProfiles();
                     return;
@@ -1057,7 +1053,7 @@ namespace AM2RLauncher
                 }
                 else 
                     isGitProcessGettingCancelled = true;
-                    //We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
+                    // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
 
             }
             else if (updateState == UpdateState.Installing)
@@ -1066,7 +1062,7 @@ namespace AM2RLauncher
                 e.Cancel = true;
             }
 
-            //this needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
+            // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
             trayIndicator.Visible = false;
 
             if (e.Cancel)

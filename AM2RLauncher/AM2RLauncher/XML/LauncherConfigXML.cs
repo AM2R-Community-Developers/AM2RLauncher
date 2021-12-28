@@ -72,12 +72,12 @@ namespace AM2RLauncher.XML
         public bool IsMaximized
         { get; set; }
 
-        //huge help from James for all of this!!!
-        //here's a short explanation of this. Basically, what we do is create an indexer. This makes it possible for this class to be indexed, like this LauncherConfigXML[i]
-        //the indexer here has a get and set "submethod". And both use Reflection to get the current class as something that can be used with lambda values
-        //so for get we just lambda the properties and search for something that can be read and has the same name as the input property. After that, we just get the value and return it as a string
-        //set is basiaclly the same, but instead of returning it, we set the prtoperty value, which would be followed after the `='. 
-        //So LauncherConfigXML[property] = hellWorld would set the value of `property` to `hellWorld`
+        // Huge help from James for all of this!!!
+        // Here's a short explanation of this. Basically, what we do is create an indexer. This makes it possible for this class to be indexed, like this LauncherConfigXML[i]
+        // The indexer here has a get and set "submethod". And both use Reflection to get the current class as something that can be used with lambda values
+        // So for get we just lambda the properties and search for something that can be read and has the same name as the input property. After that, we just get the value and return it as a string
+        // Set is basiaclly the same, but instead of returning it, we set the prtoperty value, which would be followed after the `='. 
+        // So LauncherConfigXML[property] = hellWorld would set the value of `property` to `hellWorld`
         /// <summary>
         /// An Indexer for <see cref="ProfileXML"/>. Not to be used directly, use <see cref="CrossPlatformOperations.WriteToConfig(string, object)"/>
         /// or <see cref="CrossPlatformOperations.ReadFromConfig(string)"/> instead!
@@ -88,7 +88,7 @@ namespace AM2RLauncher.XML
         {
             get
             { 
-                //this is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
+                // This is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
                 return typeof(LauncherConfigXML).GetProperties().Where(p => p.CanRead && p.Name == property).First().GetValue(this).ToString();
             }
             set
