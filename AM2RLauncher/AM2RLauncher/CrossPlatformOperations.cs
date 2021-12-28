@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using log4net;
 
 namespace AM2RLauncher
 {
@@ -17,14 +18,19 @@ namespace AM2RLauncher
     class CrossPlatformOperations
     {
         /// <summary>
+        /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+
+        /// <summary>
         /// Gets the current platform. 
         /// </summary>
         readonly private static Platform currentPlatform = Platform.Instance;
 
         /// <summary>
-        /// Current Path where the Launcher is located. For Linux this is redirected to ~/.local/share/AM2RLauncher, in order to be more compliant to the XDG Base Directory Specification.
+        /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
         /// </summary>
-        static readonly public string CURRENTPATH = currentPlatform.IsWinForms ? Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) : Environment.GetEnvironmentVariable("HOME") + "/.local/share/AM2RLauncher";
+        static readonly public string CURRENTPATH = GenerateCurrentPath();
 
         /// <summary>
         /// Name of the Launcher executable.
@@ -75,10 +81,11 @@ namespace AM2RLauncher
             }
             if (currentPlatform.IsGtk)
             {
-                //config for nix systems will be saved in .config/AM2RLauncher
+                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
-                string launcherConfigPath = homePath + "/.config/AM2RLauncher/";
-                string launcherConfigFilePath = launcherConfigPath + "config.xml";
+                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 //if folder doesn't exist, create it and the config file
@@ -122,10 +129,11 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk)
             {
-                //config for nix systems will be saved in .config/AM2RLauncher
+                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
-                string launcherConfigPath = homePath + "/.config/AM2RLauncher/";
-                string launcherConfigFilePath = launcherConfigPath + "config.xml";
+                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 //if folder doesn't exist, create it and the config file
@@ -170,9 +178,11 @@ namespace AM2RLauncher
             }
             else if(currentPlatform.IsGtk)
             {
+                //config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
                 string homePath = Environment.GetEnvironmentVariable("HOME");
-                string launcherConfigPath = homePath + "/.config/AM2RLauncher/";
-                string launcherConfigFilePath = launcherConfigPath + "config.xml";
+                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 //for some reason deserializing and saving back again works, not exactly sure why, but I'll take it
@@ -200,9 +210,14 @@ namespace AM2RLauncher
         public static void OpenFolder(string path)
         {
             // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
-            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\") : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+            // And on Nix systems, we want to replace ~ with its corresponding env var
+            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
+                                                         : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
             if (!Directory.Exists(realPath))
+            {
+                log.Info(realPath + " did not exist and was created");
                 Directory.CreateDirectory(realPath);
+            }
 
             //needs quotes otherwise paths with space wont open
             if (currentPlatform.IsWinForms)
@@ -214,15 +229,21 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Opens <paramref name="path"/> and selects it in a file explorer.
+        /// Opens <paramref name="path"/> and selects it in a file explorer. 
+        /// Only selects on Windows, on Linux it just opens the folder. Does nothing if file doesn't exist.
         /// </summary>
         /// <param name="path">Path to open.</param>
         public static void OpenFolderAndSelectFile(string path)
         {
             // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
-            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\") : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+            // And on nix systems, we want to replace ~ with its corresponding env var
+            string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
+                                                         : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
             if (!File.Exists(realPath))
+            {
+                log.Error(realPath + "did not exist, operation to open its folder was cancelled!");
                 return;
+            }
 
             //needs quotes otherwise paths with spaces wont open
             if (currentPlatform.IsWinForms)
@@ -326,7 +347,8 @@ namespace AM2RLauncher
             if (original == output)
                 output = output += "_";
 
-            string arguments = "-f -d -s \"" + original.Replace(CURRENTPATH + "/","") + "\" \"" + patch.Replace(CURRENTPATH + "/", "") + "\" \"" + output.Replace(CURRENTPATH + "/", "") + "\"";
+            string arguments = "-f -d -s \"" + original.Replace(CURRENTPATH + "/","") + "\" \"" + patch.Replace(CURRENTPATH + "/", "")
+                               + "\" \"" + output.Replace(CURRENTPATH + "/", "") + "\"";
 
             if (currentPlatform.IsWinForms)
             {
@@ -367,6 +389,78 @@ namespace AM2RLauncher
                 File.Delete(originalOutput);
                 File.Move(output, originalOutput);
             }
+        }
+
+        /// <summary>
+        /// Figures out what the AM2RLauncher's <see cref="CURRENTPATH"/> should be.<br/>
+        /// Determination is as follows:
+        /// <list type="number">
+        ///     <item><b>AM2RLAUNCHERDATA</b> environment variable is read and folders are recursively generated.</item>
+        ///     <item>The current OS is checked. For Windows, the path where the executable is located will be returned.<br/>
+        ///     For Linux, <b>$XDG_DATA_HOME/AM2RLauncher</b> will be returned. 
+        ///     Should <b>$XDG_DATA_HOME</b> be empty, it will default to <b>$HOME/.local/share</b>.</item>
+        ///     <item>The path where the executable is located will be returned.</item>
+        /// </list>
+        /// Should any errors occur, it falls down to the next step.
+        /// </summary>
+        /// <returns></returns>
+        private static string GenerateCurrentPath()
+        {
+            // First, we check if the user has a custom AM2RLAUNCHERDATA env var
+            string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
+            if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+            {
+                try
+                {
+                    // This will create the directories recursively if they don't exist
+                    Directory.CreateDirectory(am2rLauncherDataEnvVar);
+
+                    // Our env var is now set and directories exist
+                    log.Info("CurrentPath is set to " + am2rLauncherDataEnvVar);
+                    return am2rLauncherDataEnvVar;
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"There was an error with '{am2rLauncherDataEnvVar}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
+                }
+            }
+
+            if (currentPlatform.IsWinForms)
+            {
+                log.Info("Using default Windows CurrentPath.");
+                // Windows has the path where the exe is located as default
+                return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            }
+            else if (currentPlatform.IsGtk)
+            {
+                // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
+                string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+                if (string.IsNullOrWhiteSpace(xdgDataHome))
+                {
+                    log.Info("Using default Linux CurrentPath.");
+                    xdgDataHome = Environment.GetEnvironmentVariable("HOME") + "/.local/share";
+                }
+
+                // Add AM2RLauncher to the end of the dataPath
+                xdgDataHome += "/AM2RLauncher";
+
+                try
+                {
+                    // This will create the directories recursively if they don't exist
+                    Directory.CreateDirectory(xdgDataHome);
+
+                    // Our env var is now set and directories exist
+                    log.Info("CurrentPath is set to " + xdgDataHome);
+                    return xdgDataHome;
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"There was an error with '{xdgDataHome}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
+                }
+            }
+
+            log.Info("Something went wrong, falling back to the default CurrentPath.");
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
     }
 }

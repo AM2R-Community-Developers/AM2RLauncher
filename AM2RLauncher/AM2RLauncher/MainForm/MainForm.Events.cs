@@ -577,12 +577,13 @@ namespace AM2RLauncher
                 {
                     string currentOS = "";
                     if (Platform.IsWinForms) currentOS = "Windows";
-                    else if (Platform.IsGtk) currentOS = "Linux";           ///teeeeechnically, windows users and macos users could run GTK applications as well, so this would prolly need clarification.
+                    else if (Platform.IsGtk) currentOS = "Linux";       ///teeeeechnically, any OS could run GTK applications as well but it'd break a lot and is thus unsupported.
 
 
                     log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
 
-                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME",profile.Name).Replace("$OS",profile.OperatingSystem).Replace("$CURRENTOS",currentOS), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME",profile.Name).Replace("$OS",profile.OperatingSystem).Replace("$CURRENTOS",currentOS),
+                                    Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                     HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     return;
                 }
@@ -621,7 +622,8 @@ namespace AM2RLauncher
         {
             if (IsProfileIndexValid())
             {
-                log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+                log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name +
+                        ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
                 CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
             }
         }
@@ -758,7 +760,8 @@ namespace AM2RLauncher
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
             CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex + "");       //Loj, tell me a better way to do this
 
-            if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" || profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
+            if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
+                profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
                 saveWarningLabel.Visible = true;
             else
                 saveWarningLabel.Visible = false;
@@ -798,8 +801,9 @@ namespace AM2RLauncher
             bool enabled = (bool)customMirrorCheck.Checked;
             customMirrorTextBox.Enabled = enabled;
             mirrorDropDown.Enabled = !enabled;
+            // Not sure why the dropdown menu needs this hack, but the textBox does not.
             if (Platform.IsWinForms)
-                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;   // Not sure why the dropdown menu needs this hack, but the textBox does not.
+                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;   
             mirrorLabel.TextColor =  !enabled ? colGreen : colInactive;
 
             // Create warning dialog when enabling
@@ -901,7 +905,8 @@ namespace AM2RLauncher
             ProfileXML profile = profileList[settingsProfileDropDown.SelectedIndex];
             log.Info("User is attempting to delete profile " + profile.Name + ".");
 
-            DialogResult result = MessageBox.Show(Language.Text.DeleteModWarning.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
+            DialogResult result = MessageBox.Show(Language.Text.DeleteModWarning.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, 
+                                                  MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
             if (result == DialogResult.Ok)
             {
@@ -980,7 +985,8 @@ namespace AM2RLauncher
                 if (profileList.Where(p => p.Name == profile.Name).FirstOrDefault() != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
                 {
                     // Mod is already installed, so we can update!
-                    DialogResult result = MessageBox.Show(Language.Text.UpdateModWarning.Replace("$NAME", currentProfile.Name), Language.Text.WarningWindowTitle, MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
+                    DialogResult result = MessageBox.Show(Language.Text.UpdateModWarning.Replace("$NAME", currentProfile.Name), Language.Text.WarningWindowTitle,
+                                                          MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
                     if (result == DialogResult.Ok)
                     {
@@ -1003,7 +1009,8 @@ namespace AM2RLauncher
                     // Cancel the operation!
                     // Show message to tell user that mod could not be found, install this separately
                     log.Error("Mod is not installed! Cancelling mod update.");
-                    MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name), Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                    MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name),
+                                    Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
                     abort = true;
                 }
 
@@ -1042,7 +1049,8 @@ namespace AM2RLauncher
 
             if (updateState == UpdateState.Downloading)
             {
-                var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                                             MessageBoxType.Warning, MessageBoxDefaultButton.No);
                 if (result == DialogResult.No)
                 {
                     e.Cancel = true;

@@ -180,7 +180,6 @@ namespace AM2RLauncher
                     // for windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                     if (currentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
                     {
-                        // Directory.Move(CrossPlatformOperations.CURRENTPATH + "/lib", CrossPlatformOperations.CURRENTPATH + "/oldLib");
                         // So, because Windows behavior is dumb...
 
                         // Rename all files in lib to *.bak

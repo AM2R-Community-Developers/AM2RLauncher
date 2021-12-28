@@ -58,7 +58,7 @@ namespace AM2RLauncher
         private bool IsProfileInstalled(ProfileXML profile)
         {
             if (Platform.IsWinForms) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe");
-            if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");   //should we check for .AppRun as well?
+            if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
             return false;
         }
 
@@ -304,18 +304,18 @@ namespace AM2RLauncher
 
             string datawin = null, exe = null;
 
-            if(Platform.IsWinForms)
+            if (Platform.IsWinForms)
             {
                 datawin = "data.win";
                 exe = "AM2R.exe";
             }
-            else if(Platform.IsGtk)
+            else if (Platform.IsGtk)
             {
                 datawin = "game.unx";
                 // use the exe name based on the desktop file in the appimage, rather than hardcoding it.
                 string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
                 exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
-                log.Info("According to AppImage desktop file, use \"" + exe + "\" as game name.");
+                log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
             }
 
             log.Info("Attempting to patch in " + profilePath);
@@ -353,7 +353,7 @@ namespace AM2RLauncher
 
             // Applied patch
             if (Platform.IsWinForms) UpdateProgressBar(66);
-            else if (Platform.IsGtk) UpdateProgressBar(44);//linux will take a bit longer, due to appimage creation
+            else if (Platform.IsGtk) UpdateProgressBar(44); //linux will take a bit longer, due to appimage creation
             log.Info("xdelta patch(es) applied.");
 
             // Install new datafiles
@@ -418,7 +418,7 @@ namespace AM2RLauncher
             log.Info("Successfully installed profile " + profile.Name + ".");
 
             // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
-            if(Platform.IsWinForms)
+            if (Platform.IsWinForms)
                 Thread.Sleep(1000);
         }
 
@@ -644,7 +644,8 @@ namespace AM2RLauncher
                 ProfileXML profile = profileList[profileIndex.Value];
 
                 // These are used on both windows and linux for game logging
-                string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA")) : profile.SaveLocation.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+                string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
+                                                      : profile.SaveLocation.Replace("~", Environment.GetEnvironmentVariable("HOME"));
                 DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
                 string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 

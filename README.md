@@ -16,12 +16,15 @@ Linux needs the following dependencies installed:
 - `openssl`
 - `fuse2`
 
+As well as these dependencies to run AM2R:
+- libopenal1:i386
+- libpulse0:i386
+
 Optionally, for APK creation any Java runtime is needed.
 
 ### Arch Linux
 On Arch Linux, you can install these by running this:  
-(Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))
-
+(Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))  
 `sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse jre-openjdk`
 
 For other distros, refer to your local package manager for instructions.   
@@ -30,6 +33,12 @@ For other distros, refer to your local package manager for instructions.
 Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
 
 Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exist. Install it with `makepkg -si` or use your favourite AUR helper.
+
+## Configuration and Data Files
+The AM2RLauncher stores its files in the following places:
+	- On Windows, it stores the config file to the `AM2RLauncher.exe.config` next to the binary, and its data files in the same folder as the binary.
+	- On Linux, it stores the config file to `$XDG_CONFIG_HOME/AM2RLauncher` and its data files to `$XDG_DATA_HOME/AM2RLauncher` (which are defaulting back to `~/.config` and `~/.local/share` respectively).  
+The AM2RLauncher data can get quite big, so if you wish to change where it stores it, you can do so with the `AM2RLAUNCHERDATA` environment variable (i.e `AM2RLAUNCHERDATA="D:\MyLauncherData"` or `AM2RLAUNCHERDATA="/mnt/bigDrive/launcherData"`). 
 
 # Compiling Instructions:
 ## Dependencies
