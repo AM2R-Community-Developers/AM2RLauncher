@@ -395,6 +395,41 @@ namespace AM2RLauncher
             }
         }
 
+        public static void RunJavaJar(string arguments = null, string workingDirectory = null)
+        {
+            string proc = "",
+                   javaArgs = "";
+
+            if (currentPlatform.IsWinForms)
+            {
+                proc = "cmd";
+                javaArgs = "/C java -jar";
+            }
+            else if (currentPlatform.IsGtk)
+            {
+                proc = "java";
+                javaArgs = "-jar";
+            }
+
+            ProcessStartInfo jarStart = new ProcessStartInfo
+            {
+                FileName = proc,
+                Arguments = javaArgs + " " + arguments,
+                WorkingDirectory = workingDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            Process jarProcess = new Process
+            {
+                StartInfo = jarStart
+            };
+
+            jarProcess.Start();
+
+            jarProcess.WaitForExit();
+        }
+
         /// <summary>
         /// Figures out what the AM2RLauncher's <see cref="CURRENTPATH"/> should be.<br/>
         /// Determination is as follows:

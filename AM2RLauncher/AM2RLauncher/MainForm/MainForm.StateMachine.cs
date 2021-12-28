@@ -8,29 +8,11 @@ using System.Text;
 
 namespace AM2RLauncher
 {
-    partial class MainForm
+    /// <summary>
+    /// Everything state machine-related goes in here
+    /// </summary>
+    public partial class MainForm
     {
-        /// <summary>
-        /// Checks if <paramref name="profile"/> is installed.
-        /// </summary>
-        /// <param name="profile">The <see cref="ProfileXML"/> that should be checked for installation.</param>
-        /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-        private bool IsProfileInstalled(ProfileXML profile)
-        {
-            if (Platform.IsWinForms) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe");
-            if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
-            return false;
-        }
-
-        /// <summary>
-        /// Safety check function before accessing <see cref="profileIndex"/>.
-        /// </summary>
-        /// <returns><see langword="true"/> if it is valid, <see langword="false"/> if not.</returns>
-        private bool IsProfileIndexValid()
-        {
-            return profileIndex != null;
-        }
-
         /// <summary>
         /// Updates <see cref="updateState"/>, <see cref="playButton"/>, <see cref="apkButtonState"/>, and <see cref="apkButton"/> according to the current conditiions.
         /// </summary>

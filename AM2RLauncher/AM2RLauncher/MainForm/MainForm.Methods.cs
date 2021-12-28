@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace AM2RLauncher
 {
-    partial class MainForm : Form
+    public partial class MainForm : Form
     {
         /// <summary>
         /// Git Pulls from the repository.
@@ -58,6 +58,43 @@ namespace AM2RLauncher
                 }
             }
             log.Info("Repository pulled successfully.");
+        }
+
+        /// <summary>
+        /// Method that updates <see cref="progressBar"/>.
+        /// </summary>
+        /// <param name="value">The value that <see cref="progressBar"/> should be set to.</param>
+        /// <param name="min">The min value that <see cref="progressBar"/> should be set to.</param>
+        /// <param name="max">The max value that <see cref="progressBar"/> should be set to.</param>
+        private void UpdateProgressBar(int value, int min = 0, int max = 100)
+        {
+            Application.Instance.Invoke(new Action(() =>
+            {
+                progressBar.MinValue = min;
+                progressBar.MaxValue = max;
+                progressBar.Value = value;
+            }));
+        }
+
+        /// <summary>
+        /// Checks if <paramref name="profile"/> is installed.
+        /// </summary>
+        /// <param name="profile">The <see cref="ProfileXML"/> that should be checked for installation.</param>
+        /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
+        private bool IsProfileInstalled(ProfileXML profile)
+        {
+            if (Platform.IsWinForms) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe");
+            if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
+            return false;
+        }
+
+        /// <summary>
+        /// Safety check function before accessing <see cref="profileIndex"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> if it is valid, <see langword="false"/> if not.</returns>
+        private bool IsProfileIndexValid()
+        {
+            return profileIndex != null;
         }
 
         /// <summary>
@@ -234,7 +271,6 @@ namespace AM2RLauncher
                 Directory.CreateDirectory(profilePath);
             }
 
-
             // Extract 1.1
             ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", profilePath);
 
@@ -375,209 +411,105 @@ namespace AM2RLauncher
         private void CreateAPK(ProfileXML profile)
         {
             // Overall safety check just in case of bad situations
-            if (profile.SupportsAndroid)
+            if (!profile.SupportsAndroid) return;
+            log.Info("Creating Android APK for profile " + profile.Name + ".");
+
+            // Check for java, exit safely with a warning if not found!
+            if (!CrossPlatformOperations.IsJavaInstalled())
             {
-                log.Info("Creating Android APK for profile " + profile.Name + ".");
-
-                // Check for java, exit safely with a warning if not found!
-                if (!CrossPlatformOperations.IsJavaInstalled())
+                // Message box show needs to be done on main thread
+                Application.Instance.Invoke(new Action(() =>
                 {
-                    // Message box show needs to be done on main thread
-                    Application.Instance.Invoke(new Action(() =>
-                    {
-                        MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                    }));
-                    SetApkButtonState(ApkButtonState.Create);
-                    UpdateStateMachine();
-                    log.Error("Java not found! Aborting Android APK creation.");
-                    return;
-                }
-
-                // Check if xdelta is installed on linux, by searching all folders in PATH
-                if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
-                {
-                    // Message box show needs to be done on main thread
-                    Application.Instance.Invoke(new Action(() =>
-                    {
-                        MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                    }));
-                    SetApkButtonState(ApkButtonState.Create);
-                    UpdateStateMachine();
-                    log.Error("Xdelta not found. Aborting Android APK creation...");
-                    return;
-
-                }
-
-                log.Debug("java installed!");
-
-                string proc = "",
-                       args = "",
-                       apktoolPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/apktool.jar",
-                       uberPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/uber-apk-signer.jar";
-
-                if (Platform.IsWinForms)
-                {
-                    proc = "cmd";
-                    args = "/C java -jar ";
-                }
-                if (Platform.IsGtk)
-                {
-                    proc = "java";
-                    args = "-jar ";
-                }
-
-                // Create working dir after some cleanup
-                string tempDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/temp").FullName;
-
-                string dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
-
-                if (Directory.Exists(tempDir))
-                    Directory.Delete(tempDir, true);
-
-                Directory.CreateDirectory(tempDir);
-
-                // Progress 1
-                UpdateProgressBar(14);
-                log.Info("Cleanup, variables, and working directory created.");
-
-                // Extract AM2RWrapper.apk
-                ProcessStartInfo apktoolStart = new ProcessStartInfo
-                {
-                    FileName = proc,
-                    // For an explanation on the .replace look in CreateXdeltaPatch method
-                    Arguments = args + "\"" + apktoolPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "\" d \"" + dataPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "/android/AM2RWrapper.apk\"",
-                    WorkingDirectory = tempDir,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                Process apktool = new Process
-                {
-                    StartInfo = apktoolStart
-                };
-
-                apktool.Start();
-
-                apktool.WaitForExit();
-
-                // Progress 2
-                UpdateProgressBar(28);
-                log.Info("AM2RWrapper decompiled.");
-
-                // Add datafiles
-
-                string workingDir = tempDir + "/AM2RWrapper/assets";
-
-                // 1.1
-                ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", workingDir);
-
-                // New datafiles
-                HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", workingDir);
-
-                // HQ music
-                if (hqMusicAndroidCheck.Checked == true)
-                    HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
-
-                // Add AM2R.ini
-                // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
-                foreach (FileInfo file in new DirectoryInfo(dataPath + "/android").GetFiles())
-                {
-                    if (file.Name.EndsWith(".ini"))
-                    {
-                        File.Copy(file.FullName, workingDir + "/" + file.Name);
-                    }
-                }
-
-                // Progress 3
-                UpdateProgressBar(42);
-                log.Info("AM2R_11.zip extracted and datafiles copied into AM2RWrapper.");
-
-                // Patch data.win to game.droid
-                CrossPlatformOperations.ApplyXdeltaPatch(workingDir + "/data.win", dataPath + "/droid.xdelta", workingDir + "/game.droid");
-
-                // Progress 4
-                UpdateProgressBar(56);
-                log.Info("game.droid successfully patched.");
-
-                // Delete unnecessary files
-                File.Delete(workingDir + "/AM2R.exe");
-                File.Delete(workingDir + "/D3DX9_43.dll");
-                File.Delete(workingDir + "/explanations.txt");
-                File.Delete(workingDir + "/modifiers.ini");
-                File.Delete(workingDir + "/readme.txt");
-                File.Delete(workingDir + "/data.win");
-                Directory.Delete(workingDir + "/mods", true);
-                Directory.Delete(workingDir + "/lang/headers", true);
-
-                if (Platform.IsGtk)
-                {
-                    File.Delete(workingDir + "/icon.png");
-                }
-
-                // Modify apktool.yml to NOT compress ogg files
-                string apktoolText = File.ReadAllText(workingDir + "/../apktool.yml");
-                apktoolText = apktoolText.Replace("doNotCompress:", "doNotCompress:\n- ogg");
-                File.WriteAllText(workingDir + "/../apktool.yml", apktoolText);
-
-                // Progress 5
-                UpdateProgressBar(70);
-                log.Info("Unnecessary files removed, apktool.yml modified to prevent ogg compression.");
-
-                // Rebuild APK
-                apktoolStart = new ProcessStartInfo
-                {
-                    FileName = proc,
-                    Arguments = args + "\"" + apktoolPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "\" b AM2RWrapper -o \"" + profile.Name + ".apk\"",
-                    WorkingDirectory = tempDir,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                apktool = new Process
-                {
-                    StartInfo = apktoolStart
-                };
-
-                apktool.Start();
-
-                apktool.WaitForExit();
-
-                // Progress 6
-                UpdateProgressBar(84);
-                log.Info("AM2RWrapper rebuilt into " + profile.Name + ".apk.");
-
-                // Debug-sign APK
-                ProcessStartInfo uberStart = new ProcessStartInfo
-                {
-                    FileName = proc,
-                    Arguments = args + "\"" + uberPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "\" -a \"" + profile.Name + ".apk\"",
-                    WorkingDirectory = tempDir,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-
-                Process uber = new Process
-                {
-                    StartInfo = uberStart
-                };
-
-                uber.Start();
-
-                uber.WaitForExit();
-
-                // Extra file cleanup
-                File.Copy(tempDir + "/" + profile.Name + "-aligned-debugSigned.apk", CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk", true);
-
-                // Progress 7
-                UpdateProgressBar(100);
-                log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
-
-                HelperMethods.DeleteDirectory(tempDir);
-
-                CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk");
-
-                log.Info("Successfully created Android APK for profile " + profile.Name + ".");
+                    MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                }));
+                SetApkButtonState(ApkButtonState.Create);
+                UpdateStateMachine();
+                log.Error("Java not found! Aborting Android APK creation.");
+                return;
             }
+            // Check if xdelta is installed on linux
+            if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            {
+                // Message box show needs to be done on main thread
+                Application.Instance.Invoke(new Action(() =>
+                {
+                    MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                }));
+                SetApkButtonState(ApkButtonState.Create);
+                UpdateStateMachine();
+                log.Error("Xdelta not found. Aborting Android APK creation...");
+                return;
+            }
+
+            // Create working dir after some cleanup
+            string apktoolPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/apktool.jar",
+                   uberPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/uber-apk-signer.jar",
+                   tempDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/temp").FullName,
+                   dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
+            if (Directory.Exists(tempDir))
+                Directory.Delete(tempDir, true);
+            Directory.CreateDirectory(tempDir);
+
+            log.Info("Cleanup, variables, and working directory created.");
+            UpdateProgressBar(14);
+
+            // Decompile AM2RWrapper.apk
+            CrossPlatformOperations.RunJavaJar("\"" + apktoolPath + "\" d \"" + dataPath + "/android/AM2RWrapper.apk\"", tempDir);
+            log.Info("AM2RWrapper decompiled.");
+            UpdateProgressBar(28);
+
+            // Add datafiles: 1.1, new datafiles, hq music, am2r.ini
+            string workingDir = tempDir + "/AM2RWrapper/assets";
+            ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", workingDir);
+            HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", workingDir);
+            if (hqMusicAndroidCheck.Checked == true)
+                HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
+            // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
+            foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
+                File.Copy(file.FullName, workingDir + "/" + file.Name); 
+            
+            log.Info("AM2R_11.zip extracted and datafiles copied into AM2RWrapper.");
+            UpdateProgressBar(42);
+
+            // Patch data.win to game.droid
+            CrossPlatformOperations.ApplyXdeltaPatch(workingDir + "/data.win", dataPath + "/droid.xdelta", workingDir + "/game.droid");
+            log.Info("game.droid successfully patched.");
+            UpdateProgressBar(56);
+
+            // Delete unnecessary files
+            File.Delete(workingDir + "/AM2R.exe");
+            File.Delete(workingDir + "/D3DX9_43.dll");
+            File.Delete(workingDir + "/explanations.txt");
+            File.Delete(workingDir + "/modifiers.ini");
+            File.Delete(workingDir + "/readme.txt");
+            File.Delete(workingDir + "/data.win");
+            Directory.Delete(workingDir + "/mods", true);
+            Directory.Delete(workingDir + "/lang/headers", true);
+            if (Platform.IsGtk) File.Delete(workingDir + "/icon.png");
+            // Modify apktool.yml to NOT compress ogg files
+            string apktoolText = File.ReadAllText(workingDir + "/../apktool.yml");
+            apktoolText = apktoolText.Replace("doNotCompress:", "doNotCompress:\n- ogg");
+            File.WriteAllText(workingDir + "/../apktool.yml", apktoolText);
+            log.Info("Unnecessary files removed, apktool.yml modified to prevent ogg compression.");
+            UpdateProgressBar(70);
+
+            // Rebuild APK
+            CrossPlatformOperations.RunJavaJar("\"" + apktoolPath + "\" b AM2RWrapper -o \"" + profile.Name + ".apk\"", tempDir);
+            log.Info("AM2RWrapper rebuilt into " + profile.Name + ".apk.");
+            UpdateProgressBar(84);
+
+            // Debug-sign APK
+            CrossPlatformOperations.RunJavaJar("\"" + uberPath + "\" -a \"" + profile.Name + ".apk\"", tempDir);
+
+            // Extra file cleanup
+            File.Copy(tempDir + "/" + profile.Name + "-aligned-debugSigned.apk", CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk", true);
+            log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
+            HelperMethods.DeleteDirectory(tempDir);
+
+            // Done
+            UpdateProgressBar(100);
+            log.Info("Successfully created Android APK for profile " + profile.Name + ".");
+            CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk");
         }
 
         /// <summary>
@@ -743,22 +675,6 @@ namespace AM2RLauncher
 
                 log.Info("Profile " + profile.Name + " process exited.");
             }
-        }
-
-        /// <summary>
-        /// Method that updates <see cref="progressBar"/>.
-        /// </summary>
-        /// <param name="value">The value that <see cref="progressBar"/> should be set to.</param>
-        /// <param name="min">The min value that <see cref="progressBar"/> should be set to.</param>
-        /// <param name="max">The max value that <see cref="progressBar"/> should be set to.</param>
-        private void UpdateProgressBar(int value, int min = 0, int max = 100)
-        {
-            Application.Instance.Invoke(new Action(() =>
-            {
-                progressBar.MinValue = min;
-                progressBar.MaxValue = max;
-                progressBar.Value = value;
-            }));
         }
     }
 }
