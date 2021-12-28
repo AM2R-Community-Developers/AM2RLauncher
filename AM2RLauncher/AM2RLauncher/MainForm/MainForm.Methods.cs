@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AM2RLauncher.Helpers;
+using AM2RLauncher.XML;
+using Eto;
+using Eto.Drawing;
 using Eto.Forms;
-using System.Threading;
 using LibGit2Sharp;
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using Eto;
-using System.Diagnostics;
 using System.Linq;
-using Eto.Drawing;
-using System.Xml.Serialization;
-using AM2RLauncher.XML;
-using System.Net.NetworkInformation;
-using System.Net;
-using AM2RLauncher.Helpers;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AM2RLauncher
 {
@@ -269,12 +264,12 @@ namespace AM2RLauncher
             // Failsafe for Profiles directory
             if (!Directory.Exists(profilesHomePath))
                 Directory.CreateDirectory(profilesHomePath);
-            
+
 
             // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
             if (Directory.Exists(profilePath))
                 Directory.Delete(profilePath, true);
-            
+
 
             // Create profile directory
             Directory.CreateDirectory(profilePath);
@@ -326,7 +321,7 @@ namespace AM2RLauncher
                 if (profile.UsesYYC)
                 {
                     CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
-                    
+
                     // Delete 1.1's data.win, we don't need it anymore!
                     File.Delete(profilePath + "/data.win");
                 }
@@ -341,7 +336,7 @@ namespace AM2RLauncher
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
                 // Just in case the resulting file isn't chmoddded...
-                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();    
+                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();
 
                 // These are not needed by linux at all, so we delete them
                 File.Delete(profilePath + "/data.win");
@@ -363,7 +358,7 @@ namespace AM2RLauncher
             // HQ music
             if (!profile.UsesCustomMusic && (bool)hqMusicPCCheck.Checked)
                 HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", profilePath);
-            
+
 
             // Linux post-process
             if (Platform.IsGtk)
@@ -403,7 +398,7 @@ namespace AM2RLauncher
                 // Clean files
                 Directory.Delete(profilePath + "/AM2R.AppDir", true);
                 Directory.Delete(assetsPath, true);
-                File.Delete(profilePath + "/" +exe);
+                File.Delete(profilePath + "/" + exe);
                 if (File.Exists(profilePath + "/AM2R.AppImage")) File.Delete(profilePath + "/AM2R.AppImage");
                 File.Move(profilePath + "/" + "AM2R-x86_64.AppImage", profilePath + "/AM2R.AppImage");
             }
@@ -450,7 +445,7 @@ namespace AM2RLauncher
 
                 // Check if xdelta is installed on linux, by searching all folders in PATH
                 if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
-                {   
+                {
                     // Message box show needs to be done on main thread
                     Application.Instance.Invoke(new Action(() =>
                     {
@@ -500,7 +495,7 @@ namespace AM2RLauncher
                 {
                     FileName = proc,
                     // For an explanation on the .replace look in CreateXdeltaPatch method
-                    Arguments = args + "\"" + apktoolPath.Replace(CrossPlatformOperations.CURRENTPATH + "/","../") + "\" d \"" + dataPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "/android/AM2RWrapper.apk\"",
+                    Arguments = args + "\"" + apktoolPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "\" d \"" + dataPath.Replace(CrossPlatformOperations.CURRENTPATH + "/", "../") + "/android/AM2RWrapper.apk\"",
                     WorkingDirectory = tempDir,
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -646,7 +641,7 @@ namespace AM2RLauncher
 
                 // These are used on both windows and linux for game logging
                 string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
-                                                      : profile.SaveLocation.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+                                                      : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
                 DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
                 string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 
@@ -704,7 +699,7 @@ namespace AM2RLauncher
                     {
                         string envVars = customEnvVarTextBox.Text;
 
-                        for(int i = 0; i < customEnvVarTextBox.Text.Count(f => f == '='); i++)
+                        for (int i = 0; i < customEnvVarTextBox.Text.Count(f => f == '='); i++)
                         {
                             // Env var variable
                             string variable = envVars.Substring(0, envVars.IndexOf('='));
@@ -715,15 +710,15 @@ namespace AM2RLauncher
                             if (envVars[0] != '"')               // If value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
                             {
                                 if (envVars.IndexOf(' ') >= 0)
-                                    valueSubstringLength = envVars.IndexOf(' ')+1;
+                                    valueSubstringLength = envVars.IndexOf(' ') + 1;
                                 else
                                     valueSubstringLength = envVars.Length;
                             }
                             else                                // If value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
                             {
-                                int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"')+1);
+                                int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"') + 1);
                                 if (envVars.IndexOf(' ', secondQuoteIndex) >= 0)
-                                    valueSubstringLength = envVars.IndexOf(' ', secondQuoteIndex)+1;
+                                    valueSubstringLength = envVars.IndexOf(' ', secondQuoteIndex) + 1;
                                 else
                                     valueSubstringLength = envVars.Length;
                             }
@@ -746,7 +741,7 @@ namespace AM2RLauncher
                     log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
 
                     log.Info("Launching game with following variables: ");
-                    foreach(System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
+                    foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
                     {
                         log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
                     }
@@ -907,7 +902,7 @@ namespace AM2RLauncher
                     }
                     else // Otherwise, disable.
                     {
-                        apkButton.Enabled = false; 
+                        apkButton.Enabled = false;
                         apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
                     }
                 }
@@ -1048,9 +1043,9 @@ namespace AM2RLauncher
                 case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonDownloadToolTip; break;
                 case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; break; // ; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
                 case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonSelect11ToolTip; break;
-                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName) ; break;
+                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break;
                 case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonInstallingToolTip; break;
-                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonPlayToolTip.Replace("$NAME", profileName) ; break;
+                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonPlayToolTip.Replace("$NAME", profileName); break;
                 case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonPlayingToolTip; break;
             }
             playButton.Text = GetPlayButtonText();

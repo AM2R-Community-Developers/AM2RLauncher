@@ -1,10 +1,8 @@
 ﻿using log4net;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace AM2RLauncher.Helpers
 {

@@ -2,7 +2,7 @@
 	
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <ApplicationIcon>icon64.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\LauncherIcon.ico</ApplicationIcon>
     <Authors>Lojemiru, Miepee</Authors>
     <Company>AM2R-Community-Developers</Company>
     <Description>This is a Launcher for AM2R and its Community Updates.</Description>
@@ -18,6 +18,10 @@
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
+	
+  <ItemGroup>
+    <Content Include="Resources\LauncherIcon.ico" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Eto.Forms" Version="2.5.11" />
@@ -73,6 +77,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="../../LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
 </Project>

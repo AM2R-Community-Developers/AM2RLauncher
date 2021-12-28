@@ -1,17 +1,16 @@
-﻿using Eto.Drawing;
+﻿using AM2RLauncher.XML;
+using Eto.Drawing;
 using Eto.Forms;
+using log4net;
+using Pablo.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Pablo.Controls;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Globalization;
-using AM2RLauncher.XML;
-using log4net;
-using log4net.Config;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AM2RLauncher
 {
@@ -143,7 +142,7 @@ namespace AM2RLauncher
                 var results = lineRegex.Matches(osRelease).Cast<Match>();
                 var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
                 log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
-                          (version == null ? "" : " " + version.Value.Substring(8).Replace("\"","")));
+                          (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
             }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
@@ -626,7 +625,7 @@ namespace AM2RLauncher
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
             mirrorIndex = (int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) : 0;
-            mirrorDropDown.SelectedIndex =  mirrorIndex;
+            mirrorDropDown.SelectedIndex = mirrorIndex;
 
             currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
 

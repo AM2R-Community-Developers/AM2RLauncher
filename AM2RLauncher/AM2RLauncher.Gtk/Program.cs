@@ -1,7 +1,7 @@
 ﻿using Eto.Forms;
 using log4net;
-using System;
 using log4net.Config;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -22,19 +22,18 @@ namespace AM2RLauncher.Gtk
         [STAThread]
         public static void Main(string[] args)
         {
+            string launcherDataPath = GenerateCurrentPath();
 
-            string localAM2RPath = Environment.GetEnvironmentVariable("HOME") + "/.local/share/AM2RLauncher";
-
-            // Make sure first, ~/.local/share exists
-            if (!Directory.Exists(localAM2RPath))
-                Directory.CreateDirectory(localAM2RPath);
+            // Make sure first, ~/.local/share/AM2RLauncher exists
+            if (!Directory.Exists(launcherDataPath))
+                Directory.CreateDirectory(launcherDataPath);
 
             // Now, see if log4netConfig exists, if not write it again.
-            if (!File.Exists(localAM2RPath + "/log4net.config"))
-                File.WriteAllText(localAM2RPath + "/log4net.config", Properties.Resources.log4netContents);
+            if (!File.Exists(launcherDataPath + "/log4net.config"))
+                File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
 
             // Configure logger
-            XmlConfigurator.Configure(new FileInfo(localAM2RPath + "/log4net.config"));
+            XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
 
             try
             {
@@ -43,7 +42,7 @@ namespace AM2RLauncher.Gtk
                 GTKLauncher.UnhandledException += GTKLauncher_UnhandledException;
                 GTKLauncher.Run(new MainForm());
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
                 Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
@@ -57,6 +56,46 @@ namespace AM2RLauncher.Gtk
         {
             log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString());
             MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString(), "GTK", MessageBoxType.Error);
+        }
+
+        // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
+        private static string GenerateCurrentPath()
+        {
+            string NIXHOME = Environment.GetEnvironmentVariable("HOME");
+            // First, we check if the user has a custom AM2RLAUNCHERDATA env var
+            string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
+            if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+            {
+                try
+                {
+                    // This will create the directories recursively if they don't exist
+                    Directory.CreateDirectory(am2rLauncherDataEnvVar);
+
+                    // Our env var is now set and directories exist
+                    return am2rLauncherDataEnvVar;
+                }
+                catch { }
+            }
+
+            // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
+            string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+            if (string.IsNullOrWhiteSpace(xdgDataHome))
+                xdgDataHome = NIXHOME + "/.local/share";
+
+            // Add AM2RLauncher to the end of the dataPath
+            xdgDataHome += "/AM2RLauncher";
+
+            try
+            {
+                // This will create the directories recursively if they don't exist
+                Directory.CreateDirectory(xdgDataHome);
+
+                // Our env var is now set and directories exist
+                return xdgDataHome;
+            }
+            catch { }
+
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Serialization;
 using System.Linq;
-using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace AM2RLauncher.XML
 {
@@ -87,7 +83,7 @@ namespace AM2RLauncher.XML
         public object this[string property]
         {
             get
-            { 
+            {
                 // This is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
                 return typeof(LauncherConfigXML).GetProperties().Where(p => p.CanRead && p.Name == property).First().GetValue(this).ToString();
             }

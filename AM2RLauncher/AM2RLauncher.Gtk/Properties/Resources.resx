@@ -124,7 +124,7 @@
     &lt;appender-ref ref="file" /&gt;
   &lt;/root&gt;
   &lt;appender name="file" type="log4net.Appender.RollingFileAppender"&gt;
-    &lt;file value="${HOME}/.local/share/AM2RLauncher/Logs/AM2RLauncher.log" /&gt;
+    &lt;file value="${DATADIR}/Logs/AM2RLauncher.log" /&gt;
     &lt;appendToFile value="true" /&gt;
     &lt;rollingStyle value="Once" /&gt;
     &lt;maxSizeRollBackups value="7" /&gt;

@@ -1,26 +1,18 @@
-﻿using Eto;
-using Eto.Drawing;
+﻿using AM2RLauncher.Helpers;
+using AM2RLauncher.XML;
+using Eto;
 using Eto.Forms;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Pablo.Controls;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using LibGit2Sharp;
-using System.IO;
-using System.Runtime.InteropServices;
 using LibGit2Sharp.Handlers;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.ComponentModel;
-using System.Net;
-using System.IO.Compression;
-
-using AM2RLauncher.XML;
-using AM2RLauncher.Helpers;
+using System.Threading.Tasks;
 
 namespace AM2RLauncher
 {
@@ -140,7 +132,7 @@ namespace AM2RLauncher
                                 log.Info("Cancelling archival! User-defined archive in Mods already exists.");
                             }
 
-                            
+
                         }
                         else // If our desired rename already exists, it's probably a user archive... so we just delete the folder and move on with installation of the new version.
                         {
@@ -152,7 +144,7 @@ namespace AM2RLauncher
 
                         LoadProfiles();
 
-                        
+
                     }
                 }
 
@@ -225,7 +217,7 @@ namespace AM2RLauncher
                         }
                         successful = false;
                     }
-                    catch(Exception ex)             // This is if somehow any other exception might get thrown as well.
+                    catch (Exception ex)             // This is if somehow any other exception might get thrown as well.
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
@@ -352,7 +344,7 @@ namespace AM2RLauncher
                         {
                             InstallProfile(profileList[profileIndex.Value]);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                             MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
@@ -430,7 +422,7 @@ namespace AM2RLauncher
                     progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
                     currentGitObject = transferProgress.ReceivedObjects;
                     progressBar.Value = transferProgress.ReceivedObjects;
-                    
+
                 }
             }));
 
@@ -578,7 +570,7 @@ namespace AM2RLauncher
 
                     log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
 
-                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME",profile.Name).Replace("$OS",profile.OperatingSystem).Replace("$CURRENTOS",currentOS),
+                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", currentOS),
                                     Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                     HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     return;
@@ -596,7 +588,7 @@ namespace AM2RLauncher
                 addedProfile = profile;
                 log.Info(profile.Name + " successfully installed.");
                 MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
-                
+
             }
             else
             {
@@ -747,7 +739,7 @@ namespace AM2RLauncher
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
-        private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e) 
+        private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
             profileIndex = profileDropDown.SelectedIndex;
             log.Info("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
@@ -799,12 +791,12 @@ namespace AM2RLauncher
             mirrorDropDown.Enabled = !enabled;
             // Not sure why the dropdown menu needs this hack, but the textBox does not.
             if (Platform.IsWinForms)
-                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;   
-            mirrorLabel.TextColor =  !enabled ? colGreen : colInactive;
+                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
+            mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
 
             // Create warning dialog when enabling
             if (enabled)
-            {   
+            {
                 MessageBox.Show(Language.Text.WarningWindowText, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
                 currentMirror = customMirrorTextBox.Text;
             }
@@ -824,7 +816,7 @@ namespace AM2RLauncher
 
             log.Info("Current mirror has been set to " + currentMirror + ".");
 
-            CrossPlatformOperations.WriteToConfig("MirrorIndex",mirrorDropDown.SelectedIndex);
+            CrossPlatformOperations.WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
 
             // Don't overwrite the git config while we download!!!
             if (updateState == UpdateState.Downloading) return;
@@ -901,7 +893,7 @@ namespace AM2RLauncher
             ProfileXML profile = profileList[settingsProfileDropDown.SelectedIndex];
             log.Info("User is attempting to delete profile " + profile.Name + ".");
 
-            DialogResult result = MessageBox.Show(Language.Text.DeleteModWarning.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, 
+            DialogResult result = MessageBox.Show(Language.Text.DeleteModWarning.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle,
                                                   MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
             if (result == DialogResult.Ok)
@@ -992,7 +984,7 @@ namespace AM2RLauncher
                         // Rename directory to take the old one's place
                         string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");
                         Directory.Move(modsDir + "/" + extractedName, originalFolder);
-                        
+
                     }
                     else // Cancel the operation!
                     {
@@ -1051,9 +1043,9 @@ namespace AM2RLauncher
                 {
                     e.Cancel = true;
                 }
-                else 
+                else
                     isGitProcessGettingCancelled = true;
-                    // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
+                // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
 
             }
             else if (updateState == UpdateState.Installing)

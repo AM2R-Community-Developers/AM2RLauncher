@@ -1,14 +1,14 @@
 ﻿using Eto.Forms;
-using System;
 using log4net;
 using log4net.Config;
+using System;
 using System.IO;
 using System.Reflection;
 
 namespace AM2RLauncher.Wpf
 {
     /// <summary>
-    /// The main class for the GTK project.
+    /// The main class for the WinForms project.
     /// </summary>
     class MainClass
     {
@@ -17,13 +17,13 @@ namespace AM2RLauncher.Wpf
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
         /// <summary>
-        /// The main method for the GTK project.
+        /// The main method for the WinForms project.
         /// </summary>
         [STAThread]
         public static void Main(string[] args)
         {
             // Configure logger
-            XmlConfigurator.Configure(new FileInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) + "/log4net.config"));
+            XmlConfigurator.Configure(new FileInfo(GenerateCurrentPath() + "/log4net.config"));
 
             // Try catch in case it ever crashes before actually getting to the Eto application
             try
@@ -33,7 +33,7 @@ namespace AM2RLauncher.Wpf
                 WinLauncher.UnhandledException += WinLauncher_UnhandledException;
                 WinLauncher.Run(new MainForm());
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
                 System.Windows.Forms.MessageBox.Show(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace.ToString(), "Microsoft .NET Framework",
@@ -47,7 +47,28 @@ namespace AM2RLauncher.Wpf
         private static void WinLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
         {
             log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString());
-            MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" +e.ExceptionObject.ToString(), "Microsoft .NET Framework", MessageBoxType.Error);
+            MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString(), "Microsoft .NET Framework", MessageBoxType.Error);
+        }
+
+        // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
+        private static string GenerateCurrentPath()
+        {
+            // First, we check if the user has a custom AM2RLAUNCHERDATA env var
+            string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
+            if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+            {
+                try
+                {
+                    // This will create the directories recursively if they don't exist
+                    Directory.CreateDirectory(am2rLauncherDataEnvVar);
+
+                    // Our env var is now set and directories exist
+                    return am2rLauncherDataEnvVar;
+                }
+                catch { }
+            }
+            // Windows has the path where the exe is located as default
+            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
     }
 }

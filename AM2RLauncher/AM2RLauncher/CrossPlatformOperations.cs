@@ -1,21 +1,19 @@
 ﻿using Eto;
-using Eto.Forms;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using log4net;
 
 namespace AM2RLauncher
 {
     /// <summary>
     /// Class that does Operations that work cross-platform.
     /// </summary>
-    class CrossPlatformOperations
+    public class CrossPlatformOperations
     {
         /// <summary>
         /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
@@ -25,17 +23,27 @@ namespace AM2RLauncher
         /// <summary>
         /// Gets the current platform. 
         /// </summary>
-        readonly private static Platform currentPlatform = Platform.Instance;
+        private static readonly Platform currentPlatform = Platform.Instance;
 
         /// <summary>
         /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
         /// </summary>
-        static readonly public string CURRENTPATH = GenerateCurrentPath();
+        public static readonly string CURRENTPATH = GenerateCurrentPath();
 
         /// <summary>
         /// Name of the Launcher executable.
         /// </summary>
-        static readonly public string LAUNCHERNAME = AppDomain.CurrentDomain.FriendlyName;
+        public static readonly string LAUNCHERNAME = AppDomain.CurrentDomain.FriendlyName;
+
+        /// <summary>
+        /// Path to the Home Folder on *Nix-based systems.
+        /// </summary>
+        public static readonly string NIXHOME = Environment.GetEnvironmentVariable("HOME");
+
+        /// <summary>
+        /// Path to the Config folder on *Nix-based systems.
+        /// </summary>
+        public static readonly string NIXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
 
         /// <summary>
         /// Generates the mirror list, depending on the current Platform.
@@ -82,9 +90,8 @@ namespace AM2RLauncher
             if (currentPlatform.IsGtk)
             {
                 // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                string homePath = Environment.GetEnvironmentVariable("HOME");
-                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string homePath = NIXHOME;
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -121,7 +128,7 @@ namespace AM2RLauncher
                 if (appConfig == null)
                     throw new NullReferenceException("Could not find the Config file! Please make sure it exists!");
                 ConnectionStringsSection connectionStringsSection = (ConnectionStringsSection)appConfig.GetSection("connectionStrings");
-                if (connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null) 
+                if (connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null)
                     throw new ArgumentException("The property " + property + " could not be found.");
                 connectionStringsSection.ConnectionStrings[property].ConnectionString = value.ToString();
                 appConfig.Save();
@@ -130,9 +137,8 @@ namespace AM2RLauncher
             else if (currentPlatform.IsGtk)
             {
                 // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                string homePath = Environment.GetEnvironmentVariable("HOME");
-                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string homePath = NIXHOME;
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -152,7 +158,7 @@ namespace AM2RLauncher
                 File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
             }
         }
-        
+
         /// <summary>
         /// When a Launcher update occurs that introduces new config properties, this method ensures that the old user config is copied over as much as possible.
         /// </summary>
@@ -170,7 +176,7 @@ namespace AM2RLauncher
                 MatchCollection oldMatch = settingRegex.Matches(oldConfigText);
                 MatchCollection newMatch = settingRegex.Matches(newConfigText);
 
-                for(int i = 0; i < oldMatch.Count; i++)
+                for (int i = 0; i < oldMatch.Count; i++)
                     newConfigText = newConfigText.Replace(newMatch[i].Value, oldMatch[i].Value);
 
                 File.WriteAllText(newConfigPath, newConfigText);
@@ -179,9 +185,8 @@ namespace AM2RLauncher
             else if (currentPlatform.IsGtk)
             {
                 // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                string homePath = Environment.GetEnvironmentVariable("HOME");
-                string xdgConfigHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(xdgConfigHome) ? (homePath + "/.config") : xdgConfigHome) + "/AM2RLauncher";
+                string homePath = NIXHOME;
+                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -212,7 +217,7 @@ namespace AM2RLauncher
             // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
             // And on Nix systems, we want to replace ~ with its corresponding env var
             string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
-                                                         : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+                                                         : path.Replace("~", NIXHOME);
             if (!Directory.Exists(realPath))
             {
                 log.Info(realPath + " did not exist and was created");
@@ -238,7 +243,7 @@ namespace AM2RLauncher
             // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
             // And on nix systems, we want to replace ~ with its corresponding env var
             string realPath = currentPlatform.IsWinForms ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
-                                                         : path.Replace("~", Environment.GetEnvironmentVariable("HOME"));
+                                                         : path.Replace("~", NIXHOME);
             if (!File.Exists(realPath))
             {
                 log.Error(realPath + "did not exist, operation to open its folder was cancelled!");
@@ -273,16 +278,16 @@ namespace AM2RLauncher
                 arguments = "-version";
             }
 
-            ProcessStartInfo javaStart = new ProcessStartInfo();
-            javaStart.FileName = process;
-            javaStart.Arguments = arguments;
-            javaStart.UseShellExecute = false;
-            javaStart.CreateNoWindow = true;
+            ProcessStartInfo javaStart = new ProcessStartInfo
+            {
+                FileName = process,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
 
-            Process java = new Process();
-
-            java.StartInfo = javaStart;
+            Process java = new Process { StartInfo = javaStart };
 
             // This is primarily for linux, but could be happening on windows as well
             try
@@ -297,7 +302,6 @@ namespace AM2RLauncher
             }
 
             return java.ExitCode == 0;
-            
         }
 
         /// <summary>
@@ -307,18 +311,18 @@ namespace AM2RLauncher
         public static bool CheckIfXdeltaIsInstalled()
         {
             string process = "xdelta3";
-            string arguments = "-V";      
+            string arguments = "-V";
 
-            ProcessStartInfo xdeltaStart = new ProcessStartInfo();
-            xdeltaStart.FileName = process;
-            xdeltaStart.Arguments = arguments;
-            xdeltaStart.UseShellExecute = false;
-            xdeltaStart.CreateNoWindow = true;
+            ProcessStartInfo xdeltaStart = new ProcessStartInfo
+            {
+                FileName = process,
+                Arguments = arguments,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
 
-            Process xdelta = new Process();
-
-            xdelta.StartInfo = xdeltaStart;
+            Process xdelta = new Process { StartInfo = xdeltaStart };
 
             try
             {
@@ -347,7 +351,7 @@ namespace AM2RLauncher
             if (original == output)
                 output = output += "_";
 
-            string arguments = "-f -d -s \"" + original.Replace(CURRENTPATH + "/","") + "\" \"" + patch.Replace(CURRENTPATH + "/", "")
+            string arguments = "-f -d -s \"" + original.Replace(CURRENTPATH + "/", "") + "\" \"" + patch.Replace(CURRENTPATH + "/", "")
                                + "\" \"" + output.Replace(CURRENTPATH + "/", "") + "\"";
 
             if (currentPlatform.IsWinForms)
@@ -438,7 +442,7 @@ namespace AM2RLauncher
                 if (string.IsNullOrWhiteSpace(xdgDataHome))
                 {
                     log.Info("Using default Linux CurrentPath.");
-                    xdgDataHome = Environment.GetEnvironmentVariable("HOME") + "/.local/share";
+                    xdgDataHome = NIXHOME + "/.local/share";
                 }
 
                 // Add AM2RLauncher to the end of the dataPath

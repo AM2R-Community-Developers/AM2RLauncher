@@ -1,16 +1,11 @@
-﻿using Eto;
+﻿using AM2RLauncher.Helpers;
+using Eto;
 using Eto.Forms;
+using log4net;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using log4net;
-using AM2RLauncher.Helpers;
 
 namespace AM2RLauncher
 {
@@ -44,8 +39,6 @@ namespace AM2RLauncher
         public static void Main()
         {
             log.Info("Running update check...");
-
-            string version = VERSION.Replace(".", "");
 
             // Update section
 
@@ -104,7 +97,7 @@ namespace AM2RLauncher
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest");
                 HttpWebResponse response = null;
                 try
-                {        
+                {
                     response = (HttpWebResponse)request.GetResponse();
                 }
                 catch (WebException)
@@ -144,7 +137,7 @@ namespace AM2RLauncher
                         Directory.CreateDirectory(tmpUpdatePath);
 
                     try
-                    { 
+                    {
                         using (var client = new WebClient())
                         {
                             string platformSuffix = "";
@@ -152,13 +145,13 @@ namespace AM2RLauncher
                             else if (currentPlatform.IsGtk) platformSuffix = "_lin";
 
                             log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
-                            
+
                             client.DownloadFile("https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip", zipPath);
 
                             log.Info("File successfully downloaded.");
                         }
                     }
-                    catch(UnauthorizedAccessException)
+                    catch (UnauthorizedAccessException)
                     {
                         log.Error("UnauthorizedAccessException caught! Displaying MessageBox.");
                         MessageBox.Show(Language.Text.UnauthorizedAccessMessage);
@@ -174,7 +167,7 @@ namespace AM2RLauncher
 
                     foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                     {
-                        log.Info("Moving " +  file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
+                        log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
                         File.Copy(file.FullName, updatePath + "/" + file.Name, true);
                     }
                     // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
@@ -189,7 +182,7 @@ namespace AM2RLauncher
                         }
 
                         // Do the same for each subdir
-                        foreach(DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
+                        foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
                         {
                             foreach (FileInfo file in dir.GetFiles())
                             {
@@ -201,7 +194,7 @@ namespace AM2RLauncher
                         if (Directory.Exists(tmpUpdatePath + "lib"))
                             HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib", true);
                     }
-                    
+
                     Directory.Delete(tmpUpdatePath, true);
 
                     CrossPlatformOperations.CopyOldConfigToNewConfig();

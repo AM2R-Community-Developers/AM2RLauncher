@@ -1,6 +1,5 @@
 ﻿using Eto;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace AM2RLauncher
@@ -81,9 +80,9 @@ namespace AM2RLauncher
             string[] combinedSplash;
             Random rng = new Random();
 
-            if (Platform.Instance.IsGtk) 
+            if (Platform.Instance.IsGtk)
                 combinedSplash = generalSplash.Concat(linuxSplash).ToArray();
-            else 
+            else
                 combinedSplash = generalSplash;
 
             string splashString = combinedSplash[rng.Next(0, combinedSplash.Length)];

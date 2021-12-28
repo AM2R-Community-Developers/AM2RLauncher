@@ -19,7 +19,7 @@ namespace AM2RLauncher.Gtk.Properties {
     // -Klasse über ein Tool wie ResGen oder Visual Studio automatisch generiert.
     // Um einen Member hinzuzufügen oder zu entfernen, bearbeiten Sie die .ResX-Datei und führen dann ResGen
     // mit der /str-Option erneut aus, oder Sie erstellen Ihr VS-Projekt neu.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -67,14 +67,14 @@ namespace AM2RLauncher.Gtk.Properties {
         ///    &lt;appender-ref ref=&quot;file&quot; /&gt;
         ///  &lt;/root&gt;
         ///  &lt;appender name=&quot;file&quot; type=&quot;log4net.Appender.RollingFileAppender&quot;&gt;
-        ///    &lt;file value=&quot;${HOME}/.local/share/AM2RLauncher/Logs/AM2RLauncher.log&quot; /&gt;
+        ///    &lt;file value=&quot;${DATADIR}/Logs/AM2RLauncher.log&quot; /&gt;
         ///    &lt;appendToFile value=&quot;true&quot; /&gt;
         ///    &lt;rollingStyle value=&quot;Once&quot; /&gt;
         ///    &lt;maxSizeRollBackups value=&quot;7&quot; /&gt;
         ///    &lt;maximumFileSize value=&quot;3MB&quot; /&gt;
         ///    &lt;staticLogFileName value=&quot;true&quot; /&gt;
         ///    &lt;layout type=&quot;log4net.Layout.PatternLayout&quot;&gt;
-        ///      &lt;conversionPattern value=&quot;%date [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
+        ///      &lt;conversionPattern value=&quot;%date [%thread] %level %logg [Rest der Zeichenfolge wurde abgeschnitten]&quot;; ähnelt.
         /// </summary>
         internal static string log4netContents {
             get {
