@@ -40,7 +40,7 @@ namespace AM2RLauncher
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
             LoadProfiles();
-            if (IsPatchDataCloned() && (bool)autoUpdateAM2RCheck.Checked)
+            if (HelperMethods.IsPatchDataCloned() && (bool)autoUpdateAM2RCheck.Checked)
             {
                 SetPlayButtonState(UpdateState.Downloading);
 
@@ -297,7 +297,7 @@ namespace AM2RLauncher
                             return;
                         }
 
-                        IsZipAM2R11ReturnCodes errorCode = CheckIfZipIsAM2R11(fileFinder.FileName);
+                        IsZipAM2R11ReturnCodes errorCode = HelperMethods.CheckIfZipIsAM2R11(fileFinder.FileName);
                         if (errorCode != IsZipAM2R11ReturnCodes.Successful)
                         {
                             log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
