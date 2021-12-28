@@ -17,8 +17,8 @@ Linux needs the following dependencies installed:
 - `fuse2`
 
 As well as these dependencies to run AM2R:
-- libopenal1:i386
-- libpulse0:i386
+- `libopenal1:i386`
+- `libpulse0:i386`
 
 Optionally, for APK creation any Java runtime is needed.
 
