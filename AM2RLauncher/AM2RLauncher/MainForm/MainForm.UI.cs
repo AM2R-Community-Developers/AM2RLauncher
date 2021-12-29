@@ -140,7 +140,8 @@ namespace AM2RLauncher
             log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
-            log.Info("Actual Launcher location: " + Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+            // TODO: test if this logs correctly on windows now
+            log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
@@ -211,6 +212,7 @@ namespace AM2RLauncher
             Icon = new Icon(1f, am2rIcon);
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
+            // TODO: for some reason, this sometimes doesn't work on Linux. Eto bug maybe?
             ClientSize = new Size(int.Parse(CrossPlatformOperations.ReadFromConfig("Width")), int.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);

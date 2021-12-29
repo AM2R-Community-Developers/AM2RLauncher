@@ -46,6 +46,7 @@ namespace AM2RLauncher.Gtk
             {
                 log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
                 Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
+                Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
             }
         }
 
@@ -95,7 +96,7 @@ namespace AM2RLauncher.Gtk
             }
             catch { }
 
-            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
         }
     }
 }
