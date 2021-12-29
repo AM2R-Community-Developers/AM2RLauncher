@@ -636,7 +636,7 @@ namespace AM2RLauncher
 
             settingsLayout.BeginHorizontal();
             settingsLayout.AddSpace();
-            settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, (Control)profileDebugLogCheck ?? new Label(), customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
+            settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, profileDebugLogCheck, customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
             settingsLayout.AddSpace();
 
             TabPage settingsPage = new TabPage
