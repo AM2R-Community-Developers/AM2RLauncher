@@ -846,8 +846,18 @@ namespace AM2RLauncher
         /// </summary>
         private void CustomMirrorTextBoxLostFocus(object sender, EventArgs e)
         {
+            // Check first, if the text is a valid git repo
+            Regex gitURLRegex = new Regex("https://.*\\.git");
+            string mirrorText = customMirrorTextBox.Text;
+            if (!gitURLRegex.IsMatch(mirrorText))
+            {
+                log.Info("User used " + mirrorText + " as a custom Mirror, didn't pass git validation test.");
+                //TODO: Localize these
+                MessageBox.Show(Language.Text.InvalidGitURL.Replace("$NAME", mirrorText), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                return;
+            }
 
-            currentMirror = customMirrorTextBox.Text;
+            currentMirror = mirrorText;
             CrossPlatformOperations.WriteToConfig("CustomMirrorText", currentMirror);
 
             log.Info("Overwriting mirror in gitconfig.");
@@ -856,7 +866,6 @@ namespace AM2RLauncher
             string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
             if (!File.Exists(gitConfigPath)) return;
             string gitConfig = File.ReadAllText(gitConfigPath);
-            Regex gitURLRegex = new Regex("https://.*\\.git");
             Match match = gitURLRegex.Match(gitConfig);
             gitConfig = gitConfig.Replace(match.Value, currentMirror);
             File.WriteAllText(gitConfigPath, gitConfig);

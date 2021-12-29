@@ -140,7 +140,6 @@ namespace AM2RLauncher
             log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
-            // TODO: test if this logs correctly on windows now
             log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
@@ -149,7 +148,6 @@ namespace AM2RLauncher
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(c => c.NativeName.ToLower().Contains(userLanguage)).First();
 
             log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
-
 
             #region VARIABLE INITIALIZATION
             log.Info("Beginning UI initialization...");
