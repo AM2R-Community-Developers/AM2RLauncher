@@ -26,11 +26,6 @@ namespace AM2RLauncher
         private static readonly Platform currentPlatform = Platform.Instance;
 
         /// <summary>
-        /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
-        /// </summary>
-        public static readonly string CURRENTPATH = GenerateCurrentPath();
-
-        /// <summary>
         /// Name of the Launcher executable.
         /// </summary>
         public static readonly string LAUNCHERNAME = AppDomain.CurrentDomain.FriendlyName;
@@ -44,6 +39,11 @@ namespace AM2RLauncher
         /// Path to the Config folder on *Nix-based systems.
         /// </summary>
         public static readonly string NIXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+
+        /// <summary>
+        /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
+        /// </summary>
+        public static readonly string CURRENTPATH = GenerateCurrentPath();
 
         /// <summary>
         /// Generates the mirror list, depending on the current Platform.
@@ -499,7 +499,7 @@ namespace AM2RLauncher
             }
 
             log.Info("Something went wrong, falling back to the default CurrentPath.");
-            return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
         }
     }
 }

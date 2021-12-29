@@ -746,7 +746,7 @@ namespace AM2RLauncher
 
             profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex + "");       // Loj, tell me a better way to do this
+            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
                 profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
@@ -754,7 +754,6 @@ namespace AM2RLauncher
             else
                 saveWarningLabel.Visible = false;
             UpdateStateMachine();
-            Console.WriteLine("end profile drop down changed");
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>

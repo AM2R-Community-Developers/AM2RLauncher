@@ -194,7 +194,6 @@ namespace AM2RLauncher
                 if (enabled)
                 {
                     settingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
-                    SettingsProfileDropDownSelectedIndexChanged(null, null);
                 }
             }
         }
