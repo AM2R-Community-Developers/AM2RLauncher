@@ -127,12 +127,17 @@ namespace AM2RLauncher
             // Log distro and version (if it exists)
             if (Platform.IsGtk)
             {
-                string osRelease = File.ReadAllText("/etc/os-release");
-                Regex lineRegex = new Regex(".*=.*");
-                var results = lineRegex.Matches(osRelease).Cast<Match>();
-                var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
-                log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
-                          (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
+                if (File.Exists("/etc/os-release"))
+                {
+                    string osRelease = File.ReadAllText("/etc/os-release");
+                    Regex lineRegex = new Regex(".*=.*");
+                    var results = lineRegex.Matches(osRelease).Cast<Match>();
+                    var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
+                    log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
+                              (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
+                }
+                else
+                    log.Error("Couldn't determine the currently running distro!");
             }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
@@ -161,6 +166,10 @@ namespace AM2RLauncher
                 Visible = false,
                 Image = am2rIcon
             };
+
+            // Create menubar with defaults for mac
+            if (Platform.IsMac)
+                Menu = new MenuBar { };
 
             // Create array from validCount
             profileList = new List<ProfileXML>();
@@ -223,6 +232,9 @@ namespace AM2RLauncher
 
             // Drawable paint event
             drawable.Paint += DrawablePaintEvent;
+            // Some systems don't call the paintEvent by default and only do so after actual resizing
+            if (Platform.IsMac)
+                LoadComplete += (sender, e) => { Size = new Size(Size.Width + 1, Size.Height); Size = new Size(Size.Width - 1, Size.Height);};
 
             #region MAIN WINDOW
 
@@ -309,10 +321,11 @@ namespace AM2RLauncher
 
             // Yes, we know this looks horrific on GTK. Sorry. 
             // We're not exactly in a position to rewrite the entire DropDown object as a Drawable child, but if you want to, you're more than welcome!
+            // Mac gets a default BackgroundColor because it looks waaaaaaay better.
             profileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = colBGNoAlpha,
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (Platform.IsGtk)
@@ -518,7 +531,7 @@ namespace AM2RLauncher
             languageDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = colBGNoAlpha,
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
             if (Platform.IsGtk)
                 languageDropDown = new DropDown { };
@@ -608,7 +621,7 @@ namespace AM2RLauncher
             mirrorDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = colBGNoAlpha,
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
             if (Platform.IsGtk)
                 mirrorDropDown = new DropDown { };
@@ -679,7 +692,7 @@ namespace AM2RLauncher
             settingsProfileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = colBGNoAlpha,
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
@@ -813,6 +826,7 @@ namespace AM2RLauncher
             if (Platform.IsGtk)
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
+            //TODO: These don't work properly on mac? Maybe on other platforms too?
             newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
             changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
 

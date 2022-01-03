@@ -247,6 +247,7 @@ namespace AM2RLauncher.Helpers
             Directory.Delete(tmpPath, true);
 
             // If we didn't exit before, everything is fine
+            log.Info("AM2R_11 check successful!");
             return IsZipAM2R11ReturnCodes.Successful;
         }
 

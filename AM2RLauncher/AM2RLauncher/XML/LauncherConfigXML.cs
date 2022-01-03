@@ -49,6 +49,7 @@ namespace AM2RLauncher.XML
         { get; set; }
         /// <summary>Indicates whether or not to create debug logs of profile. Used for <see cref="MainForm.profileDebugLogCheck"/></summary>
         [XmlAttribute("ProfileDebugLog")]
+        //TODO: WTF WHY!?
         public string ProfileDebugLog
         { get; set; }
         /// <summary>Indicates the custom environment variable(s) as text. Used for <see cref="MainForm.customEnvVarTextBox"/></summary>

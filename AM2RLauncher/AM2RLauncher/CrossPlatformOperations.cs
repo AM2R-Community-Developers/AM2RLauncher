@@ -36,9 +36,9 @@ namespace AM2RLauncher
         public static readonly string NIXHOME = Environment.GetEnvironmentVariable("HOME");
 
         /// <summary>
-        /// Path to the Config folder on *Nix-based systems.
+        /// Path to the Config folder on Linux-based systems.
         /// </summary>
-        public static readonly string NIXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+        public static readonly string LINUXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
 
         /// <summary>
         /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
@@ -67,8 +67,18 @@ namespace AM2RLauncher
                     "https://gitlab.com/am2r-community-developers/AM2R-Autopatcher-Linux.git"
                 };
             }
+            else if (currentPlatform.IsMac)
+            {
+                return new List<string>
+                {
+                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git",
+                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"    //TODO: make mac official, put this on gitlab
+                };
+                    
+            }
             else // Should never occur, but...
             {
+                log.Error(currentPlatform.ID + " has no mirror lists!");
                 return new List<string>();
             }
         }
@@ -78,8 +88,10 @@ namespace AM2RLauncher
         /// </summary>
         /// <param name="property">The property to get the value from.</param>
         /// <returns>The value from <paramref name="property"/> as a string</returns>
+        // TODO: how often is launcherconfigpath / launcherconfigfilepath created? maybe create an extra variable for it so we don't generate it every time
         public static string ReadFromConfig(string property)
         {
+            log.Info($"Reading {property} from config.");
             if (currentPlatform.IsWinForms)
             {
                 // We use the configuration manager in order to read `property` from the app.config and then return it
@@ -87,11 +99,16 @@ namespace AM2RLauncher
                 if (appConfig == null) throw new ArgumentException("The property " + property + " could not be found.");
                 return appConfig.ConnectionString;
             }
-            if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
-                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for linux systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
                 string homePath = NIXHOME;
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
+                string launcherConfigPath = "";
+                if (currentPlatform.IsGtk)
+                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
+                else if (currentPlatform.IsMac)
+                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -111,6 +128,8 @@ namespace AM2RLauncher
                 // This uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
                 return launcherConfig[property]?.ToString();
             }
+            else
+                log.Error(currentPlatform.ID + " has no config to read from!");
             return null;
         }
 
@@ -121,6 +140,7 @@ namespace AM2RLauncher
         /// <param name="value">The value that will be written.</param>
         public static void WriteToConfig(string property, object value)
         {
+            log.Info($"Writing {value} of type {value.GetType()} to {property} to config.");
             if (currentPlatform.IsWinForms)
             {
                 // We use the configuration manager in order to read from the app.config, change the value and save it
@@ -134,11 +154,16 @@ namespace AM2RLauncher
                 appConfig.Save();
                 ConfigurationManager.RefreshSection("connectionStrings");
             }
-            else if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
                 string homePath = NIXHOME;
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
+                string launcherConfigPath = "";
+                if (currentPlatform.IsGtk)
+                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
+                else if (currentPlatform.IsMac)
+                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -157,6 +182,8 @@ namespace AM2RLauncher
                 // Serialize back into the file
                 File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
             }
+            else
+                log.Error(currentPlatform.ID + " has no config to write to!");
         }
 
         /// <summary>
@@ -182,11 +209,16 @@ namespace AM2RLauncher
                 File.WriteAllText(newConfigPath, newConfigText);
 
             }
-            else if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
                 string homePath = NIXHOME;
-                string launcherConfigPath = (String.IsNullOrWhiteSpace(NIXXDGCONFIG) ? (homePath + "/.config") : NIXXDGCONFIG) + "/AM2RLauncher";
+                string launcherConfigPath = "";
+                if (currentPlatform.IsGtk)
+                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
+                else if (currentPlatform.IsMac)
+                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -194,6 +226,8 @@ namespace AM2RLauncher
                 launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
                 File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
             }
+            else
+                log.Error(currentPlatform.ID + " has no config to transfer over!");
         }
 
         /// <summary>
@@ -206,6 +240,10 @@ namespace AM2RLauncher
                 Process.Start(url);
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", url);
+            else if (currentPlatform.IsMac)
+                Process.Start("open", url);
+            else
+                log.Error(currentPlatform.ID + " can't open URLs!");
         }
 
         /// <summary>
@@ -231,11 +269,15 @@ namespace AM2RLauncher
             // Linux only opens the directory bc opening and selecting a file is pain
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", $"\"{realPath}\"");
+            else if (currentPlatform.IsMac)
+                Process.Start("open", $"\"{realPath}\"");
+            else
+                log.Error(currentPlatform.ID + " can't open folders!");
         }
 
         /// <summary>
         /// Opens <paramref name="path"/> and selects it in a file explorer. 
-        /// Only selects on Windows, on Linux it just opens the folder. Does nothing if file doesn't exist.
+        /// Only selects on Windows and Mac, on Linux it just opens the folder. Does nothing if file doesn't exist.
         /// </summary>
         /// <param name="path">Path to open.</param>
         public static void OpenFolderAndSelectFile(string path)
@@ -256,6 +298,10 @@ namespace AM2RLauncher
                 Process.Start("explorer.exe", $"/select, \"{realPath}\"");
             else if (currentPlatform.IsGtk)
                 Process.Start("xdg-open", $"\"{Path.GetDirectoryName(realPath)}\"");
+            else if (currentPlatform.IsMac)
+                Process.Start("open", $"-R \"{realPath}\"");
+            else
+                log.Error(currentPlatform.ID + " can't open select files in file explorer!");
         }
 
         /// <summary>
@@ -272,7 +318,7 @@ namespace AM2RLauncher
                 process = "cmd.exe";
                 arguments = "/C java -version";
             }
-            else if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 process = "java";
                 arguments = "-version";
@@ -373,7 +419,7 @@ namespace AM2RLauncher
                     proc.WaitForExit();
                 }
             }
-            else if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 ProcessStartInfo parameters = new ProcessStartInfo
                 {
@@ -405,7 +451,7 @@ namespace AM2RLauncher
                 proc = "cmd";
                 javaArgs = "/C java -jar";
             }
-            else if (currentPlatform.IsGtk)
+            else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 proc = "java";
                 javaArgs = "-jar";
@@ -497,6 +543,23 @@ namespace AM2RLauncher
                     log.Error($"There was an error with '{xdgDataHome}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
                 }
             }
+            else if (currentPlatform.IsMac)
+            {
+                //Mac has the Path at HOME/Library/AM2RLauncher
+                string macPath = NIXHOME + "/Library/AM2RLauncher";
+                try
+                {
+                    Directory.CreateDirectory(macPath);
+                    log.Info("Using default Mac CurrentPath.");
+                    return macPath;
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"There was an error with '{macPath}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
+                }
+            }
+            else
+                log.Error(currentPlatform.ID + " has no current path!");
 
             log.Info("Something went wrong, falling back to the default CurrentPath.");
             return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);

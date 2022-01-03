@@ -25,6 +25,7 @@ namespace AM2RLauncher
         static readonly private string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
         /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
+        //TODO: for mac, this reports the path of the mac runner, not the actual .app
         static readonly private string updatePath = currentPlatform.IsWinForms ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
 
         // Load reference to logger
