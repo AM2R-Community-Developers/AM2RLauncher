@@ -58,10 +58,10 @@ namespace AM2RLauncher.Mac
         private static void MacLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
         {
             log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString());
-            /*Application.Instance.Invoke(new Action(() =>
+            Application.Instance.Invoke(new Action(() =>
             {
                 MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString(), "Mac", MessageBoxType.Error);
-            }));*/
+            }));
         }
 
         // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
