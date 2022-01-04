@@ -90,6 +90,9 @@ namespace AM2RLauncher
         /// </summary>
         readonly static private bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
 
+        /// <summary>
+        /// Caches the result of <see cref="Is11Installed"/> so that we don't extract and verify it too often.
+        /// </summary>
         static private bool? isAM2R11InstalledCache = null;
 
         public MainForm()
