@@ -177,12 +177,17 @@ namespace AM2RLauncher
                 profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
                 saveButton.Enabled = enabled;
                 saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
-                updateModButton.Enabled = enabled;
-                updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
-                deleteModButton.Enabled = enabled;
-                deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
                 addModButton.Enabled = enabled;
                 addModButton.ToolTip = Language.Text.AddNewModToolTip;
+
+                // Only enable these, when we're not on the community updates
+                if (settingsProfileDropDown.SelectedIndex > 0)
+                {
+                    updateModButton.Enabled = enabled;
+                    updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                    deleteModButton.Enabled = enabled;
+                    deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                }
 
                 Color col = enabled ? colGreen : colInactive;
 

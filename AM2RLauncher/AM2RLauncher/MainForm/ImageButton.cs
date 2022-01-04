@@ -73,7 +73,6 @@ namespace Pablo.Controls
                     }
                     using (var bd = disabledImage.Lock())
                     {
-                        
                         unsafe
                         {
                             var data = (int*)bd.Data;

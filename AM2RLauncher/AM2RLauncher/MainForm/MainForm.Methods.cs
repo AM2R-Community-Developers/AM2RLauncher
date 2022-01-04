@@ -535,7 +535,10 @@ namespace AM2RLauncher
                     string arguments = "";
 
                     // Game logging
-                    if ((bool)profileDebugLogCheck.Checked)
+                    bool isLoggingEnabled = false;
+                    Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
+                    
+                    if (isLoggingEnabled)
                     {
                         log.Info("Performing logging setup for profile " + profile.Name + ".");
 
