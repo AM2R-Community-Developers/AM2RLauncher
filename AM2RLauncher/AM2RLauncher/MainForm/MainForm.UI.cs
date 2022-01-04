@@ -273,6 +273,7 @@ namespace AM2RLauncher
 
             // The ProgressBar class is DUMB.
             // For some reason, height/visibility do not take effect when done through the manual constructor, so we do it on LoadComplete instead.
+            //TODO: seems like it was fixed?
             progressBar.LoadComplete += (sender, e) =>
             {
                 progressBar.Visible = false;
