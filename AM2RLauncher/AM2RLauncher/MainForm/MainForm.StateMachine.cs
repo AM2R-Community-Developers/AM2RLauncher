@@ -39,7 +39,7 @@ namespace AM2RLauncher
                     if (HelperMethods.IsPatchDataCloned())
                     {
                         // If 1.1 is installed...
-                        if (HelperMethods.Is11Installed())
+                        if (Is11Installed())
                         {
                             // If current profile is installed...
                             if (IsProfileIndexValid() && IsProfileInstalled(profileList[profileIndex.Value]))
@@ -275,5 +275,37 @@ namespace AM2RLauncher
             }
             return null;
         }
+        /// <summary>
+        /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
+        /// </summary>
+        /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
+        public static bool Is11Installed()
+        {
+            // If we have a cache, return that instead
+            if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
+
+            // Return safely if file doesn't exist
+            if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")) return false;
+            var returnCode = HelperMethods.CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+            // Check if it's valid, if not log it, rename it and silently leave
+            if (returnCode != IsZipAM2R11ReturnCodes.Successful)
+            {
+                log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
+                HelperMethods.RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+                isAM2R11InstalledCache = false;
+                return false;
+            }
+            isAM2R11InstalledCache = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Invalidates <see cref="isAM2R11InstalledCache"/>.
+        /// </summary>
+        public static void InvalidateAM2R11InstallCache()
+        {
+            isAM2R11InstalledCache = null;
+        }
+
     }
 }

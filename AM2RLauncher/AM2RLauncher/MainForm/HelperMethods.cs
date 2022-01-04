@@ -249,24 +249,5 @@ namespace AM2RLauncher.Helpers
             // If we didn't exit before, everything is fine
             return IsZipAM2R11ReturnCodes.Successful;
         }
-
-        /// <summary>
-        /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
-        /// </summary>
-        /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-        public static bool Is11Installed()
-        {
-            // Return safely if file doesn't exist
-            if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")) return false;
-            var returnCode = HelperMethods.CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
-            // Check if it's valid, if not log it, rename it and silently leave
-            if (returnCode != IsZipAM2R11ReturnCodes.Successful)
-            {
-                log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
-                HelperMethods.RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
-                return false;
-            }
-            return true;
-        }
     }
 }

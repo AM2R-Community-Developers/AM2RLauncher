@@ -159,6 +159,7 @@ namespace AM2RLauncher
         private async void PlayButtonClickEvent(object sender, EventArgs e)
         {
             // State Check
+            InvalidateAM2R11InstallCache();
             UpdateStateMachine();
 
             switch (updateState)

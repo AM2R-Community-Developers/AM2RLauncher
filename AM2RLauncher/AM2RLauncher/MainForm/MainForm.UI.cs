@@ -48,8 +48,6 @@ namespace AM2RLauncher
             Creating
         }
 
-
-
         // Splashes
         /// <summary>
         /// A <see cref="string"/>-<see cref="Array"/> of custom splashes.
@@ -91,6 +89,8 @@ namespace AM2RLauncher
         /// Indicates whether or not we have established an internet connection.
         /// </summary>
         readonly static private bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
+
+        static private bool? isAM2R11InstalledCache = null;
 
         public MainForm()
         {
