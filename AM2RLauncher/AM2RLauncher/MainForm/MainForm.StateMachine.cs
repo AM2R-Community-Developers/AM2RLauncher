@@ -284,14 +284,16 @@ namespace AM2RLauncher
             // If we have a cache, return that instead
             if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
 
+            string am2r11file = CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip";
             // Return safely if file doesn't exist
-            if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")) return false;
-            var returnCode = HelperMethods.CheckIfZipIsAM2R11(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+            if (!File.Exists(am2r11file)) return false;
+            lastAM2R11ZipMD5 = HelperMethods.CalculateMD5(am2r11file);
+            var returnCode = HelperMethods.CheckIfZipIsAM2R11(am2r11file);
             // Check if it's valid, if not log it, rename it and silently leave
             if (returnCode != IsZipAM2R11ReturnCodes.Successful)
             {
                 log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
-                HelperMethods.RecursiveRollover(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+                HelperMethods.RecursiveRollover(am2r11file);
                 isAM2R11InstalledCache = false;
                 return false;
             }
@@ -304,6 +306,11 @@ namespace AM2RLauncher
         /// </summary>
         public static void InvalidateAM2R11InstallCache()
         {
+            // If the file exists, and its hash matches with ours, don't invalidate
+            if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
+                HelperMethods.CalculateMD5(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") == lastAM2R11ZipMD5)
+                return;
+
             isAM2R11InstalledCache = null;
         }
 

@@ -96,6 +96,12 @@ namespace AM2RLauncher
         static private bool? isAM2R11InstalledCache = null;
 
         /// <summary>
+        /// Caches the MD5 hash of the provided AM2R_11.zip so we don't end up checking the zip if it hasn't changed.
+        /// </summary>
+        //TODO: worth reading / writing to config?
+        static private string lastAM2R11ZipMD5 = "";
+
+        /// <summary>
         /// Checks if the AM2RLauncher is run via WINE.
         /// </summary>
         static private bool isThisRunningFromWine = false; 
