@@ -219,6 +219,9 @@
   <data name="InternetConnectionDrop" xml:space="preserve">
     <value>Internetverbindung konnte nicht hergestellt werden! Bitte später erneut versuchen!</value>
   </data>
+  <data name="InvalidGitURL" xml:space="preserve">
+    <value>$NAME ist eine ungültige git URL!</value>
+  </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>Java wurde nicht gefunden! Ohne installiertes Java kann keine APK erstellt werden. Bitte sicherstellen das Java installiert, und in der PATH Systemvariable eingetragen ist.</value>
   </data>

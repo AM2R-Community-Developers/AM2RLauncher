@@ -220,7 +220,7 @@
     <value>¡No se puede establecer conexión a internet! ¡Reinténtalo más tarde!</value>
   </data>
   <data name="InvalidGitURL" xml:space="preserve">
-    <value>$NAME es un enlace de Git no válido</value>
+    <value>$NAME es un enlace de Git no válido!</value>
   </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>¡Java no encontrado! No se puede generar un APK sin Java instalado. Por favor asegúrate de tener Java instalado y añadido a PATH</value>

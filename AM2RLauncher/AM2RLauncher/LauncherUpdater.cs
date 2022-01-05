@@ -15,7 +15,7 @@ namespace AM2RLauncher
     public class LauncherUpdater
     {
         /// <summary>The Version that identifies this current release.</summary>
-        static readonly public string VERSION = "2.1.2";
+        static readonly public string VERSION = "2.2.0";
 
         /// <summary>The current Running platform.</summary>
         static readonly private Platform currentPlatform = Platform.Instance;   // Needs to be declared here as well, because I can't access the one from eto,
@@ -116,12 +116,18 @@ namespace AM2RLauncher
 
                 for (int i = 0; i < localVersionArray.Length; i++)
                 {
-                    if (int.Parse(onlineVersionArray[i]) > int.Parse(localVersionArray[i]))
-                    {
+                    int onlineNum = int.Parse(onlineVersionArray[i]);
+                    int localNum = int.Parse(localVersionArray[i]);
+                    if (onlineNum > localNum)
+                    { 
                         isCurrentVersionOutdated = true;
                         break;
                     }
+                    else if (localNum > onlineNum)
+                        break;
                 }
+
+                log.Info((isCurrentVersionOutdated ? "Updating" : "Not Updating") + " from " + VERSION + " to " + onlineVersion);
 
                 if (isCurrentVersionOutdated)
                 {
