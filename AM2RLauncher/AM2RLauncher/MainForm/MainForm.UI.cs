@@ -234,7 +234,7 @@ namespace AM2RLauncher
             Icon = new Icon(1f, am2rIcon);
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
-            // TODO: for some reason, this sometimes doesn't work on Linux. Eto bug maybe?
+            // TODO: for some reason, this sometimes doesn't work on Linux. Was reported at eto, stays here until its fixed
             ClientSize = new Size(int.Parse(CrossPlatformOperations.ReadFromConfig("Width")), int.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);
@@ -290,15 +290,10 @@ namespace AM2RLauncher
 
             centerInterface.AddRow(apkButton);
 
-            progressBar = new ProgressBar();
-
-            // The ProgressBar class is DUMB.
-            // For some reason, height/visibility do not take effect when done through the manual constructor, so we do it on LoadComplete instead.
-            //TODO: seems like it was fixed?
-            progressBar.LoadComplete += (sender, e) =>
+            progressBar = new ProgressBar
             {
-                progressBar.Visible = false;
-                progressBar.Height = 15;
+                Visible = false,
+                Height = 15
             };
 
             // 4px spacer between APK button and progressBar (Windows only)
