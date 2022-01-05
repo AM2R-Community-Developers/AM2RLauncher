@@ -552,6 +552,9 @@ namespace AM2RLauncher
 
                         stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
 
+                        if (isThisRunningFromWine)
+                            stream.WriteLine("Using WINE!");
+
                         stream.Flush();
 
                         stream.Close();

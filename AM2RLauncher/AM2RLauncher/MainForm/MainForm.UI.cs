@@ -95,6 +95,11 @@ namespace AM2RLauncher
         /// </summary>
         static private bool? isAM2R11InstalledCache = null;
 
+        /// <summary>
+        /// Checks if the AM2RLauncher is run via WINE.
+        /// </summary>
+        static private bool isThisRunningFromWine = false; 
+
         public MainForm()
         {
             // Exit if we're already running the AM2RLauncher
@@ -127,8 +132,18 @@ namespace AM2RLauncher
             log.Info("Mutex check passed. Entering main thread.");
             log.Info("Current Launcher Version: " + VERSION);
             log.Info("Current Platform-ID is: " + Platform.ID);
+
+            // Log wine
+            if (Platform.IsWinForms)
+            {
+                if (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null)
+                {
+                    isThisRunningFromWine = true;
+                    log.Info("Currently running from WINE!");
+                }
+            }
             // Log distro and version (if it exists)
-            if (Platform.IsGtk)
+            else if (Platform.IsGtk)
             {
                 string osRelease = File.ReadAllText("/etc/os-release");
                 Regex lineRegex = new Regex(".*=.*");
@@ -385,7 +400,7 @@ namespace AM2RLauncher
 
 
             // Version number label
-            versionLabel = new Label { Text = "v" + VERSION, Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen, Font = new Font(SystemFont.Default, 12) };
+            versionLabel = new Label { Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""), Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen, Font = new Font(SystemFont.Default, 12) };
 
             // Tie everything together
             var mainLayout = new DynamicLayout();
@@ -397,7 +412,8 @@ namespace AM2RLauncher
             mainLayout.AddColumn(null, centerInterface, null);
             mainLayout.AddSpace();
 
-            mainLayout.AddColumn(versionLabel, null);
+            // Yes, I'm hardcoding this string. Linux users can english.
+            mainLayout.AddColumn(versionLabel, isThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = colRed, TextAlignment = TextAlignment.Right } : null);
 
             drawable.Content = mainLayout;
 
