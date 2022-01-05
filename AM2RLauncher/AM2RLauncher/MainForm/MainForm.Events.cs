@@ -634,7 +634,7 @@ namespace AM2RLauncher
         /// </summary>
         private void SettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: for some reason, clearing the dropdown triggers this event on mac. Why!?
+            //TODO: Eto bug, staying here until it gets fixed.
             if (Platform.IsMac && settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
             log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
 
@@ -746,7 +746,7 @@ namespace AM2RLauncher
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
         private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: eto bug maybe? for some reason this method shouldnt even get fired when clearing a dropdown...
+            //TODO: Eto bug, staying here until it gets fixed.
             if (Platform.IsMac && profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
 
             profileIndex = profileDropDown.SelectedIndex;

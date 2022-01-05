@@ -40,6 +40,16 @@ namespace AM2RLauncher
         /// </summary>
         public static readonly string LINUXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
 
+        // Config for linux systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
+        // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
+        /// <summary>
+        /// Path to the Config file folder on *nix based systems. <br/>
+        /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher
+        /// </summary>
+        public static readonly string NIXLAUNCHERCONFIGPATH = currentPlatform.IsGtk ? ((String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (NIXHOME + "/.config")
+                                                                                                                                  : LINUXXDGCONFIG) + "/AM2RLauncher")
+                                                                                    : NIXHOME + "/Library/Preferences/AM2RLauncher";
+
         /// <summary>
         /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
         /// </summary>
@@ -72,7 +82,7 @@ namespace AM2RLauncher
                 return new List<string>
                 {
                     "https://github.com/Miepee/AM2R-Autopatcher-Mac.git",
-                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"    //TODO: make mac official, put this on gitlab
+                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"    //TODO: make mac official at some point:tm:, put this on gitlab
                 };
                     
             }
@@ -88,7 +98,6 @@ namespace AM2RLauncher
         /// </summary>
         /// <param name="property">The property to get the value from.</param>
         /// <returns>The value from <paramref name="property"/> as a string</returns>
-        // TODO: how often is launcherconfigpath / launcherconfigfilepath created? maybe create an extra variable for it so we don't generate it every time
         public static string ReadFromConfig(string property)
         {
             log.Info($"Reading {property} from config.");
@@ -101,15 +110,8 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
-                // Config for linux systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
-                string homePath = NIXHOME;
-                string launcherConfigPath = "";
-                if (currentPlatform.IsGtk)
-                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
-                else if (currentPlatform.IsMac)
-                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
-                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
+                string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
+                string launcherConfigFilePath = launcherConfigPath + "/.config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // If folder doesn't exist, create it and the config file
@@ -156,14 +158,7 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
-                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
-                string homePath = NIXHOME;
-                string launcherConfigPath = "";
-                if (currentPlatform.IsGtk)
-                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
-                else if (currentPlatform.IsMac)
-                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
+                string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
@@ -211,14 +206,7 @@ namespace AM2RLauncher
             }
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
-                // Config for nix systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-                // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
-                string homePath = NIXHOME;
-                string launcherConfigPath = "";
-                if (currentPlatform.IsGtk)
-                    launcherConfigPath = (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (homePath + "/.config") : LINUXXDGCONFIG) + "/AM2RLauncher";
-                else if (currentPlatform.IsMac)
-                    launcherConfigPath = homePath + "/Library/Preferences/AM2RLauncher";
+                string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
                 string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 

@@ -270,10 +270,6 @@ namespace AM2RLauncher
             // Switch profilePath on Gtk
             if (Platform.IsGtk)
             {
-                //TODO: it was just recursively deleted, is this really necessary?
-                if (Directory.Exists(profilePath + "/assets"))
-                    Directory.Delete(profilePath + "/assets", true);
-
                 profilePath += "/assets";
                 Directory.CreateDirectory(profilePath);
             }
