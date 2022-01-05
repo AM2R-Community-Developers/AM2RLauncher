@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Gtk", "AM2RLau
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Wpf", "AM2RLauncher.Wpf\AM2RLauncher.Wpf.csproj", "{8A162932-BAA3-429A-84C4-B93A1C85DDE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM2RLauncher.Mac", "AM2RLauncher.Mac\AM2RLauncher.Mac.csproj", "{6F240F19-144E-4704-A16A-8FDAC3867EC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A162932-BAA3-429A-84C4-B93A1C85DDE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F240F19-144E-4704-A16A-8FDAC3867EC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F240F19-144E-4704-A16A-8FDAC3867EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F240F19-144E-4704-A16A-8FDAC3867EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F240F19-144E-4704-A16A-8FDAC3867EC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

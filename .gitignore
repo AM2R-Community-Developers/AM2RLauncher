@@ -352,3 +352,6 @@ MigrationBackup/
 
 # Visual Studio Code folder
 .vscode/
+
+# Mac's DS_Stores
+.DS_Store

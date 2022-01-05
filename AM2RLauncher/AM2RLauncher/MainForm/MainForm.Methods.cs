@@ -25,12 +25,16 @@ namespace AM2RLauncher
             using (var repo = new Repository(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
             {
                 // Permanently undo commits not pushed to remote
-                Branch originMaster = repo.Branches["origin/master"];
+                Branch originMaster = repo.Branches.ToList().Where(b => b.FriendlyName.Contains("origin/master") || b.FriendlyName.Contains("origin/main")).FirstOrDefault();
 
                 if (originMaster == null)
                 {
+                    log.Info("Neither branch 'master' nor branch 'main' could be found! Corrupted or invalid git repo? Deleting PatchData...");
                     // Directory exists, but seems corrupted, we delete it and prompt the user to download it again.
-                    MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    Application.Instance.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    }));
                     HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                     throw new UserCancelledException();
                 }
@@ -84,7 +88,10 @@ namespace AM2RLauncher
         private bool IsProfileInstalled(ProfileXML profile)
         {
             if (Platform.IsWinForms) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe");
-            if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
+            else if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
+            else if (Platform.IsMac) return Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.app");
+
+            log.Error(Platform.ID + " can't have profiles installed!");
             return false;
         }
 
@@ -212,7 +219,7 @@ namespace AM2RLauncher
             settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
             settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
-            log.Info("Profiles loaded.");
+            log.Info("Loaded " + profileList.Count + " profile(s).");
 
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
@@ -233,7 +240,7 @@ namespace AM2RLauncher
             log.Info("Installing profile " + profile.Name + "...");
 
             // Check if xdelta is installed on linux, by searching all folders in PATH
-            if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            if ((Platform.IsGtk || Platform.IsMac) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 Application.Instance.Invoke(new Action(() =>
                 {
@@ -256,19 +263,34 @@ namespace AM2RLauncher
             // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
             if (Directory.Exists(profilePath))
                 Directory.Delete(profilePath, true);
-
-
+            
             // Create profile directory
             Directory.CreateDirectory(profilePath);
 
             // Switch profilePath on Gtk
             if (Platform.IsGtk)
             {
+                //TODO: it was just recursively deleted, is this really necessary?
                 if (Directory.Exists(profilePath + "/assets"))
                     Directory.Delete(profilePath + "/assets", true);
 
                 profilePath += "/assets";
                 Directory.CreateDirectory(profilePath);
+            }
+            else if (Platform.IsMac)
+            {
+                // Folder structure for mac is like this:
+                // am2r.app -> Contents
+                //     -Frameworks (some libs)
+                //     -MacOS (runner)
+                //     -Resources (asset path)
+                profilePath += "/AM2R.app/Contents";
+                Directory.CreateDirectory(profilePath);
+                Directory.CreateDirectory(profilePath + "/MacOS");
+                Directory.CreateDirectory(profilePath + "/Resources");
+                profilePath += "/Resources";
+
+                log.Info("ProfileInstallstion: Created folder structure.");
             }
 
             // Extract 1.1
@@ -298,6 +320,15 @@ namespace AM2RLauncher
                 exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
                 log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
             }
+            else if (Platform.IsMac)
+            {
+                datawin = "game.ios";
+                exe = "Mac_Runner";
+            }
+            else
+            {
+                log.Error(Platform.ID + " does not have valid runner / data.win names!");
+            }
 
             log.Info("Attempting to patch in " + profilePath);
 
@@ -317,24 +348,31 @@ namespace AM2RLauncher
                     CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
                 }
             }
-            else if (Platform.IsGtk)    // YYC and VM look exactly the same on Linux so we're all good here.
+            else if (Platform.IsGtk || Platform.IsMac)    // YYC and VM look exactly the same on Linux and Mac so we're all good here.
             {
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
                 // Just in case the resulting file isn't chmoddded...
                 Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();
 
-                // These are not needed by linux at all, so we delete them
+                // These are not needed by linux or Mac at all, so we delete them
                 File.Delete(profilePath + "/data.win");
                 File.Delete(profilePath + "/AM2R.exe");
                 File.Delete(profilePath + "/D3DX9_43.dll");
 
-                // Move exe one directory out
-                File.Move(profilePath + "/" + exe, profilePath.Substring(0, profilePath.LastIndexOf("/")) + "/" + exe);
+                // Move exe one directory out on Linux, move to MacOS folder instead on Mac
+                if (Platform.IsGtk)
+                    File.Move(profilePath + "/" + exe, profilePath.Substring(0, profilePath.LastIndexOf("/")) + "/" + exe);
+                else
+                    File.Move(profilePath + "/" + exe, profilePath.Replace("Resources", "MacOS") + "/" + exe);
+            }
+            else
+            {
+                log.Error(Platform.ID + " does not have patching methods!");
             }
 
             // Applied patch
-            if (Platform.IsWinForms) UpdateProgressBar(66);
+            if (Platform.IsWinForms || Platform.IsMac) UpdateProgressBar(66);
             else if (Platform.IsGtk) UpdateProgressBar(44); // Linux will take a bit longer, due to appimage creation
             log.Info("xdelta patch(es) applied.");
 
@@ -388,6 +426,22 @@ namespace AM2RLauncher
                 if (File.Exists(profilePath + "/AM2R.AppImage")) File.Delete(profilePath + "/AM2R.AppImage");
                 File.Move(profilePath + "/" + "AM2R-x86_64.AppImage", profilePath + "/AM2R.AppImage");
             }
+            // Mac post-process
+            else if (Platform.IsMac)
+            {
+                // Rename all songs to lowercase
+                foreach (var file in new DirectoryInfo(profilePath).GetFiles())
+                    if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
+                        File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
+                // Loading custom fonts crashes on Mac, so we delete those
+                Directory.Delete(profilePath + "/lang/fonts", true);
+                // Move Frameworks, Info.plist and PkgInfo over
+                HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
+                File.Copy(dataPath + "/Info.plist", profilePath.Replace("Resources", "") + "/Info.plist", true);
+                File.Copy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/PkgInfo", profilePath.Replace("Resources", "") + "/PkgInfo", true);
+                //Put profilePath back to what it was before
+                profilePath = profilesHomePath + "/" + profile.Name;
+            }
 
             // Copy profile.xml so we can grab data to compare for updates later!
             // tldr; check if we're in PatchData or not
@@ -428,7 +482,7 @@ namespace AM2RLauncher
                 return;
             }
             // Check if xdelta is installed on linux
-            if (Platform.IsGtk && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            if ((Platform.IsGtk || Platform.IsMac) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 // Message box show needs to be done on main thread
                 Application.Instance.Invoke(new Action(() =>
@@ -678,6 +732,48 @@ namespace AM2RLauncher
                     }
 
                 }
+                else if (Platform.IsMac)
+                {
+                    // Sets the arguments to only open the game, or append the profiles save path/logs and create time based logs. Creates the folder if necessary.
+                    string arguments = "AM2R.app -W";
+
+                    // Game logging
+                    if ((bool)profileDebugLogCheck.Checked)
+                    {
+                        log.Info("Performing logging setup for profile " + profile.Name + ".");
+
+                        if (!Directory.Exists(logDir.FullName))
+                            Directory.CreateDirectory(logDir.FullName);
+
+                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+
+                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
+
+                        stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
+
+                        stream.Flush();
+
+                        stream.Close();
+
+                        arguments += " --stdout \"" + logDir.FullName + "/" + profile.Name + ".txt\" --stderr \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
+                    }
+
+                    ProcessStartInfo proc = new ProcessStartInfo();
+
+                    proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                    proc.FileName = "open";
+                    proc.Arguments = arguments;
+
+                    log.Info("CWD of Profile is " + proc.WorkingDirectory);
+
+                    using (var p = Process.Start(proc))
+                    {
+                        p.WaitForExit();
+                    }
+                }
+                else
+                    log.Error(Platform.ID + " cannot run games!");
 
                 log.Info("Profile " + profile.Name + " process exited.");
             }

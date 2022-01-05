@@ -562,12 +562,12 @@ namespace AM2RLauncher
                 ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
 
                 // Check if the OS versions match
-                if ((Platform.IsWinForms && profile.OperatingSystem != "Windows") || (Platform.IsGtk && profile.OperatingSystem != "Linux"))
+                if ((Platform.IsWinForms && profile.OperatingSystem != "Windows") || (Platform.IsGtk && profile.OperatingSystem != "Linux") || (Platform.IsMac && profile.OperatingSystem != "Mac"))
                 {
                     string currentOS = "";
                     if (Platform.IsWinForms) currentOS = "Windows";
                     else if (Platform.IsGtk) currentOS = "Linux";       // Teeeeechnically, any OS could run GTK applications as well but it'd break a lot and is thus unsupported.
-
+                    else if (Platform.IsMac) currentOS = "Mac";
 
                     log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
 
@@ -634,6 +634,8 @@ namespace AM2RLauncher
         /// </summary>
         private void SettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
+            //TODO: for some reason, clearing the dropdown triggers this event on mac. Why!?
+            if (Platform.IsMac && settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
             log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
 
             if (settingsProfileDropDown.SelectedIndex <= 0 || settingsProfileDropDown.Items.Count == 0)
@@ -662,6 +664,7 @@ namespace AM2RLauncher
                 profileNotesTextArea.TextColor = colGreen;
                 profileNotesTextArea.Text = Language.Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
             }
+            
         }
 
         /// <summary>
@@ -677,6 +680,7 @@ namespace AM2RLauncher
                 addModButton.Enabled = false;
                 settingsProfileLabel.TextColor = colInactive;
                 settingsProfileDropDown.Enabled = false;
+                profileButton.Enabled = false;
                 saveButton.Enabled = false;
                 updateModButton.Enabled = false;
                 deleteModButton.Enabled = false;
@@ -742,6 +746,9 @@ namespace AM2RLauncher
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
         private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
+            //TODO: eto bug maybe? for some reason this method shouldnt even get fired when clearing a dropdown...
+            if (Platform.IsMac && profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
+
             profileIndex = profileDropDown.SelectedIndex;
             log.Info("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
 
@@ -754,7 +761,9 @@ namespace AM2RLauncher
                 saveWarningLabel.Visible = true;
             else
                 saveWarningLabel.Visible = false;
+
             UpdateStateMachine();
+            
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>
