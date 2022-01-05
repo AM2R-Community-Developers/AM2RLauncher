@@ -55,5 +55,5 @@ In order to build for linux, use `dotnet publish AM2RLauncher.Gtk -p:PublishSing
 You *have* to specify it to build for Ubuntu, even on non-Ubuntu distros, because one of our Dependencies, libgit2sharp fails on the `linux-x64` RID.
 
 ## Mac Instructions
-You can open the solution with Visual Studio for Mac, but it likely will crash after compliation. Use `dotnet publish AM2RLauncher.Mac -c release` instead.
+You can open the solution with Visual Studio for Mac, but it likely will crash after compliation. Use `dotnet publish AM2RLauncher.Mac -c release` instead.  
 Note that Mac is currently **unsupported**. We will try to answer questions, but cannot guarantee to fix issues with Mac.
