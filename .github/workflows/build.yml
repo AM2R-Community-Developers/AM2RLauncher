@@ -40,4 +40,4 @@ jobs:
       run: dotnet restore
     - name: Build
       working-directory: ./AM2RLauncher
-      run: dotnet publish "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}" && "${{ matrix.COMMAND2 }}"
+      run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}" && "${{ matrix.COMMAND2 }}"
