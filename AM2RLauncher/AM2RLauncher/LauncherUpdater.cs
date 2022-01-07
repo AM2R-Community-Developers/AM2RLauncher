@@ -14,6 +14,9 @@ namespace AM2RLauncher
     /// </summary>
     public class LauncherUpdater
     {
+        // How often this was broken count: 6
+        // Auto updating is fun!
+
         /// <summary>The Version that identifies this current release.</summary>
         static readonly public string VERSION = "2.2.0";
 
@@ -28,7 +31,6 @@ namespace AM2RLauncher
         //TODO: for mac, this reports the path of the mac runner, not the actual .app
         static readonly private string updatePath = currentPlatform.IsWinForms ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
 
-        // Load reference to logger
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
@@ -139,7 +141,7 @@ namespace AM2RLauncher
 
                     // Clean tmpupdate
                     if (Directory.Exists(tmpUpdatePath))
-                        Directory.Delete(tmpUpdatePath);
+                        Directory.Delete(tmpUpdatePath, true);
                     if (!Directory.Exists(tmpUpdatePath))
                         Directory.CreateDirectory(tmpUpdatePath);
 
@@ -185,7 +187,7 @@ namespace AM2RLauncher
                         // Rename all files in lib to *.bak
                         foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
                         {
-                            file.CopyTo(file.Directory + file.Name + ".bak");
+                            file.CopyTo(file.Directory + "/" +  file.Name + ".bak");
                         }
 
                         // Do the same for each subdir
@@ -193,7 +195,7 @@ namespace AM2RLauncher
                         {
                             foreach (FileInfo file in dir.GetFiles())
                             {
-                                file.CopyTo(file.Directory + file.Name + ".bak");
+                                file.CopyTo(file.Directory + "/" + file.Name + ".bak");
                             }
                         }
 
