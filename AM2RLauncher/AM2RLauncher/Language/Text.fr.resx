@@ -221,6 +221,9 @@ ce profil !</value>
   <data name="InternetConnectionDrop" xml:space="preserve">
     <value>Impossible d'établir une connexion internet. Réessayez plus tard.</value>
   </data>
+  <data name="InvalidGitURL" xml:space="preserve">
+    <value>$NAME est une URL git invalide!</value>
+  </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>Java non trouvé ! Impossible de générer un APK. Assurez-vous que Java est installé et est dans le PATH.</value>
   </data>

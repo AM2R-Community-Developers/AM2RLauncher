@@ -219,6 +219,9 @@
   <data name="InternetConnectionDrop" xml:space="preserve">
     <value>インターネットに接続できませんでした。後ほどお試しください</value>
   </data>
+  <data name="InvalidGitURL" xml:space="preserve">
+    <value>$NAMEは無効なGitリンクです。</value>
+  </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>Javaが見つかりません！ APKの作成にはJavaが必要です。環境変数のPATHにJavaが追加されているかご確認下さい</value>
   </data>

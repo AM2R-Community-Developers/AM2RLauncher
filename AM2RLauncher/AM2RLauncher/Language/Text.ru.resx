@@ -219,6 +219,9 @@
   <data name="InternetConnectionDrop" xml:space="preserve">
     <value>Не удалось установить интернет-соединение! Попробуйте позже!</value>
   </data>
+  <data name="InvalidGitURL" xml:space="preserve">
+    <value>$NAME не является ссылкой Git!</value>
+  </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>Не обнаружена Java! Невозможно сгенерировать APK-файл без установленной Java. Убедитесь, что Java установлена, и прописана в PATH.</value>
   </data>

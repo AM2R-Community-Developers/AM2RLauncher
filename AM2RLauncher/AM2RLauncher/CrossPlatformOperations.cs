@@ -44,7 +44,8 @@ namespace AM2RLauncher
         // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
         /// <summary>
         /// Path to the Config file folder on *nix based systems. <br/>
-        /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher
+        /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher <br/>
+        /// Mac: Will point to ~/Library/Preferences/AM2RLauncher
         /// </summary>
         public static readonly string NIXLAUNCHERCONFIGPATH = currentPlatform.IsGtk ? ((String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (NIXHOME + "/.config")
                                                                                                                                   : LINUXXDGCONFIG) + "/AM2RLauncher")

@@ -338,19 +338,20 @@ namespace AM2RLauncher
                     UpdateApkState();
                     UpdateProfileState();
 
-                    await Task.Run(() =>
+                    // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
+                    try
                     {
-                        // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
-                        try
+
+                        await Task.Run(() =>
                         {
                             InstallProfile(profileList[profileIndex.Value]);
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                            MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                        }
-                    });
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
+                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    }
                     progressBar.Visible = false;
                     progressBar.Value = 0;
 

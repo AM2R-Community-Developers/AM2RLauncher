@@ -321,6 +321,9 @@
   <data name="SelectModFileDialog" xml:space="preserve">
     <value>Selecione seu mod</value>
   </data>
+  <data name="String1InvalidGitURL" xml:space="preserve">
+    <value>$NAME é um link Git inválido!</value>
+  </data>
   <data name="SuccessWindowTitle" xml:space="preserve">
     <value>Sucesso!</value>
   </data>

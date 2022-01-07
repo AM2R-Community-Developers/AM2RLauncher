@@ -219,6 +219,9 @@
   <data name="InternetConnectionDrop" xml:space="preserve">
     <value>无法连接到服务器！请稍后再试！</value>
   </data>
+  <data name="InvalidGitURL" xml:space="preserve">
+    <value>$NAME 不是有效的Git仓库地址！</value>
+  </data>
   <data name="JavaNotFound" xml:space="preserve">
     <value>未检测到 Java！必须使用 Java 才能生成 APK 文件。请确保已安装 Java 并将其路径添加至环境变量 PATH 中。</value>
   </data>
