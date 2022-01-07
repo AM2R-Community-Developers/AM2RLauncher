@@ -948,9 +948,9 @@ namespace AM2RLauncher
 
 
 
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update AM2R or not.</summary>
         private CheckBox autoUpdateAM2RCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update the AM2RLauncher or not.</summary>
         private CheckBox autoUpdateLauncherCheck;
         /// <summary>A <see cref="CheckBox"/>, that indicates wether to use a custom mirror or not.</summary>
         private CheckBox customMirrorCheck;
