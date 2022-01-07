@@ -40,8 +40,6 @@ namespace AM2RLauncher
         /// </summary>
         public static readonly string LINUXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
 
-        // Config for linux systems will be saved in XDG_CONFIG_HOME/AM2RLauncher (or if empty, ~/.config)
-        // Config for mac systems will be saved in ~/Library/Preferences/AM2RLauncher
         /// <summary>
         /// Path to the Config file folder on *nix based systems. <br/>
         /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher <br/>
@@ -50,6 +48,11 @@ namespace AM2RLauncher
         public static readonly string NIXLAUNCHERCONFIGPATH = currentPlatform.IsGtk ? ((String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (NIXHOME + "/.config")
                                                                                                                                   : LINUXXDGCONFIG) + "/AM2RLauncher")
                                                                                     : NIXHOME + "/Library/Preferences/AM2RLauncher";
+
+        /// <summary>
+        /// Config file path for *nix based systems. Will be <see cref="NIXLAUNCHERCONFIGPATH"/> + "/config.xml".
+        /// </summary>
+        public static readonly string NIXLAUNCHERCONFIGFILEPATH = NIXLAUNCHERCONFIGPATH + "/config.xml";
 
         /// <summary>
         /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
@@ -112,7 +115,7 @@ namespace AM2RLauncher
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
-                string launcherConfigFilePath = launcherConfigPath + "/.config.xml";
+                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // If folder doesn't exist, create it and the config file
@@ -160,7 +163,7 @@ namespace AM2RLauncher
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
-                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
+                string launcherConfigFilePath = NIXLAUNCHERCONFIGFILEPATH;
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // If folder doesn't exist, create it and the config file
@@ -208,7 +211,7 @@ namespace AM2RLauncher
             else if (currentPlatform.IsGtk || currentPlatform.IsMac)
             {
                 string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
-                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
+                string launcherConfigFilePath = NIXLAUNCHERCONFIGFILEPATH;
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // For some reason deserializing and saving back again works, not exactly sure why, but I'll take it
