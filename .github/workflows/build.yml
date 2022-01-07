@@ -26,7 +26,7 @@ jobs:
             COMMAND2: ""
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -r win-x86 -o "builds\win86" 
-            COMMAND2: && ROBOCOPY "builds\win86" "builds\win86\lib\ " /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
+            COMMAND2: \&\& ROBOCOPY "builds\win86" "builds\win86\lib\ " /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
     runs-on: ${{ matrix.os }}
     
 
