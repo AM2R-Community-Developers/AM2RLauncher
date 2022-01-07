@@ -39,7 +39,7 @@ The AM2RLauncher stores its files in the following places:
 - On Windows, it stores the config file to the `AM2RLauncher.exe.config` next to the binary, and its data files in the same folder as the binary.
 - On Linux, it stores the config file to `$XDG_CONFIG_HOME/AM2RLauncher` and its data files to `$XDG_DATA_HOME/AM2RLauncher` (which are defaulting back to `~/.config` and `~/.local/share` respectively).  
 
-The AM2RLauncher data can get quite big, so if you wish to change where it stores it, you can do so with the `AM2RLAUNCHERDATA` environment variable (i.e `AM2RLAUNCHERDATA="D:\MyLauncherData"` or `AM2RLAUNCHERDATA="/mnt/bigDrive/launcherData"`). 
+The AM2RLauncher data can get quite big, so if you wish to change where it stores it, you can do so with the `AM2RLAUNCHERDATA` environment variable (i.e `$env:AM2RLAUNCHERDATA="D:\MyLauncherData"` or `AM2RLAUNCHERDATA="/mnt/bigDrive/launcherData"`). 
 **Data files are different for each OS, you cannot mix and match them!**
 
 # Compiling Instructions:
