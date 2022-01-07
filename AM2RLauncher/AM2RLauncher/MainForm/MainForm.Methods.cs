@@ -637,10 +637,9 @@ namespace AM2RLauncher
 
                     ProcessStartInfo startInfo = new ProcessStartInfo();
 
-                    log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(customEnvVarTextBox.Text));
-
                     string envVars = "";
                     Application.Instance.Invoke(new Action(() => envVars = customEnvVarTextBox.Text));
+                    log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(envVars));
 
                     if (!string.IsNullOrWhiteSpace(envVars))
                     {
