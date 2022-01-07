@@ -376,6 +376,8 @@ namespace AM2RLauncher
             HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", profilePath);
 
             // HQ music
+            bool isHqMusicChecked = false;
+            Application.Instance.Invoke(new Action(() => isHqMusicChecked = (bool)hqMusicPCCheck.Checked));
             if (!profile.UsesCustomMusic && (bool)hqMusicPCCheck.Checked)
                 HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", profilePath);
 
