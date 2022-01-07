@@ -22,8 +22,18 @@ namespace AM2RLauncher.Wpf
         [STAThread]
         public static void Main(string[] args)
         {
+            string launcherDataPath = GenerateCurrentPath();
+
+            // Make sure first, that the path exists
+            if (!Directory.Exists(launcherDataPath))
+                Directory.CreateDirectory(launcherDataPath);
+
+            // Now, see if log4netConfig exists, if not write it again.
+            if (!File.Exists(launcherDataPath + "/log4net.config"))
+                File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
+
             // Configure logger
-            XmlConfigurator.Configure(new FileInfo(GenerateCurrentPath() + "/log4net.config"));
+            XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
 
             // Try catch in case it ever crashes before actually getting to the Eto application
             try
