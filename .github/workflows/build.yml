@@ -16,17 +16,14 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        configuration: [Debug, Release]
+        configuration: [Release]
         include:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
-            COMMAND2: ""
           - os: macOS-latest
             COMMAND: AM2RLauncher.Mac
-            COMMAND2: ""
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
-            #COMMAND2: \&\& ROBOCOPY builds\win86 builds\win86\lib\ /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
     runs-on: ${{ matrix.os }}
     
 
@@ -35,11 +32,10 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        #dotnet-version: 6.0.x
-        dotnet-version: 4.8
+        dotnet-version: 6.0.x
     - name: Restore dependencies
       working-directory: ./AM2RLauncher
       run: dotnet restore
     - name: Build
       working-directory: ./AM2RLauncher
-      run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}" ${{ matrix.COMMAND2 }}
+      run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
