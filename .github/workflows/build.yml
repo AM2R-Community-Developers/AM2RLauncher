@@ -36,7 +36,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
+      working-directory: ./AM2RLauncher
       run: dotnet restore
     - name: Build
-      working-directory: ./AM2RLauncher "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}" && "${{ matrix.COMMAND2 }}"
-      run: dotnet publish "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}"
+      working-directory: ./AM2RLauncher
+      run: dotnet publish "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}" && "${{ matrix.COMMAND2 }}"
