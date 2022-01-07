@@ -18,11 +18,14 @@ jobs:
         configuration: [Debug, Release]
         include:
           - os: ubuntu-latest
-            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -c "${{ matrix.configuration }}" -r ubuntu.18.04-x64 --no-self-contained
+            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
+            COMMAND2: ""
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac -c "${{ matrix.configuration }}"
+            COMMAND: AM2RLauncher.Mac
+            COMMAND2: ""
           - os: windows-latest
-            COMMAND: AM2RLauncher.Wpf -c "${{ matrix.configuration }}" -r win-x86 -o "builds\win86" && ROBOCOPY "builds\win86" "builds\win86\lib\ " /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
+            COMMAND: AM2RLauncher.Wpf -r win-x86 -o "builds\win86" 
+            COMMAND2: ROBOCOPY "builds\win86" "builds\win86\lib\ " /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
     runs-on: ${{ matrix.os }}
     
 
@@ -35,5 +38,5 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      working-directory: ./AM2RLauncher
-      run: dotnet publish "${{ matrix.COMMAND }}"
+      working-directory: ./AM2RLauncher "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}" && "${{ matrix.COMMAND2 }}"
+      run: dotnet publish "${{ matrix.COMMAND }}" -c "${{ matrix.configuration }}"
