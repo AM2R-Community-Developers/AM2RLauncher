@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: 
+      - 'README.md'
+  pull_request:
+    branches: [ main ]
+    paths-ignore: 
+      - 'README.md'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        configuration: [Debug, Release]
+        include:
+          - os: ubuntu-latest
+            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -c "${{ matrix.configuration }}" -r ubuntu.18.04-x64 --no-self-contained
+          - os: macOS-latest
+            COMMAND: AM2RLauncher.Mac -c "${{ matrix.configuration }}"
+          - os: windows-latest
+            COMMAND: AM2RLauncher.Wpf -c "${{ matrix.configuration }}" -r win-x86 -o "builds\win86" && ROBOCOPY "builds\win86" "builds\win86\lib\ " /XF *.exe *.config *.manifest /XD lib logs data /E /IS /MOVE
+    runs-on: ${{ matrix.os }}
+    
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      working-directory: ./AM2RLauncher
+      run: dotnet publish "${{ matrix.COMMAND }}"
