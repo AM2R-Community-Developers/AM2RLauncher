@@ -8,7 +8,7 @@ A front-end application that simplifies installing the latest AM2R-Community-Upd
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
 Linux needs the following dependencies installed:
 
-- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/5.0) or above
+- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/6.0) or later. .NET Core 6.0 is preferred.
 - `xdelta3` 
 - `gtk3`
 - `libappindicator3`
@@ -17,8 +17,8 @@ Linux needs the following dependencies installed:
 - `fuse2`
 
 As well as these dependencies to run AM2R:
-- `libopenal1:i386`
-- `libpulse0:i386`
+- 32-bit version of `libpulse`
+- 32-bit version of `openal`
 
 Optionally, for APK creation any Java runtime is needed.
 
