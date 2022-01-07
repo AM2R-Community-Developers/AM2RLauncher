@@ -57,7 +57,10 @@ namespace AM2RLauncher
                     if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
                     {
                         log.Error("Druid PatchData corruption occurred!");
-                        MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                        Application.Instance.Invoke(new Action(() =>
+                        {
+                            MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                        }));
                         HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         return;
                     }
@@ -341,11 +344,7 @@ namespace AM2RLauncher
                     // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
                     try
                     {
-
-                        await Task.Run(() =>
-                        {
-                            InstallProfile(profileList[profileIndex.Value]);
-                        });
+                        await Task.Run(() => InstallProfile(profileList[profileIndex.Value]));
                     }
                     catch (Exception ex)
                     {

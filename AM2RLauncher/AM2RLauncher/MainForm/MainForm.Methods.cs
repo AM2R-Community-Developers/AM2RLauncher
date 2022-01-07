@@ -514,7 +514,9 @@ namespace AM2RLauncher
             string workingDir = tempDir + "/AM2RWrapper/assets";
             ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", workingDir);
             HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", workingDir);
-            if (hqMusicAndroidCheck.Checked == true)
+            bool isHqMusicChecked = false;
+            Application.Instance.Invoke(new Action(() => isHqMusicChecked = (bool)hqMusicAndroidCheck.Checked));
+            if (isHqMusicChecked)
                 HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
             // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
             foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
@@ -581,14 +583,16 @@ namespace AM2RLauncher
 
                 log.Info("Launching game profile " + profile.Name + ".");
 
+                bool isLoggingEnabled = false;
+                Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
+
                 if (Platform.IsWinForms)
                 {
                     // Sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
                     string arguments = "";
 
                     // Game logging
-                    bool isLoggingEnabled = false;
-                    Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
+                    
                     
                     if (isLoggingEnabled)
                     {
@@ -635,11 +639,12 @@ namespace AM2RLauncher
 
                     log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(customEnvVarTextBox.Text));
 
-                    if (!string.IsNullOrWhiteSpace(customEnvVarTextBox.Text))
-                    {
-                        string envVars = customEnvVarTextBox.Text;
+                    string envVars = "";
+                    Application.Instance.Invoke(new Action(() => envVars = customEnvVarTextBox.Text));
 
-                        for (int i = 0; i < customEnvVarTextBox.Text.Count(f => f == '='); i++)
+                    if (!string.IsNullOrWhiteSpace(envVars))
+                    {
+                        for (int i = 0; i < envVars.Count(f => f == '='); i++)
                         {
                             // Env var variable
                             string variable = envVars.Substring(0, envVars.IndexOf('='));
@@ -689,7 +694,7 @@ namespace AM2RLauncher
                     using (Process p = new Process())
                     {
                         p.StartInfo = startInfo;
-                        if ((bool)profileDebugLogCheck.Checked)
+                        if (isLoggingEnabled)
                         {
                             p.StartInfo.RedirectStandardOutput = true;
                             p.OutputDataReceived += new DataReceivedEventHandler((sender, e) => { terminalOutput += e.Data + "\n"; });
@@ -736,7 +741,7 @@ namespace AM2RLauncher
                     string arguments = "AM2R.app -W";
 
                     // Game logging
-                    if ((bool)profileDebugLogCheck.Checked)
+                    if (isLoggingEnabled)
                     {
                         log.Info("Performing logging setup for profile " + profile.Name + ".");
 
