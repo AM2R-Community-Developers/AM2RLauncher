@@ -704,8 +704,11 @@ namespace AM2RLauncher
 
                         p.Start();
 
-                        p.BeginOutputReadLine();
-                        p.BeginErrorReadLine();
+                        if (isLoggingEnabled)
+                        {
+                            p.BeginOutputReadLine();
+                            p.BeginErrorReadLine();
+                        }
 
                         p.WaitForExit();
                     }
