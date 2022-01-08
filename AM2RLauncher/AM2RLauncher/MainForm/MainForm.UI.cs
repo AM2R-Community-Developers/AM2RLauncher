@@ -23,7 +23,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
 
         /// <summary>
         /// An enum, that has possible states for our Launcher.
@@ -56,62 +56,61 @@ namespace AM2RLauncher
         /// <summary>
         /// The current Launcher version.
         /// </summary>
-        static readonly private string VERSION = LauncherUpdater.VERSION;
+        private static readonly string VERSION = LauncherUpdater.VERSION;
 
         /// <summary>
         /// A <see cref="Bitmap"/> of the AM2R icon.
         /// </summary>
-        static readonly private Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
+        private static readonly Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
 
         /// <summary>
         /// This variable has the current global state of the Launcher.
         /// </summary>
-        static private UpdateState updateState = UpdateState.Download;
+        private static UpdateState updateState = UpdateState.Download;
         /// <summary>
         /// This variable has the current global statue of the <see cref="apkButton"/>.
         /// </summary>
-        static private ApkButtonState apkButtonState = ApkButtonState.Create;
+        private static ApkButtonState apkButtonState = ApkButtonState.Create;
 
         /// <summary>
         /// Stores the index for <see cref="profileDropDown"/>.
         /// </summary>
-        static private int? profileIndex = null;
+        private static int? profileIndex = null;
         /// <summary>
         /// Stores the index for <see cref="mirrorDropDown"/>.
         /// </summary>
-        static private int mirrorIndex = 0;
+        private static int mirrorIndex = 0;
         /// <summary>
         /// Stores the current mirror from either <see cref="currentMirror"/> or <see cref="customMirrorTextBox"/>.
         /// </summary>
-        static private string currentMirror;
+        private static string currentMirror;
 
         /// <summary>
         /// Indicates whether or not we have established an internet connection.
         /// </summary>
-        readonly static private bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
+        private static readonly bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
 
         /// <summary>
         /// Caches the result of <see cref="Is11Installed"/> so that we don't extract and verify it too often.
         /// </summary>
-        static private bool? isAM2R11InstalledCache = null;
+        private static bool? isAM2R11InstalledCache = null;
 
         /// <summary>
         /// Caches the MD5 hash of the provided AM2R_11.zip so we don't end up checking the zip if it hasn't changed.
         /// </summary>
-        //TODO: worth reading / writing to config?
-        static private string lastAM2R11ZipMD5 = "";
+        private static string lastAM2R11ZipMD5 = "";
 
         /// <summary>
         /// Checks if the AM2RLauncher is run via WINE.
         /// </summary>
-        static private bool isThisRunningFromWine = false; 
+        private static bool isThisRunningFromWine = false; 
 
         public MainForm()
         {
             // Exit if we're already running the AM2RLauncher
 
             // Thanks, StackOverflow! https://stackoverflow.com/questions/184084/how-to-force-c-sharp-net-app-to-run-only-one-instance-in-windows
-            bool singleInstance = true;
+            bool singleInstance;
 
             // This mutex needs to CONTINUE existing for the entire application's lifetime, or else the rest of this won't ever work!
             // We're basically using it to key a thread and scan for other instances of that tag.
@@ -135,9 +134,9 @@ namespace AM2RLauncher
                 Environment.Exit(0);
             }
 
-            log.Info("Mutex check passed. Entering main thread.");
-            log.Info("Current Launcher Version: " + VERSION);
-            log.Info("Current Platform-ID is: " + Platform.ID);
+            Log.Info("Mutex check passed. Entering main thread.");
+            Log.Info("Current Launcher Version: " + VERSION);
+            Log.Info("Current Platform-ID is: " + Platform.ID);
 
             // Log wine
             if (Platform.IsWinForms)
@@ -145,7 +144,7 @@ namespace AM2RLauncher
                 if (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null)
                 {
                     isThisRunningFromWine = true;
-                    log.Info("Currently running from WINE!");
+                    Log.Info("Currently running from WINE!");
                 }
             }
             // Log distro and version (if it exists)
@@ -157,29 +156,29 @@ namespace AM2RLauncher
                     Regex lineRegex = new Regex(".*=.*");
                     var results = lineRegex.Matches(osRelease).Cast<Match>();
                     var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
-                    log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
+                    Log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
                               (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
                 }
                 else
-                    log.Error("Couldn't determine the currently running distro!");
+                    Log.Error("Couldn't determine the currently running distro!");
             }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
             Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
-            log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
+            Log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
-            log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
+            Log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(c => c.NativeName.ToLower().Contains(userLanguage)).First();
 
-            log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
+            Log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
 
             #region VARIABLE INITIALIZATION
-            log.Info("Beginning UI initialization...");
+            Log.Info("Beginning UI initialization...");
 
             // System tray indicator
             showButton = new ButtonMenuItem() { Text = Language.Text.TrayButtonShow };
@@ -193,7 +192,7 @@ namespace AM2RLauncher
 
             // Create menubar with defaults for mac
             if (Platform.IsMac)
-                Menu = new MenuBar { };
+                Menu = new MenuBar();
 
             // Create array from validCount
             profileList = new List<ProfileXML>();
@@ -206,7 +205,7 @@ namespace AM2RLauncher
 
             // Custom splash texts
             string splash = Splash.GetSplash();
-            log.Info("Randomly chosen splash: " + splash);
+            Log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps
             redditIcon = new Bitmap(AM2RLauncher.Properties.Resources.redditIcon48);
@@ -249,7 +248,7 @@ namespace AM2RLauncher
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
-            log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
+            Log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
             if (bool.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
             drawable = new Drawable() { BackgroundColor = colBGNoAlpha };
@@ -349,7 +348,7 @@ namespace AM2RLauncher
             };
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (Platform.IsGtk)
-                profileDropDown = new DropDown { };
+                profileDropDown = new DropDown();
 
             profileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
 
@@ -555,7 +554,7 @@ namespace AM2RLauncher
                 BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
             if (Platform.IsGtk)
-                languageDropDown = new DropDown { };
+                languageDropDown = new DropDown();
 
             languageDropDown.Items.AddRange(languageList);
 
@@ -564,7 +563,7 @@ namespace AM2RLauncher
 
             if (languageDropDown.SelectedIndex == -1)
             {
-                log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
+                Log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
                 languageDropDown.SelectedIndex = 0;
             }
 
@@ -645,7 +644,7 @@ namespace AM2RLauncher
                 BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
             };
             if (Platform.IsGtk)
-                mirrorDropDown = new DropDown { };
+                mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
             mirrorIndex = (int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) : 0;
@@ -718,7 +717,7 @@ namespace AM2RLauncher
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (Platform.IsGtk)
-                settingsProfileDropDown = new DropDown { };
+                settingsProfileDropDown = new DropDown();
 
             settingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
 
@@ -816,8 +815,8 @@ namespace AM2RLauncher
             };
 
             #region EVENTS
-            log.Info("All UI objects have been initalized, UI has been set up.");
-            log.Info("Beginning event linkage...");
+            Log.Info("All UI objects have been initalized, UI has been set up.");
+            Log.Info("Beginning event linkage...");
 
             Closing += MainformClosing;
             showButton.Click += ShowButtonClick;
@@ -851,7 +850,7 @@ namespace AM2RLauncher
             newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
             changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
 
-            log.Info("Events linked successfully.");
+            Log.Info("Events linked successfully.");
 
             #endregion
         }

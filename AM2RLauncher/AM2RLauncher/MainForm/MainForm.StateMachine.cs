@@ -1,10 +1,7 @@
 ﻿using AM2RLauncher.Helpers;
-using AM2RLauncher.XML;
 using Eto.Drawing;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace AM2RLauncher
 {
@@ -292,7 +289,7 @@ namespace AM2RLauncher
             // Check if it's valid, if not log it, rename it and silently leave
             if (returnCode != IsZipAM2R11ReturnCodes.Successful)
             {
-                log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
+                Log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
                 HelperMethods.RecursiveRollover(am2r11file);
                 isAM2R11InstalledCache = false;
                 return false;

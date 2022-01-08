@@ -355,3 +355,6 @@ MigrationBackup/
 
 # Mac's DS_Stores
 .DS_Store
+
+# IDEA files and folders
+.idea/

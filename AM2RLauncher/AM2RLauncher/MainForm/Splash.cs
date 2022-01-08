@@ -12,7 +12,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Cross-Platform splash strings
         /// </summary>
-        static readonly string[] generalSplash =
+        static readonly string[] GeneralSplash =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -48,7 +48,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Linux only splash strings
         /// </summary>
-        static readonly string[] linuxSplash =
+        static readonly string[] LinuxSplash =
         {
             "Sorry this is ugly, but at least it works.",
             "GTK + QT = 💣",
@@ -81,9 +81,9 @@ namespace AM2RLauncher
             Random rng = new Random();
 
             if (Platform.Instance.IsGtk)
-                combinedSplash = generalSplash.Concat(linuxSplash).ToArray();
+                combinedSplash = GeneralSplash.Concat(LinuxSplash).ToArray();
             else
-                combinedSplash = generalSplash;
+                combinedSplash = GeneralSplash;
 
             string splashString = combinedSplash[rng.Next(0, combinedSplash.Length)];
             return splashString;

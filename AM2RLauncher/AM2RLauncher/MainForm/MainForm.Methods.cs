@@ -1,7 +1,5 @@
 ﻿using AM2RLauncher.Helpers;
 using AM2RLauncher.XML;
-using Eto;
-using Eto.Drawing;
 using Eto.Forms;
 using LibGit2Sharp;
 using System;
@@ -21,20 +19,20 @@ namespace AM2RLauncher
         /// </summary>
         private void PullPatchData()
         {
-            log.Info("Attempting to pull repository " + currentMirror + "...");
+            Log.Info("Attempting to pull repository " + currentMirror + "...");
             using (var repo = new Repository(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
             {
                 // Permanently undo commits not pushed to remote
-                Branch originMaster = repo.Branches.ToList().Where(b => b.FriendlyName.Contains("origin/master") || b.FriendlyName.Contains("origin/main")).FirstOrDefault();
+                Branch originMaster = repo.Branches.ToList().FirstOrDefault(b => b.FriendlyName.Contains("origin/master") || b.FriendlyName.Contains("origin/main"));
 
                 if (originMaster == null)
                 {
-                    log.Info("Neither branch 'master' nor branch 'main' could be found! Corrupted or invalid git repo? Deleting PatchData...");
+                    Log.Info("Neither branch 'master' nor branch 'main' could be found! Corrupted or invalid git repo? Deleting PatchData...");
                     // Directory exists, but seems corrupted, we delete it and prompt the user to download it again.
-                    Application.Instance.Invoke(new Action(() =>
+                    Application.Instance.Invoke(() =>
                     {
                         MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    }));
+                    });
                     HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                     throw new UserCancelledException();
                 }
@@ -57,11 +55,11 @@ namespace AM2RLauncher
                 }
                 catch
                 {
-                    log.Error("Repository pull attempt failed!");
+                    Log.Error("Repository pull attempt failed!");
                     return;
                 }
             }
-            log.Info("Repository pulled successfully.");
+            Log.Info("Repository pulled successfully.");
         }
 
         /// <summary>
@@ -72,12 +70,12 @@ namespace AM2RLauncher
         /// <param name="max">The max value that <see cref="progressBar"/> should be set to.</param>
         private void UpdateProgressBar(int value, int min = 0, int max = 100)
         {
-            Application.Instance.Invoke(new Action(() =>
+            Application.Instance.Invoke(() =>
             {
                 progressBar.MinValue = min;
                 progressBar.MaxValue = max;
                 progressBar.Value = value;
-            }));
+            });
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace AM2RLauncher
             else if (Platform.IsGtk) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
             else if (Platform.IsMac) return Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.app");
 
-            log.Error(Platform.ID + " can't have profiles installed!");
+            Log.Error(Platform.ID + " can't have profiles installed!");
             return false;
         }
 
@@ -109,7 +107,7 @@ namespace AM2RLauncher
         /// </summary>
         private void DeleteProfile(ProfileXML profile, bool reloadProfileList = true)
         {
-            log.Info("Attempting to delete profile " + profile.Name + "...");
+            Log.Info("Attempting to delete profile " + profile.Name + "...");
 
             // Delete folder in Mods
             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
@@ -133,7 +131,7 @@ namespace AM2RLauncher
             if (reloadProfileList)
                 LoadProfiles();
 
-            log.Info("Succesfully deleted profile " + profile.Name + ".");
+            Log.Info("Succesfully deleted profile " + profile.Name + ".");
         }
 
         /// <summary>
@@ -141,7 +139,7 @@ namespace AM2RLauncher
         /// </summary>
         private void LoadProfiles()
         {
-            log.Info("Loading profiles...");
+            Log.Info("Loading profiles...");
 
             // Reset loaded profiles
             profileDropDown.Items.Clear();
@@ -170,7 +168,7 @@ namespace AM2RLauncher
                     if (file.Name == "profile.xml")
                     {
                         ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
-                        if (prof.Installable == true || IsProfileInstalled(prof)) // Safety check for non-installable profiles
+                        if (prof.Installable || IsProfileInstalled(prof)) // Safety check for non-installable profiles
                         {
                             prof.DataPath = "/Mods/" + dir.Name;
                             profileList.Add(prof);
@@ -219,7 +217,7 @@ namespace AM2RLauncher
             settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
             settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
-            log.Info("Loaded " + profileList.Count + " profile(s).");
+            Log.Info("Loaded " + profileList.Count + " profile(s).");
 
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
@@ -237,18 +235,18 @@ namespace AM2RLauncher
         /// <param name="profile"><see cref="ProfileXML"/> to be installed.</param>
         private void InstallProfile(ProfileXML profile)
         {
-            log.Info("Installing profile " + profile.Name + "...");
+            Log.Info("Installing profile " + profile.Name + "...");
 
             // Check if xdelta is installed on linux, by searching all folders in PATH
             if ((Platform.IsGtk || Platform.IsMac) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
-                Application.Instance.Invoke(new Action(() =>
+                Application.Instance.Invoke(() =>
                 {
                     MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                }));
+                });
                 SetPlayButtonState(UpdateState.Install);
                 UpdateStateMachine();
-                log.Error("Xdelta not found. Aborting installing a profile...");
+                Log.Error("Xdelta not found. Aborting installing a profile...");
                 return;
             }
 
@@ -286,7 +284,7 @@ namespace AM2RLauncher
                 Directory.CreateDirectory(profilePath + "/Resources");
                 profilePath += "/Resources";
 
-                log.Info("ProfileInstallstion: Created folder structure.");
+                Log.Info("ProfileInstallstion: Created folder structure.");
             }
 
             // Extract 1.1
@@ -294,12 +292,10 @@ namespace AM2RLauncher
 
             // Extracted 1.1
             UpdateProgressBar(33);
-            log.Info("Profile folder created and AM2R_11.zip extracted.");
-
-            string dataPath;
+            Log.Info("Profile folder created and AM2R_11.zip extracted.");
 
             // Set local datapath for installation files
-            dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
+            var dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
 
             string datawin = null, exe = null;
 
@@ -314,7 +310,7 @@ namespace AM2RLauncher
                 // Use the exe name based on the desktop file in the appimage, rather than hardcoding it.
                 string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
                 exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
-                log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
+                Log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
             }
             else if (Platform.IsMac)
             {
@@ -323,10 +319,10 @@ namespace AM2RLauncher
             }
             else
             {
-                log.Error(Platform.ID + " does not have valid runner / data.win names!");
+                Log.Error(Platform.ID + " does not have valid runner / data.win names!");
             }
 
-            log.Info("Attempting to patch in " + profilePath);
+            Log.Info("Attempting to patch in " + profilePath);
 
             if (Platform.IsWinForms)
             {
@@ -364,13 +360,13 @@ namespace AM2RLauncher
             }
             else
             {
-                log.Error(Platform.ID + " does not have patching methods!");
+                Log.Error(Platform.ID + " does not have patching methods!");
             }
 
             // Applied patch
             if (Platform.IsWinForms || Platform.IsMac) UpdateProgressBar(66);
             else if (Platform.IsGtk) UpdateProgressBar(44); // Linux will take a bit longer, due to appimage creation
-            log.Info("xdelta patch(es) applied.");
+            Log.Info("xdelta patch(es) applied.");
 
             // Install new datafiles
             HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", profilePath);
@@ -405,7 +401,7 @@ namespace AM2RLauncher
                 File.Copy(profilePath + "/" + exe, profilePath + "/AM2R.AppDir/usr/bin/" + exe);
 
                 UpdateProgressBar(66);
-                log.Info("Gtk-specific formatting finished.");
+                Log.Info("Gtk-specific formatting finished.");
 
                 // Temp save the currentWorkingDirectory and console.error, change it to profilePath and null, call the script, and change it back.
                 string workingDir = Directory.GetCurrentDirectory();
@@ -449,7 +445,7 @@ namespace AM2RLauncher
 
             // Installed datafiles
             UpdateProgressBar(100);
-            log.Info("Successfully installed profile " + profile.Name + ".");
+            Log.Info("Successfully installed profile " + profile.Name + ".");
 
             // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
             if (Platform.IsWinForms)
@@ -464,32 +460,32 @@ namespace AM2RLauncher
         {
             // Overall safety check just in case of bad situations
             if (!profile.SupportsAndroid) return;
-            log.Info("Creating Android APK for profile " + profile.Name + ".");
+            Log.Info("Creating Android APK for profile " + profile.Name + ".");
 
             // Check for java, exit safely with a warning if not found!
             if (!CrossPlatformOperations.IsJavaInstalled())
             {
                 // Message box show needs to be done on main thread
-                Application.Instance.Invoke(new Action(() =>
+                Application.Instance.Invoke(() =>
                 {
                     MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                }));
+                });
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
-                log.Error("Java not found! Aborting Android APK creation.");
+                Log.Error("Java not found! Aborting Android APK creation.");
                 return;
             }
             // Check if xdelta is installed on linux
             if ((Platform.IsGtk || Platform.IsMac) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 // Message box show needs to be done on main thread
-                Application.Instance.Invoke(new Action(() =>
+                Application.Instance.Invoke(() =>
                 {
                     MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                }));
+                });
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
-                log.Error("Xdelta not found. Aborting Android APK creation...");
+                Log.Error("Xdelta not found. Aborting Android APK creation...");
                 return;
             }
 
@@ -502,12 +498,12 @@ namespace AM2RLauncher
                 Directory.Delete(tempDir, true);
             Directory.CreateDirectory(tempDir);
 
-            log.Info("Cleanup, variables, and working directory created.");
+            Log.Info("Cleanup, variables, and working directory created.");
             UpdateProgressBar(14);
 
             // Decompile AM2RWrapper.apk
             CrossPlatformOperations.RunJavaJar("\"" + apktoolPath + "\" d \"" + dataPath + "/android/AM2RWrapper.apk\"", tempDir);
-            log.Info("AM2RWrapper decompiled.");
+            Log.Info("AM2RWrapper decompiled.");
             UpdateProgressBar(28);
 
             // Add datafiles: 1.1, new datafiles, hq music, am2r.ini
@@ -522,12 +518,12 @@ namespace AM2RLauncher
             foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
                 File.Copy(file.FullName, workingDir + "/" + file.Name); 
             
-            log.Info("AM2R_11.zip extracted and datafiles copied into AM2RWrapper.");
+            Log.Info("AM2R_11.zip extracted and datafiles copied into AM2RWrapper.");
             UpdateProgressBar(42);
 
             // Patch data.win to game.droid
             CrossPlatformOperations.ApplyXdeltaPatch(workingDir + "/data.win", dataPath + "/droid.xdelta", workingDir + "/game.droid");
-            log.Info("game.droid successfully patched.");
+            Log.Info("game.droid successfully patched.");
             UpdateProgressBar(56);
 
             // Delete unnecessary files
@@ -544,12 +540,12 @@ namespace AM2RLauncher
             string apktoolText = File.ReadAllText(workingDir + "/../apktool.yml");
             apktoolText = apktoolText.Replace("doNotCompress:", "doNotCompress:\n- ogg");
             File.WriteAllText(workingDir + "/../apktool.yml", apktoolText);
-            log.Info("Unnecessary files removed, apktool.yml modified to prevent ogg compression.");
+            Log.Info("Unnecessary files removed, apktool.yml modified to prevent ogg compression.");
             UpdateProgressBar(70);
 
             // Rebuild APK
             CrossPlatformOperations.RunJavaJar("\"" + apktoolPath + "\" b AM2RWrapper -o \"" + profile.Name + ".apk\"", tempDir);
-            log.Info("AM2RWrapper rebuilt into " + profile.Name + ".apk.");
+            Log.Info("AM2RWrapper rebuilt into " + profile.Name + ".apk.");
             UpdateProgressBar(84);
 
             // Debug-sign APK
@@ -557,12 +553,12 @@ namespace AM2RLauncher
 
             // Extra file cleanup
             File.Copy(tempDir + "/" + profile.Name + "-aligned-debugSigned.apk", CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk", true);
-            log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
+            Log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
             HelperMethods.DeleteDirectory(tempDir);
 
             // Done
             UpdateProgressBar(100);
-            log.Info("Successfully created Android APK for profile " + profile.Name + ".");
+            Log.Info("Successfully created Android APK for profile " + profile.Name + ".");
             CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk");
         }
 
@@ -581,7 +577,7 @@ namespace AM2RLauncher
                 DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
                 string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 
-                log.Info("Launching game profile " + profile.Name + ".");
+                Log.Info("Launching game profile " + profile.Name + ".");
 
                 bool isLoggingEnabled = false;
                 Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
@@ -596,7 +592,7 @@ namespace AM2RLauncher
                     
                     if (isLoggingEnabled)
                     {
-                        log.Info("Performing logging setup for profile " + profile.Name + ".");
+                        Log.Info("Performing logging setup for profile " + profile.Name + ".");
 
                         if (!Directory.Exists(logDir.FullName))
                             Directory.CreateDirectory(logDir.FullName);
@@ -624,7 +620,7 @@ namespace AM2RLauncher
                     proc.FileName = proc.WorkingDirectory + "/AM2R.exe";
                     proc.Arguments = arguments;
 
-                    log.Info("CWD of Profile is " + proc.WorkingDirectory);
+                    Log.Info("CWD of Profile is " + proc.WorkingDirectory);
 
                     using (var p = Process.Start(proc))
                     {
@@ -639,7 +635,7 @@ namespace AM2RLauncher
 
                     string envVars = "";
                     Application.Instance.Invoke(new Action(() => envVars = customEnvVarTextBox.Text));
-                    log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(envVars));
+                    Log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(envVars));
 
                     if (!string.IsNullOrWhiteSpace(envVars))
                     {
@@ -670,7 +666,7 @@ namespace AM2RLauncher
                             string value = envVars.Substring(0, valueSubstringLength);
                             envVars = envVars.Substring(value.Length);
 
-                            log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
+                            Log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
                             startInfo.EnvironmentVariables[variable] = value;
                         }
                     }
@@ -682,12 +678,12 @@ namespace AM2RLauncher
                     startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
                     startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
 
-                    log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
+                    Log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
 
-                    log.Info("Launching game with following variables: ");
+                    Log.Info("Launching game with following variables: ");
                     foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
                     {
-                        log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
+                        Log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
                     }
 
                     using (Process p = new Process())
@@ -696,10 +692,10 @@ namespace AM2RLauncher
                         if (isLoggingEnabled)
                         {
                             p.StartInfo.RedirectStandardOutput = true;
-                            p.OutputDataReceived += new DataReceivedEventHandler((sender, e) => { terminalOutput += e.Data + "\n"; });
+                            p.OutputDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
 
                             p.StartInfo.RedirectStandardError = true;
-                            p.ErrorDataReceived += new DataReceivedEventHandler((sender, e) => { terminalOutput += e.Data + "\n"; });
+                            p.ErrorDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
                         }
 
                         p.Start();
@@ -715,7 +711,7 @@ namespace AM2RLauncher
 
                     if (terminalOutput != null)
                     {
-                        log.Info("Performed logging setup for profile " + profile.Name + ".");
+                        Log.Info("Performed logging setup for profile " + profile.Name + ".");
 
                         if (!Directory.Exists(logDir.FullName))
                             Directory.CreateDirectory(logDir.FullName);
@@ -745,7 +741,7 @@ namespace AM2RLauncher
                     // Game logging
                     if (isLoggingEnabled)
                     {
-                        log.Info("Performing logging setup for profile " + profile.Name + ".");
+                        Log.Info("Performing logging setup for profile " + profile.Name + ".");
 
                         if (!Directory.Exists(logDir.FullName))
                             Directory.CreateDirectory(logDir.FullName);
@@ -770,17 +766,17 @@ namespace AM2RLauncher
                     proc.FileName = "open";
                     proc.Arguments = arguments;
 
-                    log.Info("CWD of Profile is " + proc.WorkingDirectory);
+                    Log.Info("CWD of Profile is " + proc.WorkingDirectory);
 
                     using (var p = Process.Start(proc))
                     {
-                        p.WaitForExit();
+                        p?.WaitForExit();
                     }
                 }
                 else
-                    log.Error(Platform.ID + " cannot run games!");
+                    Log.Error(Platform.ID + " cannot run games!");
 
-                log.Info("Profile " + profile.Name + " process exited.");
+                Log.Info("Profile " + profile.Name + " process exited.");
             }
         }
     }

@@ -10,7 +10,7 @@ using System.Security.Cryptography;
 namespace AM2RLauncher.Helpers
 {
     /// <summary>
-    /// An enum, that has possible return codes for <see cref="CheckIfZipIsAM2R11(string)"./>
+    /// An enum, that has possible return codes for <see cref="HelperMethods.CheckIfZipIsAM2R11"/>.
     /// </summary>
     public enum IsZipAM2R11ReturnCodes
     {
@@ -30,7 +30,7 @@ namespace AM2RLauncher.Helpers
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
 
         // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
@@ -151,7 +151,8 @@ namespace AM2RLauncher.Helpers
             {
                 RecursiveRollover(fileName, max);
             }
-
+            
+            //TODO: this can fail
             // If index is less than max, rename file.
             if (index < max)
             {
@@ -167,7 +168,7 @@ namespace AM2RLauncher.Helpers
         /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
         public static bool IsConnectedToInternet()
         {
-            log.Info("Checking internet connection...");
+            Log.Info("Checking internet connection...");
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
             HttpWebResponse response = null;
             try
@@ -176,10 +177,10 @@ namespace AM2RLauncher.Helpers
             }
             catch (WebException)
             {
-                log.Info("Internet connection failed.");
+                Log.Info("Internet connection failed.");
                 return false;
             }
-            log.Info("Internet connection established!");
+            Log.Info("Internet connection established!");
             return true;
         }
 
@@ -197,7 +198,7 @@ namespace AM2RLauncher.Helpers
         /// Checks if a Zip file is a valid AM2R_1.1 zip.
         /// </summary>
         /// <param name="zipPath">Full Path to the Zip file to check.</param>
-        /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result
+        /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result</returns>
         public static IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
         {
             const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
@@ -247,7 +248,7 @@ namespace AM2RLauncher.Helpers
             Directory.Delete(tmpPath, true);
 
             // If we didn't exit before, everything is fine
-            log.Info("AM2R_11 check successful!");
+            Log.Info("AM2R_11 check successful!");
             return IsZipAM2R11ReturnCodes.Successful;
         }
     }

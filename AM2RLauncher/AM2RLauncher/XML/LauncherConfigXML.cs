@@ -79,17 +79,17 @@ namespace AM2RLauncher.XML
         /// or <see cref="CrossPlatformOperations.ReadFromConfig(string)"/> instead!
         /// </summary>
         /// <param name="property">The property to get or set.</param>
-        /// <returns>The value of <paramref name="property"/> as an <see cref="object"/> if used as a get, <see cref="void"/> if used as a set.</returns>
+        /// <returns>The value of <paramref name="property"/> as an <see cref="object"/> if used as a get, <see cref="Void"/> if used as a set.</returns>
         public object this[string property]
         {
             get
             {
                 // This is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
-                return typeof(LauncherConfigXML).GetProperties().Where(p => p.CanRead && p.Name == property).First().GetValue(this).ToString();
+                return typeof(LauncherConfigXML).GetProperties().First(p => p.CanRead && p.Name == property).GetValue(this).ToString();
             }
             set
             {
-                typeof(LauncherConfigXML).GetProperties().Where(p => p.CanWrite && p.Name == property).First().SetValue(this, value);
+                typeof(LauncherConfigXML).GetProperties().First(p => p.CanWrite && p.Name == property).SetValue(this, value);
             }
         }
 
@@ -126,7 +126,7 @@ namespace AM2RLauncher.XML
         /// <param name="mirrorIndex">Parameter that saves the index of the selected mirror in <see cref="MainForm.mirrorDropDown"/>.</param>
         /// <param name="customEnvVar">Parameter that saves custom Environment variables that will be used on Linux for launching a game.</param>
         /// <param name="customMirrorEnabled">Parameter that indicates if <see cref="MainForm.customMirrorCheck"/> is enabled or not.</param>
-        /// <param name="profileDebugLog">Parameter that indicates if <see cref="Mainform.profileDebugLog"/> is enabled or not.</param>
+        /// <param name="profileDebugLog">Parameter that indicates if <see cref="MainForm.profileDebugLogCheck"/> is enabled or not.</param>
         /// <param name="customMirrorText">Parameter that's used for <see cref="MainForm.customMirrorTextBox"/>.</param>
         /// <param name="width">Parameter that indicates the width of <see cref="MainForm"/>.</param>
         /// <param name="height">Parameter that indicates the height of <see cref="MainForm"/>.</param>

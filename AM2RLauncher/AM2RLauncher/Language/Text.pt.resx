@@ -141,7 +141,7 @@
   <data name="AutoUpdateAM2R" xml:space="preserve">
     <value>Atualizar AM2R automaticamente</value>
   </data>
-  <data name="AutoUpdateAM2RLauncher" xml:space="preserve">
+  <data name="AutoUpdateLauncher" xml:space="preserve">
     <value>Atualizar AM2RLauncher automaticamente</value>
   </data>
   <data name="ChangelogTab" xml:space="preserve">
@@ -321,7 +321,7 @@
   <data name="SelectModFileDialog" xml:space="preserve">
     <value>Selecione seu mod</value>
   </data>
-  <data name="String1InvalidGitURL" xml:space="preserve">
+  <data name="InvalidGitURL" xml:space="preserve">
     <value>$NAME é um link Git inválido!</value>
   </data>
   <data name="SuccessWindowTitle" xml:space="preserve">

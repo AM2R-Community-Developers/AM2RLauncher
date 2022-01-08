@@ -3,19 +3,18 @@ using log4net;
 using log4net.Config;
 using System;
 using System.IO;
-using System.Reflection;
 
 namespace AM2RLauncher.Gtk
 {
     /// <summary>
     /// The main class for the GTK project.
     /// </summary>
-    class MainClass
+    static class MainClass
     {
         /// <summary>
         /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
         /// <summary>
         /// The main method for the GTK project.
         /// </summary>
@@ -44,8 +43,8 @@ namespace AM2RLauncher.Gtk
             }
             catch (Exception e)
             {
-                log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
-                Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace.ToString());
+                Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
+                Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
                 Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
             }
         }
@@ -55,17 +54,17 @@ namespace AM2RLauncher.Gtk
         /// </summary>
         private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
         {
-            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString());
-            Application.Instance.Invoke(new Action(() =>
+            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+            Application.Instance.Invoke(() =>
             {
-                MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject.ToString(), "GTK", MessageBoxType.Error);
-            }));
+                MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
+            });
         }
 
         // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
         private static string GenerateCurrentPath()
         {
-            string NIXHOME = Environment.GetEnvironmentVariable("HOME");
+            string nixHome = Environment.GetEnvironmentVariable("HOME");
             // First, we check if the user has a custom AM2RLAUNCHERDATA env var
             string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
             if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
@@ -84,7 +83,7 @@ namespace AM2RLauncher.Gtk
             // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
             string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
             if (string.IsNullOrWhiteSpace(xdgDataHome))
-                xdgDataHome = NIXHOME + "/.local/share";
+                xdgDataHome = nixHome + "/.local/share";
 
             // Add AM2RLauncher to the end of the dataPath
             xdgDataHome += "/AM2RLauncher";
