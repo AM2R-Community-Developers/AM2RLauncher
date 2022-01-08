@@ -17,6 +17,7 @@
     <PackageProjectUrl>https://github.com/AM2R-Community-Developers/AM2RLauncherRewrite/</PackageProjectUrl>
     <PackageLicenseExpression>GNU General Public License v3.0</PackageLicenseExpression>
     <Description>A Launcher for AM2R that with mod capabilities.</Description>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

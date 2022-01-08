@@ -131,7 +131,7 @@ namespace AM2RLauncher
             if (reloadProfileList)
                 LoadProfiles();
 
-            Log.Info("Succesfully deleted profile " + profile.Name + ".");
+            Log.Info("Successfully deleted profile " + profile.Name + ".");
         }
 
         /// <summary>
@@ -165,19 +165,18 @@ namespace AM2RLauncher
             {
                 foreach (FileInfo file in dir.GetFiles())
                 {
-                    if (file.Name == "profile.xml")
+                    if (file.Name != "profile.xml")
+                        continue;
+                    ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
+                    if (prof.Installable || IsProfileInstalled(prof)) // Safety check for non-installable profiles
                     {
-                        ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
-                        if (prof.Installable || IsProfileInstalled(prof)) // Safety check for non-installable profiles
-                        {
-                            prof.DataPath = "/Mods/" + dir.Name;
-                            profileList.Add(prof);
-                        }
-                        else if (!IsProfileInstalled(prof)) // If not installable and isn't installed, remove it
-                        {
-                            prof.DataPath = "/Mods/" + dir.Name;
-                            DeleteProfile(prof, false);
-                        }
+                        prof.DataPath = "/Mods/" + dir.Name;
+                        profileList.Add(prof);
+                    }
+                    else if (!IsProfileInstalled(prof)) // If not installable and isn't installed, remove it
+                    {
+                        prof.DataPath = "/Mods/" + dir.Name;
+                        DeleteProfile(prof, false);
                     }
                 }
             }
@@ -284,7 +283,7 @@ namespace AM2RLauncher
                 Directory.CreateDirectory(profilePath + "/Resources");
                 profilePath += "/Resources";
 
-                Log.Info("ProfileInstallstion: Created folder structure.");
+                Log.Info("ProfileInstallation: Created folder structure.");
             }
 
             // Extract 1.1
@@ -345,7 +344,7 @@ namespace AM2RLauncher
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
                 // Just in case the resulting file isn't chmoddded...
-                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"").WaitForExit();
+                Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"")?.WaitForExit();
 
                 // These are not needed by linux or Mac at all, so we delete them
                 File.Delete(profilePath + "/data.win");
@@ -409,7 +408,7 @@ namespace AM2RLauncher
                 Directory.SetCurrentDirectory(profilePath);
                 Console.SetError(new StreamWriter(Stream.Null));
                 Environment.SetEnvironmentVariable("ARCH", "x86_64");
-                Process.Start(CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/appimagetool-x86_64.AppImage", "-n AM2R.AppDir").WaitForExit();
+                Process.Start(CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/appimagetool-x86_64.AppImage", "-n AM2R.AppDir")?.WaitForExit();
                 Directory.SetCurrentDirectory(workingDir);
                 Console.SetError(cliError);
 
@@ -439,7 +438,7 @@ namespace AM2RLauncher
 
             // Copy profile.xml so we can grab data to compare for updates later!
             // tldr; check if we're in PatchData or not
-            if (new DirectoryInfo(dataPath).Parent.Name == "PatchData")
+            if (new DirectoryInfo(dataPath)?.Parent?.Name == "PatchData")
                 File.Copy(dataPath + "/../profile.xml", profilePath + "/profile.xml");
             else File.Copy(dataPath + "/profile.xml", profilePath + "/profile.xml");
 
@@ -567,217 +566,217 @@ namespace AM2RLauncher
         /// </summary>
         private void RunGame()
         {
-            if (IsProfileIndexValid())
+            if (!IsProfileIndexValid())
+                return;
+            
+            ProfileXML profile = profileList[profileIndex.Value];
+
+            // These are used on both windows and linux for game logging
+            string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
+                : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
+            DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
+            string date = String.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+
+            Log.Info("Launching game profile " + profile.Name + ".");
+
+            bool isLoggingEnabled = false;
+            Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
+
+            if (Platform.IsWinForms)
             {
-                ProfileXML profile = profileList[profileIndex.Value];
+                // Sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
+                string arguments = "";
 
-                // These are used on both windows and linux for game logging
-                string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
-                                                      : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
-                DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
-                string date = string.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
-
-                Log.Info("Launching game profile " + profile.Name + ".");
-
-                bool isLoggingEnabled = false;
-                Application.Instance.Invoke(new Action(() => isLoggingEnabled = (bool)profileDebugLogCheck.Checked));
-
-                if (Platform.IsWinForms)
-                {
-                    // Sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
-                    string arguments = "";
-
-                    // Game logging
+                // Game logging
                     
                     
-                    if (isLoggingEnabled)
-                    {
-                        Log.Info("Performing logging setup for profile " + profile.Name + ".");
-
-                        if (!Directory.Exists(logDir.FullName))
-                            Directory.CreateDirectory(logDir.FullName);
-
-                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
-                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
-
-                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
-
-                        stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
-
-                        if (isThisRunningFromWine)
-                            stream.WriteLine("Using WINE!");
-
-                        stream.Flush();
-
-                        stream.Close();
-
-                        arguments = "-debugoutput \"" + logDir.FullName + "/" + profile.Name + ".txt\" -output \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
-                    }
-
-                    ProcessStartInfo proc = new ProcessStartInfo();
-
-                    proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
-                    proc.FileName = proc.WorkingDirectory + "/AM2R.exe";
-                    proc.Arguments = arguments;
-
-                    Log.Info("CWD of Profile is " + proc.WorkingDirectory);
-
-                    using (var p = Process.Start(proc))
-                    {
-                        SetForegroundWindow(p.MainWindowHandle);
-                        p.WaitForExit();
-                    }
-                }
-                else if (Platform.IsGtk)
+                if (isLoggingEnabled)
                 {
+                    Log.Info("Performing logging setup for profile " + profile.Name + ".");
 
-                    ProcessStartInfo startInfo = new ProcessStartInfo();
+                    if (!Directory.Exists(logDir.FullName))
+                        Directory.CreateDirectory(logDir.FullName);
 
-                    string envVars = "";
-                    Application.Instance.Invoke(new Action(() => envVars = customEnvVarTextBox.Text));
-                    Log.Info("Is the environment textbox null or whitespace = " + string.IsNullOrWhiteSpace(envVars));
+                    if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                        HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
 
-                    if (!string.IsNullOrWhiteSpace(envVars))
-                    {
-                        for (int i = 0; i < envVars.Count(f => f == '='); i++)
-                        {
-                            // Env var variable
-                            string variable = envVars.Substring(0, envVars.IndexOf('='));
-                            envVars = envVars.Replace(variable + "=", "");
+                    StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
-                            // This thing here is the value parser. Since values are sometimes in quotes, i need to compensate for them.
-                            int valueSubstringLength = 0;
-                            if (envVars[0] != '"')               // If value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
-                            {
-                                if (envVars.IndexOf(' ') >= 0)
-                                    valueSubstringLength = envVars.IndexOf(' ') + 1;
-                                else
-                                    valueSubstringLength = envVars.Length;
-                            }
-                            else                                // If value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
-                            {
-                                int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"') + 1);
-                                if (envVars.IndexOf(' ', secondQuoteIndex) >= 0)
-                                    valueSubstringLength = envVars.IndexOf(' ', secondQuoteIndex) + 1;
-                                else
-                                    valueSubstringLength = envVars.Length;
-                            }
-                            // Env var value
-                            string value = envVars.Substring(0, valueSubstringLength);
-                            envVars = envVars.Substring(value.Length);
+                    stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
 
-                            Log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
-                            startInfo.EnvironmentVariables[variable] = value;
-                        }
-                    }
+                    if (isThisRunningFromWine)
+                        stream.WriteLine("Using WINE!");
 
-                    // If we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
-                    string terminalOutput = null;
+                    stream.Flush();
 
-                    startInfo.UseShellExecute = false;
-                    startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
-                    startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
+                    stream.Close();
 
-                    Log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
-
-                    Log.Info("Launching game with following variables: ");
-                    foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
-                    {
-                        Log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
-                    }
-
-                    using (Process p = new Process())
-                    {
-                        p.StartInfo = startInfo;
-                        if (isLoggingEnabled)
-                        {
-                            p.StartInfo.RedirectStandardOutput = true;
-                            p.OutputDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
-
-                            p.StartInfo.RedirectStandardError = true;
-                            p.ErrorDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
-                        }
-
-                        p.Start();
-
-                        if (isLoggingEnabled)
-                        {
-                            p.BeginOutputReadLine();
-                            p.BeginErrorReadLine();
-                        }
-
-                        p.WaitForExit();
-                    }
-
-                    if (terminalOutput != null)
-                    {
-                        Log.Info("Performed logging setup for profile " + profile.Name + ".");
-
-                        if (!Directory.Exists(logDir.FullName))
-                            Directory.CreateDirectory(logDir.FullName);
-
-                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
-                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
-
-                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
-
-                        // Write general info
-                        stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
-
-                        // Write what was in the terminal
-                        stream.WriteLine(terminalOutput);
-
-                        stream.Flush();
-
-                        stream.Close();
-                    }
-
+                    arguments = "-debugoutput \"" + logDir.FullName + "/" + profile.Name + ".txt\" -output \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
                 }
-                else if (Platform.IsMac)
+
+                ProcessStartInfo proc = new ProcessStartInfo();
+
+                proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                proc.FileName = proc.WorkingDirectory + "/AM2R.exe";
+                proc.Arguments = arguments;
+
+                Log.Info("CWD of Profile is " + proc.WorkingDirectory);
+
+                using (var p = Process.Start(proc))
                 {
-                    // Sets the arguments to only open the game, or append the profiles save path/logs and create time based logs. Creates the folder if necessary.
-                    string arguments = "AM2R.app -W";
-
-                    // Game logging
-                    if (isLoggingEnabled)
-                    {
-                        Log.Info("Performing logging setup for profile " + profile.Name + ".");
-
-                        if (!Directory.Exists(logDir.FullName))
-                            Directory.CreateDirectory(logDir.FullName);
-
-                        if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
-                            HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
-
-                        StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
-
-                        stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
-
-                        stream.Flush();
-
-                        stream.Close();
-
-                        arguments += " --stdout \"" + logDir.FullName + "/" + profile.Name + ".txt\" --stderr \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
-                    }
-
-                    ProcessStartInfo proc = new ProcessStartInfo();
-
-                    proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
-                    proc.FileName = "open";
-                    proc.Arguments = arguments;
-
-                    Log.Info("CWD of Profile is " + proc.WorkingDirectory);
-
-                    using (var p = Process.Start(proc))
-                    {
-                        p?.WaitForExit();
-                    }
+                    SetForegroundWindow(p.MainWindowHandle);
+                    p.WaitForExit();
                 }
-                else
-                    Log.Error(Platform.ID + " cannot run games!");
-
-                Log.Info("Profile " + profile.Name + " process exited.");
             }
+            else if (Platform.IsGtk)
+            {
+
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+
+                string envVars = "";
+                Application.Instance.Invoke(new Action(() => envVars = customEnvVarTextBox.Text));
+                Log.Info("Is the environment textbox null or whitespace = " + String.IsNullOrWhiteSpace(envVars));
+
+                if (!String.IsNullOrWhiteSpace(envVars))
+                {
+                    for (int i = 0; i < envVars.Count(f => f == '='); i++)
+                    {
+                        // Env var variable
+                        string variable = envVars.Substring(0, envVars.IndexOf('='));
+                        envVars = envVars.Replace(variable + "=", "");
+
+                        // This thing here is the value parser. Since values are sometimes in quotes, i need to compensate for them.
+                        int valueSubstringLength = 0;
+                        if (envVars[0] != '"') // If value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
+                        {
+                            if (envVars.IndexOf(' ') >= 0)
+                                valueSubstringLength = envVars.IndexOf(' ') + 1;
+                            else
+                                valueSubstringLength = envVars.Length;
+                        }
+                        else // If value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
+                        {
+                            int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"') + 1);
+                            if (envVars.IndexOf(' ', secondQuoteIndex) >= 0)
+                                valueSubstringLength = envVars.IndexOf(' ', secondQuoteIndex) + 1;
+                            else
+                                valueSubstringLength = envVars.Length;
+                        }
+                        // Env var value
+                        string value = envVars.Substring(0, valueSubstringLength);
+                        envVars = envVars.Substring(value.Length);
+
+                        Log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
+                        startInfo.EnvironmentVariables[variable] = value;
+                    }
+                }
+
+                // If we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
+                string terminalOutput = null;
+
+                startInfo.UseShellExecute = false;
+                startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
+
+                Log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
+
+                Log.Info("Launching game with following variables: ");
+                foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
+                {
+                    Log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
+                }
+
+                using (Process p = new Process())
+                {
+                    p.StartInfo = startInfo;
+                    if (isLoggingEnabled)
+                    {
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.OutputDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
+
+                        p.StartInfo.RedirectStandardError = true;
+                        p.ErrorDataReceived += (sender, e) => { terminalOutput += e.Data + "\n"; };
+                    }
+
+                    p.Start();
+
+                    if (isLoggingEnabled)
+                    {
+                        p.BeginOutputReadLine();
+                        p.BeginErrorReadLine();
+                    }
+
+                    p.WaitForExit();
+                }
+
+                if (terminalOutput != null)
+                {
+                    Log.Info("Performed logging setup for profile " + profile.Name + ".");
+
+                    if (!Directory.Exists(logDir.FullName))
+                        Directory.CreateDirectory(logDir.FullName);
+
+                    if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                        HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+
+                    StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
+
+                    // Write general info
+                    stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
+
+                    // Write what was in the terminal
+                    stream.WriteLine(terminalOutput);
+
+                    stream.Flush();
+
+                    stream.Close();
+                }
+
+            }
+            else if (Platform.IsMac)
+            {
+                // Sets the arguments to only open the game, or append the profiles save path/logs and create time based logs. Creates the folder if necessary.
+                string arguments = "AM2R.app -W";
+
+                // Game logging
+                if (isLoggingEnabled)
+                {
+                    Log.Info("Performing logging setup for profile " + profile.Name + ".");
+
+                    if (!Directory.Exists(logDir.FullName))
+                        Directory.CreateDirectory(logDir.FullName);
+
+                    if (File.Exists(logDir.FullName + "/" + profile.Name + ".txt"))
+                        HelperMethods.RecursiveRollover(logDir.FullName + "/" + profile.Name + ".txt", 5);
+
+                    StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
+
+                    stream.WriteLine("AM2RLauncher " + VERSION + " log generated at " + date);
+
+                    stream.Flush();
+
+                    stream.Close();
+
+                    arguments += " --stdout \"" + logDir.FullName + "/" + profile.Name + ".txt\" --stderr \"" + logDir.FullName + "/" + profile.Name + ".txt\"";
+                }
+
+                ProcessStartInfo proc = new ProcessStartInfo();
+
+                proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+                proc.FileName = "open";
+                proc.Arguments = arguments;
+
+                Log.Info("CWD of Profile is " + proc.WorkingDirectory);
+
+                using (var p = Process.Start(proc))
+                {
+                    p?.WaitForExit();
+                }
+            }
+            else
+                Log.Error(Platform.ID + " cannot run games!");
+
+            Log.Info("Profile " + profile.Name + " process exited.");
         }
     }
 }

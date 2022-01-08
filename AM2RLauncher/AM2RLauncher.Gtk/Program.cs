@@ -4,101 +4,101 @@ using log4net.Config;
 using System;
 using System.IO;
 
-namespace AM2RLauncher.Gtk
+namespace AM2RLauncher.Gtk;
+
+/// <summary>
+/// The main class for the GTK project.
+/// </summary>
+static class MainClass
 {
     /// <summary>
-    /// The main class for the GTK project.
+    /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
     /// </summary>
-    static class MainClass
+    private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+    /// <summary>
+    /// The main method for the GTK project.
+    /// </summary>
+    [STAThread]
+    public static void Main()
     {
-        /// <summary>
-        /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
-        /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
-        /// <summary>
-        /// The main method for the GTK project.
-        /// </summary>
-        [STAThread]
-        public static void Main(string[] args)
+        string launcherDataPath = GenerateCurrentPath();
+
+        // Make sure first, ~/.local/share/AM2RLauncher exists
+        if (!Directory.Exists(launcherDataPath))
+            Directory.CreateDirectory(launcherDataPath);
+
+        // Now, see if log4netConfig exists, if not write it again.
+        if (!File.Exists(launcherDataPath + "/log4net.config"))
+            File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
+
+        // Configure logger
+        XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
+
+        try
         {
-            string launcherDataPath = GenerateCurrentPath();
-
-            // Make sure first, ~/.local/share/AM2RLauncher exists
-            if (!Directory.Exists(launcherDataPath))
-                Directory.CreateDirectory(launcherDataPath);
-
-            // Now, see if log4netConfig exists, if not write it again.
-            if (!File.Exists(launcherDataPath + "/log4net.config"))
-                File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
-
-            // Configure logger
-            XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
-
-            try
-            {
-                Application GTKLauncher = new Application(Eto.Platforms.Gtk);
-                LauncherUpdater.Main();
-                GTKLauncher.UnhandledException += GTKLauncher_UnhandledException;
-                GTKLauncher.Run(new MainForm());
-            }
-            catch (Exception e)
-            {
-                Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
-                Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
-                Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
-            }
+            Application GTKLauncher = new Application(Eto.Platforms.Gtk);
+            LauncherUpdater.Main();
+            GTKLauncher.UnhandledException += GTKLauncher_UnhandledException;
+            GTKLauncher.Run(new MainForm());
         }
-
-        /// <summary>
-        /// This method gets fired when an unhandled excpetion occurs in <see cref="MainForm"/>.
-        /// </summary>
-        private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
+        catch (Exception e)
         {
-            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
-            Application.Instance.Invoke(() =>
-            {
-                MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
-            });
+            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
+            Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
+            Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
         }
+    }
 
-        // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
-        private static string GenerateCurrentPath()
+    /// <summary>
+    /// This method gets fired when an unhandled excpetion occurs in <see cref="MainForm"/>.
+    /// </summary>
+    private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
+    {
+        Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        Application.Instance.Invoke(() =>
         {
-            string nixHome = Environment.GetEnvironmentVariable("HOME");
-            // First, we check if the user has a custom AM2RLAUNCHERDATA env var
-            string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
-            if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
-            {
-                try
-                {
-                    // This will create the directories recursively if they don't exist
-                    Directory.CreateDirectory(am2rLauncherDataEnvVar);
+            MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
+        });
+    }
 
-                    // Our env var is now set and directories exist
-                    return am2rLauncherDataEnvVar;
-                }
-                catch { }
-            }
-
-            // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
-            string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-            if (string.IsNullOrWhiteSpace(xdgDataHome))
-                xdgDataHome = nixHome + "/.local/share";
-
-            // Add AM2RLauncher to the end of the dataPath
-            xdgDataHome += "/AM2RLauncher";
-
+    // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
+    private static string GenerateCurrentPath()
+    {
+        string nixHome = Environment.GetEnvironmentVariable("HOME");
+        // First, we check if the user has a custom AM2RLAUNCHERDATA env var
+        string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
+        if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+        {
             try
             {
                 // This will create the directories recursively if they don't exist
-                Directory.CreateDirectory(xdgDataHome);
+                Directory.CreateDirectory(am2rLauncherDataEnvVar);
 
                 // Our env var is now set and directories exist
-                return xdgDataHome;
+                return am2rLauncherDataEnvVar;
             }
             catch { }
-
-            return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
         }
+
+        // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
+        string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+        if (String.IsNullOrWhiteSpace(xdgDataHome))
+            xdgDataHome = nixHome + "/.local/share";
+
+        // Add AM2RLauncher to the end of the dataPath
+        xdgDataHome += "/AM2RLauncher";
+
+        try
+        {
+            // This will create the directories recursively if they don't exist
+            Directory.CreateDirectory(xdgDataHome);
+
+            // Our env var is now set and directories exist
+            return xdgDataHome;
+        }
+        catch { }
+
+        return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
     }
 }
+

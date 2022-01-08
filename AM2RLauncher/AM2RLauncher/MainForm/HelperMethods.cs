@@ -67,14 +67,15 @@ namespace AM2RLauncher.Helpers
             }
 
             // If copying subdirectories, copy them and their contents to new location.
-            if (copySubDirs)
+            if (!copySubDirs)
+                return;
+            
+            foreach (DirectoryInfo subDir in dirs)
             {
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    string tempPath = Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, tempPath, overwriteFiles, copySubDirs);
-                }
+                string tempPath = Path.Combine(destDirName, subDir.Name);
+                DirectoryCopy(subDir.FullName, tempPath, overwriteFiles);
             }
+            
         }
 
 
@@ -170,10 +171,9 @@ namespace AM2RLauncher.Helpers
         {
             Log.Info("Checking internet connection...");
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
-            HttpWebResponse response = null;
             try
             {
-                response = (HttpWebResponse)request.GetResponse();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             }
             catch (WebException)
             {

@@ -5,6 +5,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <ApplicationIcon>icon64.ico</ApplicationIcon>
     <RollForward>LatestMajor</RollForward>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

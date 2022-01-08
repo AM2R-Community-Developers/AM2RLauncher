@@ -45,9 +45,9 @@ namespace AM2RLauncher
         /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher <br/>
         /// Mac: Will point to ~/Library/Preferences/AM2RLauncher
         /// </summary>
-        private static readonly string NIXLAUNCHERCONFIGPATH = CurrentPlatform.IsGtk ? ((String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? (NIXHOME + "/.config")
-                                                                                                                                  : LINUXXDGCONFIG) + "/AM2RLauncher")
-                                                                                    : NIXHOME + "/Library/Preferences/AM2RLauncher";
+        private static readonly string NIXLAUNCHERCONFIGPATH = CurrentPlatform.IsGtk ? (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? NIXHOME + "/.config"
+                                                                                                                                  : LINUXXDGCONFIG) + "/AM2RLauncher"
+                                                                                     : NIXHOME + "/Library/Preferences/AM2RLauncher";
 
         /// <summary>
         /// Config file path for *nix based systems. Will be <see cref="NIXLAUNCHERCONFIGPATH"/> + "/config.xml".
@@ -154,7 +154,7 @@ namespace AM2RLauncher
                 if (appConfig == null)
                     throw new NullReferenceException("Could not find the Config file! Please make sure it exists!");
                 ConnectionStringsSection connectionStringsSection = (ConnectionStringsSection)appConfig.GetSection("connectionStrings");
-                if (connectionStringsSection == null || connectionStringsSection.ConnectionStrings[property]?.ConnectionString == null)
+                if (connectionStringsSection?.ConnectionStrings[property]?.ConnectionString == null)
                     throw new ArgumentException("The property " + property + " could not be found.");
                 connectionStringsSection.ConnectionStrings[property].ConnectionString = value.ToString();
                 appConfig.Save();
@@ -512,7 +512,7 @@ namespace AM2RLauncher
             {
                 // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
                 string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-                if (string.IsNullOrWhiteSpace(xdgDataHome))
+                if (String.IsNullOrWhiteSpace(xdgDataHome))
                 {
                     Log.Info("Using default Linux CurrentPath.");
                     xdgDataHome = NIXHOME + "/.local/share";

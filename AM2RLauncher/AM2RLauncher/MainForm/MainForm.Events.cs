@@ -30,7 +30,7 @@ namespace AM2RLauncher
         /// <param name="hWnd">Pointer to the process you want to have in the foreground.</param>
         /// <returns></returns>
         [DllImport("user32.dll")]
-        static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         /// <summary>
         /// After the <see cref="playButton"/> has bee loaded, git pull if a repo has been cloned already.
@@ -38,120 +38,120 @@ namespace AM2RLauncher
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
             LoadProfiles();
-            if (HelperMethods.IsPatchDataCloned() && (bool)autoUpdateAM2RCheck.Checked)
+            if (!HelperMethods.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
+                return;
+            
+            SetPlayButtonState(UpdateState.Downloading);
+
+            progressBar.Visible = true;
+            progressLabel.Visible = true;
+            progressBar.Value = 0;
+
+            // Try to pull first.
+            try
             {
-                SetPlayButtonState(UpdateState.Downloading);
+                await Task.Run(PullPatchData);
 
-                progressBar.Visible = true;
-                progressLabel.Visible = true;
-                progressBar.Value = 0;
-
-                // Try to pull first.
-                try
+                // Thank you druid, for this case that should never happen
+                if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
                 {
-                    await Task.Run(PullPatchData);
-
-                    // Thank you druid, for this case that should never happen
-                    if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
+                    Log.Error("Druid PatchData corruption occurred!");
+                    await Application.Instance.InvokeAsync(() =>
                     {
-                        Log.Error("Druid PatchData corruption occurred!");
-                        await Application.Instance.InvokeAsync(() =>
-                        {
-                            MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                        });
-                        HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
-                        return;
+                        MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    });
+                    HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                    return;
+                }
+            }
+            catch (UserCancelledException) { } // We deliberately cancelled this!
+            catch (LibGit2SharpException ex)   // This is for any exceptions from libgit
+            {
+                // Libgit2sharp error messages are always in english!
+                if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
+                    ex.Message.ToLower().Contains("failed to resolve address"))
+                {
+                    if (!(bool)autoUpdateAM2RCheck.Checked)
+                    {
+                        Log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
+                        MessageBox.Show(Language.Text.InternetConnectionDrop, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
                     }
                 }
-                catch (UserCancelledException) { }  // We deliberately cancelled this!
-                catch (LibGit2SharpException ex)    // This is for any exceptions from libgit
-                {
-                    // Libgit2sharp error messages are always in english!
-                    if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
-                        ex.Message.ToLower().Contains("failed to resolve address"))
-                    {
-                        if (!(bool)autoUpdateAM2RCheck.Checked)
-                        {
-                            Log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
-                            MessageBox.Show(Language.Text.InternetConnectionDrop, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
-                        }
-                    }
-                    else
-                    {
-                        Log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    }
-                }
-                catch (Exception ex)                // This is if somehow any other exception might get thrown as well.
+                else
                 {
                     Log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                     MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
-                finally
-                {
-                    progressBar.Visible = false;
-                    progressLabel.Visible = false;
-                    LoadProfiles();
-                }
+            }
+            catch (Exception ex) // This is if somehow any other exception might get thrown as well.
+            {
+                Log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
+                MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+            }
+            finally
+            {
+                progressBar.Visible = false;
+                progressLabel.Visible = false;
+                LoadProfiles();
+            }
 
-                // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
-                // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
-                if (profileList.Count > 0 && IsProfileInstalled(profileList[0]))
-                {
-                    ProfileXML currentXML = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)/profile.xml"));
+            // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
+            // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
+            if (profileList.Count > 0 && IsProfileInstalled(profileList[0]))
+            {
+                ProfileXML currentXML = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)/profile.xml"));
 
-                    if (currentXML.Version != profileList[0].Version)
+                if (currentXML.Version != profileList[0].Version)
+                {
+                    Log.Info("New game version (" + profileList[0].Version + ") detected! Beginning archival of version " + currentXML.Version + "...");
+
+                    string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (" + currentXML.Version + ")";
+
+                    // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
+                    if (!Directory.Exists(profileArchivePath))
                     {
-                        Log.Info("New game version (" + profileList[0].Version + ") detected! Beginning archival of version " + currentXML.Version + "...");
+                        // Rename current Community Updates
+                        Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)", profileArchivePath);
 
-                        string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (" + currentXML.Version + ")";
+                        currentXML.Name = "Community Updates (" + currentXML.Version + ")";
+
+                        // Set as non-installable so that it's just treated as a launching reference
+                        currentXML.Installable = false;
+                        currentXML.SupportsAndroid = false;
+
+                        string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + currentXML.Name;
 
                         // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
-                        if (!Directory.Exists(profileArchivePath))
+                        if (!Directory.Exists(modArchivePath))
                         {
-                            // Rename current Community Updates
-                            Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)", profileArchivePath);
-
-                            currentXML.Name = "Community Updates (" + currentXML.Version + ")";
-
-                            // Set as non-installable so that it's just treated as a launching reference
-                            currentXML.Installable = false;
-                            currentXML.SupportsAndroid = false;
-
-                            string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + currentXML.Name;
-
-                            // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
-                            if (!Directory.Exists(modArchivePath))
-                            {
-                                Directory.CreateDirectory(modArchivePath);
-                                File.WriteAllText(modArchivePath + "/profile.xml", Serializer.Serialize<ProfileXML>(currentXML));
-                                Log.Info("Finished archival.");
-                            }
-                            else
-                            {
-                                HelperMethods.DeleteDirectory(profileArchivePath);
-                                Log.Info("Cancelling archival! User-defined archive in Mods already exists.");
-                            }
-
-
+                            Directory.CreateDirectory(modArchivePath);
+                            File.WriteAllText(modArchivePath + "/profile.xml", Serializer.Serialize<ProfileXML>(currentXML));
+                            Log.Info("Finished archival.");
                         }
-                        else // If our desired rename already exists, it's probably a user archive... so we just delete the folder and move on with installation of the new version.
+                        else
                         {
-                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
-                            Log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
+                            HelperMethods.DeleteDirectory(profileArchivePath);
+                            Log.Info("Cancelling archival! User-defined archive in Mods already exists.");
                         }
-
-                        profileDropDown.SelectedIndex = 0;
-
-                        LoadProfiles();
 
 
                     }
-                }
+                    else // If our desired rename already exists, it's probably a user archive... so we just delete the folder and move on with installation of the new version.
+                    {
+                        HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
+                        Log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
+                    }
 
-                SetPlayButtonState(UpdateState.Install);
-                UpdateStateMachine();
+                    profileDropDown.SelectedIndex = 0;
+
+                    LoadProfiles();
+
+
+                }
             }
+
+            SetPlayButtonState(UpdateState.Install);
+            UpdateStateMachine();
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace AM2RLauncher
                         Title = Language.Text.Select11FileDialog
                     };
 
-                    fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
+                    fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
 
                     if (fileFinder.ShowDialog(this) != DialogResult.Ok)
                     {
@@ -290,7 +290,7 @@ namespace AM2RLauncher
                         return;
                     }
 
-                    if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
+                    if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
                     {
                         if (Directory.Exists(fileFinder.FileName))
                         {
@@ -416,13 +416,11 @@ namespace AM2RLauncher
             {
                 progressBar.MinValue = 0;
                 progressBar.MaxValue = transferProgress.TotalObjects;
-                if (currentGitObject < transferProgress.ReceivedObjects)
-                {
-                    progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
-                    currentGitObject = transferProgress.ReceivedObjects;
-                    progressBar.Value = transferProgress.ReceivedObjects;
-
-                }
+                if (currentGitObject >= transferProgress.ReceivedObjects)
+                    return;
+                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
+                currentGitObject = transferProgress.ReceivedObjects;
+                progressBar.Value = transferProgress.ReceivedObjects;
             });
 
             return true;
@@ -507,7 +505,7 @@ namespace AM2RLauncher
                 Title = Language.Text.SelectModFileDialog
             };
 
-            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
+            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -515,7 +513,7 @@ namespace AM2RLauncher
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
+            if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
             {
                 Log.Info("User selected \"" + fileFinder.FileName + "\"");
 
@@ -607,12 +605,11 @@ namespace AM2RLauncher
         /// </summary>
         private void ProfilesButtonClickEvent(object sender, EventArgs e)
         {
-            if (IsProfileIndexValid())
-            {
-                Log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name +
-                        ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-                CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
-            }
+            if (!IsProfileIndexValid())
+                return;
+            Log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name +
+                     ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
         }
 
         /// <summary>
@@ -657,12 +654,11 @@ namespace AM2RLauncher
             saveButton.Enabled = true;
             saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
 
-            if (!(settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0))
-            {
-                profileNotesTextArea.TextColor = colGreen;
-                profileNotesTextArea.Text = Language.Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
-            }
-            
+            if (settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0)
+                return;
+            profileNotesTextArea.TextColor = colGreen;
+            profileNotesTextArea.Text = Language.Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
+
         }
 
         /// <summary>
@@ -673,17 +669,16 @@ namespace AM2RLauncher
         {
             // Safety check
             if (settingsProfileDropDown == null) return;
-            if (settingsProfileDropDown.Items.Count == 0)
-            {
-                addModButton.Enabled = false;
-                settingsProfileLabel.TextColor = colInactive;
-                settingsProfileDropDown.Enabled = false;
-                profileButton.Enabled = false;
-                saveButton.Enabled = false;
-                updateModButton.Enabled = false;
-                deleteModButton.Enabled = false;
-                profileNotesTextArea.TextColor = colInactive;
-            }
+            if (settingsProfileDropDown.Items.Count != 0)
+                return;
+            addModButton.Enabled = false;
+            settingsProfileLabel.TextColor = colInactive;
+            settingsProfileDropDown.Enabled = false;
+            profileButton.Enabled = false;
+            saveButton.Enabled = false;
+            updateModButton.Enabled = false;
+            deleteModButton.Enabled = false;
+            profileNotesTextArea.TextColor = colInactive;
         }
 
         /// <summary>
@@ -942,7 +937,7 @@ namespace AM2RLauncher
                 Title = Language.Text.SelectModFileDialog
             };
 
-            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, new[] { ".zip" }));
+            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -950,7 +945,7 @@ namespace AM2RLauncher
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
+            if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
             {
                 Log.Info("User selected \"" + fileFinder.FileName + "\"");
 
@@ -1047,32 +1042,34 @@ namespace AM2RLauncher
 
             CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
             CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
-            CrossPlatformOperations.WriteToConfig("IsMaximized", (this.WindowState == WindowState.Maximized));
+            CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
 
-            if (updateState == UpdateState.Downloading)
+            switch (updateState)
             {
-                var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo,
-                                             MessageBoxType.Warning, MessageBoxDefaultButton.No);
-                if (result == DialogResult.No)
+                case UpdateState.Downloading:
                 {
-                    e.Cancel = true;
+                    var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                                                 MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                    if (result == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                        isGitProcessGettingCancelled = true;
+                    // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
+                    break;
                 }
-                else
-                    isGitProcessGettingCancelled = true;
-                // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
-
-            }
-            else if (updateState == UpdateState.Installing)
-            {
-                MessageBox.Show(Language.Text.CloseOnInstallingText, Language.Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
-                e.Cancel = true;
+                case UpdateState.Installing:
+                    MessageBox.Show(Language.Text.CloseOnInstallingText, Language.Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
+                    e.Cancel = true;
+                    break;
             }
 
             // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
             trayIndicator.Visible = false;
 
             if (e.Cancel)
-                Log.Info("Cancelled MainForm closing event during UpdateState." + updateState.ToString() + ".");
+                Log.Info("Cancelled MainForm closing event during UpdateState." + updateState + ".");
             else
                 Log.Info("Successfully closed MainForm. Exiting main thread.");
         }

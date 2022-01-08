@@ -28,7 +28,7 @@ namespace AM2RLauncher
         /// <summary>
         /// An enum, that has possible states for our Launcher.
         /// </summary>
-        enum UpdateState
+        private enum UpdateState
         {
             Download,
             Downloading,
@@ -42,7 +42,7 @@ namespace AM2RLauncher
         /// <summary>
         /// An enum, that has different states for <see cref="apkButton"/>.
         /// </summary>
-        enum ApkButtonState
+        private enum ApkButtonState
         {
             Create,
             Creating
@@ -52,11 +52,10 @@ namespace AM2RLauncher
         /// <summary>
         /// A <see cref="string"/>-<see cref="Array"/> of custom splashes.
         /// </summary>
-
         /// <summary>
         /// The current Launcher version.
         /// </summary>
-        private static readonly string VERSION = LauncherUpdater.VERSION;
+        private const string VERSION = LauncherUpdater.VERSION;
 
         /// <summary>
         /// A <see cref="Bitmap"/> of the AM2R icon.
@@ -124,11 +123,10 @@ namespace AM2RLauncher
                     Process current = Process.GetCurrentProcess();
                     foreach (Process process in Process.GetProcessesByName(current.ProcessName))
                     {
-                        if (process.Id != current.Id)
-                        {
-                            SetForegroundWindow(process.MainWindowHandle);
-                            break;
-                        }
+                        if (process.Id == current.Id)
+                            continue;
+                        SetForegroundWindow(process.MainWindowHandle);
+                        break;
                     }
                 }
                 Environment.Exit(0);
@@ -173,7 +171,7 @@ namespace AM2RLauncher
             // Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
-                Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).Where(c => c.NativeName.ToLower().Contains(userLanguage)).First();
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
             Log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
 
@@ -181,8 +179,8 @@ namespace AM2RLauncher
             Log.Info("Beginning UI initialization...");
 
             // System tray indicator
-            showButton = new ButtonMenuItem() { Text = Language.Text.TrayButtonShow };
-            trayIndicator = new TrayIndicator()
+            showButton = new ButtonMenuItem { Text = Language.Text.TrayButtonShow };
+            trayIndicator = new TrayIndicator
             {
                 Menu = new ContextMenu(showButton),
                 Title = "AM2RLauncher",
@@ -198,9 +196,9 @@ namespace AM2RLauncher
             profileList = new List<ProfileXML>();
 
             profileNames = new List<ListItem>();
-            for (int i = 0; i < profileList.Count; i++)
+            foreach (var profile in profileList)
             {
-                profileNames.Add(profileList[i].Name);
+                profileNames.Add(profile.Name);
             }
 
             // Custom splash texts
@@ -243,15 +241,15 @@ namespace AM2RLauncher
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
             // TODO: for some reason, this sometimes doesn't work on Linux. Was reported at eto, stays here until its fixed
-            ClientSize = new Size(int.Parse(CrossPlatformOperations.ReadFromConfig("Width")), int.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
+            ClientSize = new Size(Int32.Parse(CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
             Log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
-            if (bool.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
+            if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
-            drawable = new Drawable() { BackgroundColor = colBGNoAlpha };
+            drawable = new Drawable { BackgroundColor = colBGNoAlpha };
 
             // Drawable paint event
             drawable.Paint += DrawablePaintEvent;
@@ -318,7 +316,7 @@ namespace AM2RLauncher
                 Height = 15,
                 Text = "",
                 TextColor = colGreen,
-                Visible = false,
+                Visible = false
             };
 
             centerInterface.AddRow(progressLabel);
@@ -331,7 +329,7 @@ namespace AM2RLauncher
                 BackgroundColor = colBG,
                 Height = 15,
                 Text = Language.Text.CurrentProfile,
-                TextColor = colGreen,
+                TextColor = colGreen
             };
 
             centerInterface.AddRow(profileLabel);
@@ -344,7 +342,7 @@ namespace AM2RLauncher
             profileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
             };
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (Platform.IsGtk)
@@ -382,23 +380,23 @@ namespace AM2RLauncher
                 Width = 20,
                 Height = 55,
                 Text = Language.Text.SaveLocationWarning,
-                TextColor = colRed,
+                TextColor = colRed
             };
 
             centerInterface.AddRow(saveWarningLabel);
 
 
             // Social buttons
-            var redditButton = new ImageButton() { ToolTip = Language.Text.RedditToolTip, Image = redditIcon };
+            var redditButton = new ImageButton { ToolTip = Language.Text.RedditToolTip, Image = redditIcon };
             redditButton.Click += RedditIconOnClick;
 
-            var githubButton = new ImageButton() { ToolTip = Language.Text.GithubToolTip, Image = githubIcon };
+            var githubButton = new ImageButton { ToolTip = Language.Text.GithubToolTip, Image = githubIcon };
             githubButton.Click += GithubIconOnClick;
 
-            var youtubeButton = new ImageButton() { ToolTip = Language.Text.YoutubeToolTip, Image = youtubeIcon };
+            var youtubeButton = new ImageButton { ToolTip = Language.Text.YoutubeToolTip, Image = youtubeIcon };
             youtubeButton.Click += YoutubeIconOnClick;
 
-            var discordButton = new ImageButton() { ToolTip = Language.Text.DiscordToolTip, Image = discordIcon };
+            var discordButton = new ImageButton { ToolTip = Language.Text.DiscordToolTip, Image = discordIcon };
             discordButton.Click += DiscordIconOnClick;
 
 
@@ -534,7 +532,7 @@ namespace AM2RLauncher
 
             // Language DropDown menu
 
-            List<ListItem> languageList = new List<ListItem>()
+            List<ListItem> languageList = new List<ListItem>
             {
                 Language.Text.SystemLanguage,
                 "Deutsch",
@@ -551,7 +549,7 @@ namespace AM2RLauncher
             languageDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
             };
             if (Platform.IsGtk)
                 languageDropDown = new DropDown();
@@ -559,7 +557,7 @@ namespace AM2RLauncher
             languageDropDown.Items.AddRange(languageList);
 
             var tmpLanguage = CrossPlatformOperations.ReadFromConfig("Language");
-            languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.Where(x => x.Text.Equals(tmpLanguage)).FirstOrDefault());
+            languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
 
             if (languageDropDown.SelectedIndex == -1)
             {
@@ -570,7 +568,7 @@ namespace AM2RLauncher
             // autoUpdateAM2R checkbox
             autoUpdateAM2RCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
                 Text = Language.Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
@@ -579,7 +577,7 @@ namespace AM2RLauncher
             // autoUpdateLauncher checkbox
             autoUpdateLauncherCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
                 Text = Language.Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
@@ -587,7 +585,7 @@ namespace AM2RLauncher
             // HQ music, PC
             hqMusicPCCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
                 Text = Language.Text.HighQualityPC,
                 TextColor = colGreen
             };
@@ -595,7 +593,7 @@ namespace AM2RLauncher
             // HQ music, Android
             hqMusicAndroidCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
                 Text = Language.Text.HighQualityAndroid,
                 TextColor = colGreen
             };
@@ -641,13 +639,14 @@ namespace AM2RLauncher
             mirrorDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
             };
             if (Platform.IsGtk)
                 mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-            mirrorIndex = (int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? int.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) : 0;
+            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
+                                                                                                                                  : 0;
             mirrorDropDown.SelectedIndex = mirrorIndex;
 
             currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
@@ -655,7 +654,7 @@ namespace AM2RLauncher
             // Custom mirror
             customMirrorCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
                 Text = Language.Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
@@ -712,7 +711,7 @@ namespace AM2RLauncher
             settingsProfileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color(),
+                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
             };
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
@@ -815,7 +814,7 @@ namespace AM2RLauncher
             };
 
             #region EVENTS
-            Log.Info("All UI objects have been initalized, UI has been set up.");
+            Log.Info("All UI objects have been initialized, UI has been set up.");
             Log.Info("Beginning event linkage...");
 
             Closing += MainformClosing;

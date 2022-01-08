@@ -12,7 +12,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Cross-Platform splash strings
         /// </summary>
-        static readonly string[] GeneralSplash =
+        private static readonly string[] GeneralSplash =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -48,7 +48,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Linux only splash strings
         /// </summary>
-        static readonly string[] LinuxSplash =
+        private static readonly string[] LinuxSplash =
         {
             "Sorry this is ugly, but at least it works.",
             "GTK + QT = 💣",
@@ -75,7 +75,7 @@ namespace AM2RLauncher
         /// Get a random splash string, according to the current OS.
         /// </summary>
         /// <returns>The randomly chosen splash as a <see cref="string"/>.</returns>
-        static public string GetSplash()
+        public static string GetSplash()
         {
             string[] combinedSplash;
             Random rng = new Random();

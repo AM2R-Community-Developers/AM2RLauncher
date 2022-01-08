@@ -7,7 +7,7 @@ namespace AM2RLauncher.XML
     /// <summary>
     /// The <c>Serializer</c> class, that serializes to and deserializes from XML files.
     /// </summary>
-    public class Serializer
+    public static class Serializer
     {
         /// <summary>
         /// Serializes <paramref name="item"/> as a <typeparamref name="T"/> to XML.
