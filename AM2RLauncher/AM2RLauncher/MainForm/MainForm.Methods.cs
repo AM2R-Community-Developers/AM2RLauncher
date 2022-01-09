@@ -573,7 +573,7 @@ namespace AM2RLauncher
 
             // These are used on both windows and linux for game logging
             string savePath = Platform.IsWinForms ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
-                : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
+                                                  : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
             DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
             string date = String.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 

@@ -27,49 +27,51 @@ namespace AM2RLauncher
         private void UpdatePlayState()
         {
             // If not downloading or installing...
-            if (updateState != UpdateState.Downloading && updateState != UpdateState.Installing)
+            if ((updateState == UpdateState.Downloading) || (updateState == UpdateState.Installing))
+                return;
+
+            // If we're currently creating an APK...
+            if (apkButtonState != ApkButtonState.Creating)
             {
-                if (apkButtonState != ApkButtonState.Creating)
+                playButton.Enabled = true;
+                // If PatchData is cloned...
+                if (HelperMethods.IsPatchDataCloned())
                 {
-                    playButton.Enabled = true;
-                    // If PatchData is cloned...
-                    if (HelperMethods.IsPatchDataCloned())
+                    // If 1.1 is installed or if the current profile is invalid...
+                    if (Is11Installed())
                     {
-                        // If 1.1 is installed...
-                        if (Is11Installed())
+                        var isProfileValid = IsProfileIndexValid();
+                        // If current profile is installed...
+                        if (isProfileValid && IsProfileInstalled(profileList[profileIndex.Value]))
                         {
-                            // If current profile is installed...
-                            if (IsProfileIndexValid() && IsProfileInstalled(profileList[profileIndex.Value]))
-                            {
-                                // We're ready to play!
-                                SetPlayButtonState(UpdateState.Play);
-                            }
-                            // Otherwise, if profile is NOT installable...
-                            else if (IsProfileIndexValid() && profileList[profileIndex.Value].Installable == false)
-                            {
-                                // We delete the profile, because we can't install it and it therefor holds no value!
-                                DeleteProfile(profileList[profileIndex.Value]);
-                            }
-                            // Otherwise, we still need to install.
-                            else
-                            {
-                                SetPlayButtonState(UpdateState.Install);
-                            }
+                            // We're ready to play!
+                            SetPlayButtonState(UpdateState.Play);
                         }
-                        else // We still need to select 1.1.
+                        // Otherwise, if profile is NOT installable...
+                        else if (isProfileValid && profileList[profileIndex.Value].Installable == false)
                         {
-                            SetPlayButtonState(UpdateState.Select11);
+                            // We delete the profile, because we can't install it and it therefore holds no value!
+                            DeleteProfile(profileList[profileIndex.Value]);
+                        }
+                        // Otherwise, we still need to install.
+                        else
+                        {
+                            SetPlayButtonState(UpdateState.Install);
                         }
                     }
-                    else // We still need to download.
+                    else // We still need to select 1.1.
                     {
-                        SetPlayButtonState(UpdateState.Download);
+                        SetPlayButtonState(UpdateState.Select11);
                     }
                 }
-                else
+                else // We still need to download.
                 {
-                    playButton.Enabled = false;
+                    SetPlayButtonState(UpdateState.Download);
                 }
+            }
+            else // We disable the Play button.
+            {
+                playButton.Enabled = false;
             }
         }
 
@@ -81,28 +83,20 @@ namespace AM2RLauncher
             // Safety check
             if (apkButton == null)
                 return;
-            // If profile supports Android...
-            if (IsProfileIndexValid() && profileList[profileIndex.Value].SupportsAndroid && profileList[profileIndex.Value].Installable)
+            var profile = profileList[profileIndex.Value];
+            // If profile supports Android and if we are NOT already creating an APK...
+            if (IsProfileIndexValid() && profile.SupportsAndroid && profile.Installable && (apkButtonState == ApkButtonState.Create))
             {
-                // If we are NOT already creating an APK...
-                if (apkButtonState == ApkButtonState.Create)
+                // Switch status based on main button's state
+                switch (updateState)
                 {
-                    // Switch status based on main button's state
-                    switch (updateState)
-                    {
-                        case UpdateState.Download: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Downloading: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Select11: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Install: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                        case UpdateState.Installing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                        case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    }
-                }
-                else // Otherwise, disable.
-                {
-                    apkButton.Enabled = false;
-                    apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
+                    case UpdateState.Download: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    case UpdateState.Downloading: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    case UpdateState.Select11: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    case UpdateState.Install: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                    case UpdateState.Installing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                    case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
                 }
             }
             else // Otherwise, disable.
@@ -203,11 +197,11 @@ namespace AM2RLauncher
         private void SetPlayButtonState(UpdateState state)
         {
             updateState = state;
-            string profileName = (profileDropDown != null && profileDropDown.Items.Count > 0) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
+            string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
                 case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonDownloadToolTip; break;
-                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; break; // ; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
+                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
                 case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonSelect11ToolTip; break;
                 case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break;
                 case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonInstallingToolTip; break;

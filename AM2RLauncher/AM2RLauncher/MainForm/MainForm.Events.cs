@@ -668,9 +668,7 @@ namespace AM2RLauncher
         private void ProfileLayoutLoadComplete(object sender, EventArgs e)
         {
             // Safety check
-            if (settingsProfileDropDown == null) return;
-            if (settingsProfileDropDown.Items.Count != 0)
-                return;
+            if ((settingsProfileDropDown == null) || (settingsProfileDropDown.Items.Count != 0)) return;
             addModButton.Enabled = false;
             settingsProfileLabel.TextColor = colInactive;
             settingsProfileDropDown.Enabled = false;
