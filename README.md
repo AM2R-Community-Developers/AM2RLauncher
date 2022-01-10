@@ -22,17 +22,28 @@ As well as these dependencies to run AM2R:
 
 Optionally, for APK creation any Java runtime is needed.
 
+### Ubuntu
+On Ubuntu, you can install them by following these instructions:
+1. [Follow the instructions here to download and install the .NET Core Runtime](https://docs.microsoft.com/dotnet/core/install/linux-ubuntu#supported-distributions)
+2. Enable the i386 architecture if you haven't already:
+```
+sudo dpkg --add-architecture i386
+sudo apt update && sudo apt install libc6:i386 libncurses5:i386 libstdc++6:i386
+```
+3. Install the rest of the dependencies with `sudo apt install xdelta3 libgl1:i386 libopenal1:i386 libpulse0:i386 default-jre`
+
 ### Arch Linux
 On Arch Linux, you can install these by running this:  
 (Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))  
 `sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse jre-openjdk`
 
+### Other distros
 For other distros, refer to your local package manager for instructions.   
 
 ## Downloads
 Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
 
-Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exist. Install it with `makepkg -si` or use your favourite AUR helper.
+Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
 
 ## Configuration and Data Files
 The AM2RLauncher stores its files in the following places:
@@ -52,7 +63,8 @@ Alternatively, build via `dotnet build` /  the `buildAll` batch file.
 
 ## Linux Instructions
 In order to build for linux, use `dotnet publish AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -c release -r ubuntu.18.04-x64 --no-self-contained`, MonoDevelop sadly doesn't work.  
-You *have* to specify it to build for Ubuntu, even on non-Ubuntu distros, because one of our Dependencies, libgit2sharp fails on the `linux-x64` RID.
+You *have* to specify it to build for Ubuntu, even on non-Ubuntu distros, because one of our Dependencies, libgit2sharp fails on the `linux-x64` RID.  
+For Arch Linux users, an `am2rlauncher-git` [AUR Package](https://aur.archlinux.org/packages/am2rlauncher-git/) also exists.
 
 ## Mac Instructions
 You can open the solution with Visual Studio for Mac, but it likely will crash after compliation. Use `dotnet publish AM2RLauncher.Mac -c release` instead.  
