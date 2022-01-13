@@ -30,7 +30,7 @@ On Ubuntu, you can install them by following these instructions:
 sudo dpkg --add-architecture i386
 sudo apt update && sudo apt install libc6:i386 libncurses5:i386 libstdc++6:i386
 ```
-3. Install the rest of the dependencies with `sudo apt install xdelta3 libgl1:i386 libopenal1:i386 libpulse0:i386 default-jre`
+3. Install the rest of the dependencies with `sudo apt install libappindicator3-1 libwebkit2gtk-4.0-37 xdelta3 libgl1:i386 libopenal1:i386 libpulse0:i386 default-jre`
 
 ### Arch Linux
 On Arch Linux, you can install these by running this:  
