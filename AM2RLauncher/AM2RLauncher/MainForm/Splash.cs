@@ -1,4 +1,4 @@
-﻿using Eto;
+using Eto;
 using System;
 using System.Linq;
 
@@ -42,7 +42,8 @@ namespace AM2RLauncher
             "AH THE MOLE",
             "S P I D E R B A L L",
             "Fun is infinite with Community-Developers Inc.",
-            "You may only proceed if you wear baggy pants."
+            "You may only proceed if you wear baggy pants.",
+            "Did you know that games take time to develop?"
         };
 
         /// <summary>
