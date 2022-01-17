@@ -23,7 +23,7 @@ As well as these dependencies to run AM2R:
 Optionally, for APK creation any Java runtime is needed.
 
 ### Ubuntu
-On Ubuntu, you can install them by following these instructions:
+On Ubuntu you can install them by following these instructions:
 1. [Follow the instructions here to download and install the .NET Core Runtime](https://docs.microsoft.com/dotnet/core/install/linux-ubuntu#supported-distributions)
 2. Enable the i386 architecture if you haven't already:
 ```
@@ -33,12 +33,16 @@ sudo apt update && sudo apt install libc6:i386 libncurses5:i386 libstdc++6:i386
 3. Install the rest of the dependencies with `sudo apt install libappindicator3-1 libwebkit2gtk-4.0-37 xdelta3 libgl1:i386 libopenal1:i386 libpulse0:i386 default-jre`
 
 ### Arch Linux
-On Arch Linux, you can install these by running this:  
+On Arch Linux you can install them by running this:  
 (Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))  
 `sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse jre-openjdk`
 
+### Fedora
+On Fedora you can install them by running this command:  
+`dnf install dotnet-runtime-6.0 libappindicator-gtk3 xdelta mesa-libGL.i686 pulseaudio-libs.1686 openal-soft.i686`
+
 ### Other distros
-For other distros, refer to your local package manager for instructions.   
+For other distros refer to your local package manager for instructions.   
 
 ## Downloads
 Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
