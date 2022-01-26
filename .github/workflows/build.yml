@@ -26,7 +26,7 @@ jobs:
             ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -c Release -r win-x86 -o builds\win86 
-            ARTIFACT: AM2RLauncher/builds/win86/
+            ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
     runs-on: ${{ matrix.os }}
     
 
