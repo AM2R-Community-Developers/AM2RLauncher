@@ -23,7 +23,7 @@ jobs:
             ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net5.0/ubuntu.18.04-x64/publish/
           - os: macOS-latest
             COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained
-            ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-64/AM2RLauncher.Mac.app/
+            ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
             ARTIFACT: AM2RLauncher/builds/win86/
