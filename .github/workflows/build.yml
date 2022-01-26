@@ -45,4 +45,5 @@ jobs:
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1.0.0
       with:
+        name: ${{ matrix.os }}
         path: ${{ matrix.ARTIFACT }}
