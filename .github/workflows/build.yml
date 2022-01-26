@@ -20,10 +20,13 @@ jobs:
         include:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
+            ARTIFACT: bin/Release/net5.0/ubuntu.18.04-x64/publish/
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac
+            COMMAND: AM2RLauncher.Mac -r
+            ARTIFACT: bin/Release/net6.0/AM2RLauncher.Mac.app/
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
+            ARTIFACT: builds/win86/
     runs-on: ${{ matrix.os }}
     
 
@@ -39,3 +42,7 @@ jobs:
     - name: Build
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        path: ${{ matrix.ARTIFACT }}
