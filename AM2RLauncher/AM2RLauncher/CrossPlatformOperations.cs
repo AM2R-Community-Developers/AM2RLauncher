@@ -85,8 +85,8 @@ namespace AM2RLauncher
             {
                 return new List<string>
                 {
-                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git",
-                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"    //TODO: make mac official at some point:tm:, put this on gitlab
+                    "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"
+                    //TODO: make mac official at some point:tm:, put this on gitlab
                 };
                     
             }

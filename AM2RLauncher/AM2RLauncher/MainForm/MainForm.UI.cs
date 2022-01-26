@@ -229,12 +229,15 @@ namespace AM2RLauncher
 
             // Create mirror list
             // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
-            mirrorDescriptionList = new List<ListItem>
+            mirrorDescriptionList = new List<ListItem>();
+            // Add each entry dynamically instead of harcoding it to two. If we have neither a github or gitlab mirror, we use the mirror itself as text
+            foreach (var mirror in mirrorList)
             {
-                new ListItem { Key = mirrorList[0], Text = Language.Text.MirrorGithubText },
-                new ListItem { Key = mirrorList[1], Text = Language.Text.MirrorGitlabText}
-            };
-
+                string text = mirror;
+                if (text.Contains("github.com")) text = Language.Text.MirrorGithubText;
+                else if (text.Contains("gitlab.com")) text = Language.Text.MirrorGitlabText;
+                mirrorDescriptionList.Add(new ListItem() { Key = mirror, Text = text });
+            }
             #endregion
 
             Icon = new Icon(1f, am2rIcon);
