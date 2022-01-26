@@ -43,8 +43,7 @@ jobs:
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
     - name: Zip to Archive
-      working-directory: ${{ matrix.ARTIFACT }}/../
-      run: 7z a -tzip ${{ matrix.os }}.zip ${{ matrix.ARTIFACT }}
+      run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1.0.0
       with:
