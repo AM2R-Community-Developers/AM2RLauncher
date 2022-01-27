@@ -2,6 +2,7 @@
 using log4net;
 using log4net.Config;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace AM2RLauncher.Mac;
@@ -9,12 +10,12 @@ namespace AM2RLauncher.Mac;
 /// <summary>
 /// The main class for the Mac project.
 /// </summary>
-static class MainClass
+internal static class MainClass
 {
     /// <summary>
     /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
     /// </summary>
-    private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+    private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
 
     /// <summary>
     /// The main method for the Mac project.
@@ -44,7 +45,7 @@ static class MainClass
         }
         catch (Exception e)
         {
-            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
+            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
             Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
             Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
         }
@@ -55,7 +56,7 @@ static class MainClass
     /// </summary>
     private static void MacLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
         Application.Instance.Invoke(() =>
         {
             MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "Mac", MessageBoxType.Error);
@@ -63,8 +64,23 @@ static class MainClass
     }
 
     // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
+    [return: NotNull]
     private static string GenerateCurrentPath()
     {
+        string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
+        if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+        {
+            try
+            {
+                // This will create the directories recursively if they don't exist
+                Directory.CreateDirectory(am2rLauncherDataEnvVar);
+
+                // Our env var is now set and directories exist
+                return am2rLauncherDataEnvVar;
+            }
+            catch { }
+        }
+
         string nixHome = Environment.GetEnvironmentVariable("HOME");
         //Mac has the Path at HOME/Library/AM2RLauncher
         string macPath = nixHome + "/Library/AM2RLauncher";

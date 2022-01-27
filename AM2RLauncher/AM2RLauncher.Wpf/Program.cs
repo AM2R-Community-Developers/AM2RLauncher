@@ -10,12 +10,12 @@ namespace AM2RLauncher.Wpf;
 /// <summary>
 /// The main class for the WinForms project.
 /// </summary>
-static class MainClass
+internal static class MainClass
 {
     /// <summary>
     /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
     /// </summary>
-    private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+    private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
     /// <summary>
     /// The main method for the WinForms project.
     /// </summary>
@@ -45,7 +45,7 @@ static class MainClass
         }
         catch (Exception e)
         {
-            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
+            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
             System.Windows.Forms.MessageBox.Show(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace, "Microsoft .NET Framework",
                 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
         }
@@ -56,7 +56,7 @@ static class MainClass
     /// </summary>
     private static void WinLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
         MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "Microsoft .NET Framework", MessageBoxType.Error);
     }
 
@@ -65,20 +65,22 @@ static class MainClass
     {
         // First, we check if the user has a custom AM2RLAUNCHERDATA env var
         string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
-        if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
-        {
-            try
-            {
-                // This will create the directories recursively if they don't exist
-                Directory.CreateDirectory(am2rLauncherDataEnvVar);
-
-                // Our env var is now set and directories exist
-                return am2rLauncherDataEnvVar;
-            }
-            catch { }
-        }
         // Windows has the path where the exe is located as default
-        return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+        string defaultPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+        if (String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
+            return defaultPath;
+        
+        try
+        {
+            // This will create the directories recursively if they don't exist
+            Directory.CreateDirectory(am2rLauncherDataEnvVar);
+
+            // Our env var is now set and directories exist
+            return am2rLauncherDataEnvVar;
+        }
+        catch
+        {
+            return defaultPath;
+        }
     }
 }
-

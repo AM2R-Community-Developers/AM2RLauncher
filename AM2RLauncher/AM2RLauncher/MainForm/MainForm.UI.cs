@@ -81,21 +81,20 @@ namespace AM2RLauncher
         /// </summary>
         private static string currentMirror;
 
-        private static bool isInternetThere = Core.Core.isInternetThere;
+        private static bool isInternetThere = Core.Core.IsInternetThere;
 
-        private static bool isThisRunningFromWine = Core.Core.isThisRunningFromWine;
+        private static bool isThisRunningFromWine = Core.Core.IsThisRunningFromWine;
+
+        private static bool singleInstance;
+
+        // This mutex needs to CONTINUE existing for the entire application's lifetime, or else the rest of this won't ever work!
+        // We're basically using it to key a thread and scan for other instances of that tag.
+        Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
 
         public MainForm()
         {
             // Exit if we're already running the AM2RLauncher
-
             // Thanks, StackOverflow! https://stackoverflow.com/questions/184084/how-to-force-c-sharp-net-app-to-run-only-one-instance-in-windows
-            bool singleInstance;
-
-            // This mutex needs to CONTINUE existing for the entire application's lifetime, or else the rest of this won't ever work!
-            // We're basically using it to key a thread and scan for other instances of that tag.
-            Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
-
             if (!singleInstance)
             {
                 // If on Windows, set the original app to the foreground window to prevent confusion
@@ -149,7 +148,7 @@ namespace AM2RLauncher
             Log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
-            string userLanguage = Core.CrossPlatformOperations.ReadFromConfig("Language").ToLower();
+            string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
@@ -182,7 +181,7 @@ namespace AM2RLauncher
             }
 
             // Custom splash texts
-            string splash = Core.Splash.GetSplash();
+            string splash = Splash.GetSplash();
             Log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps
@@ -205,7 +204,7 @@ namespace AM2RLauncher
 
             // Create mirror list - eventually this should be platform specific!
             // We do this as a List<Uri> so we can add more dynamically on user input... if necessary.
-            mirrorList = Core.CrossPlatformOperations.GenerateMirrorList();
+            mirrorList = CrossPlatformOperations.GenerateMirrorList();
 
             // Create mirror list
             // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
@@ -224,13 +223,13 @@ namespace AM2RLauncher
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
             // TODO: for some reason, this sometimes doesn't work on Linux. Was reported at eto, stays here until its fixed
-            ClientSize = new Size(Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("Height")));
+            ClientSize = new Size(Int32.Parse(CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
             Log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
-            if (Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
+            if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
             drawable = new Drawable { BackgroundColor = colBGNoAlpha };
 
@@ -450,7 +449,6 @@ namespace AM2RLauncher
                     {
                         changelogWebView
                     }
-
                 }
             };
 
@@ -541,7 +539,7 @@ namespace AM2RLauncher
 
             languageDropDown.Items.AddRange(languageList);
 
-            var tmpLanguage = Core.CrossPlatformOperations.ReadFromConfig("Language");
+            var tmpLanguage = CrossPlatformOperations.ReadFromConfig("Language");
             languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
 
             if (languageDropDown.SelectedIndex == -1)
@@ -553,7 +551,7 @@ namespace AM2RLauncher
             // autoUpdateAM2R checkbox
             autoUpdateAM2RCheck = new CheckBox
             {
-                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
                 Text = Language.Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
@@ -562,7 +560,7 @@ namespace AM2RLauncher
             // autoUpdateLauncher checkbox
             autoUpdateLauncherCheck = new CheckBox
             {
-                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
                 Text = Language.Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
@@ -570,7 +568,7 @@ namespace AM2RLauncher
             // HQ music, PC
             hqMusicPCCheck = new CheckBox
             {
-                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
                 Text = Language.Text.HighQualityPC,
                 TextColor = colGreen
             };
@@ -578,7 +576,7 @@ namespace AM2RLauncher
             // HQ music, Android
             hqMusicAndroidCheck = new CheckBox
             {
-                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
                 Text = Language.Text.HighQualityAndroid,
                 TextColor = colGreen
             };
@@ -639,14 +637,14 @@ namespace AM2RLauncher
             // Custom mirror
             customMirrorCheck = new CheckBox
             {
-                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
                 Text = Language.Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
 
             customMirrorTextBox = new TextBox
             {
-                Text = Core.CrossPlatformOperations.ReadFromConfig("CustomMirrorText"),
+                Text = CrossPlatformOperations.ReadFromConfig("CustomMirrorText"),
                 BackgroundColor = colBGNoAlpha,
                 TextColor = colGreen
             };

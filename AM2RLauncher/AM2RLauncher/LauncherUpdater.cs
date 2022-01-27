@@ -1,5 +1,4 @@
 ﻿using AM2RLauncher.Core;
-using Eto;
 using Eto.Forms;
 using log4net;
 using System;
@@ -21,41 +20,41 @@ namespace AM2RLauncher
         public const string VERSION = Core.Core.VERSION;
 
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
-        private static readonly string OldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
+        private static readonly string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
         /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
         //TODO: for mac, this reports the path of the mac runner, not the actual .app
-        private static readonly string UpdatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+        private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
         //TODO: Mac support for this in general
 
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
 
         /// <summary>
         /// Performs the entire AM2RLauncher update procedure. 
         /// </summary>
         public static void Main()
         {
-            Log.Info("Running update check...");
+            log.Info("Running update check...");
 
             // Update section
 
             // Clean old files that have been left
             if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak"))
             {
-                Log.Info("AM2RLauncher.bak detected. Removing file.");
+                log.Info("AM2RLauncher.bak detected. Removing file.");
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
             }
-            if (OS.IsWindows && File.Exists(OldConfigPath))
+            if (OS.IsWindows && File.Exists(oldConfigPath))
             {
-                Log.Info(CrossPlatformOperations.LAUNCHERNAME + ".oldCfg detected. Removing file.");
-                File.Delete(OldConfigPath);
+                log.Info(CrossPlatformOperations.LAUNCHERNAME + ".oldCfg detected. Removing file.");
+                File.Delete(oldConfigPath);
             }
             if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/oldLib"))
             {
-                Log.Info("Old lib folder detected, removing folder.");
+                log.Info("Old lib folder detected, removing folder.");
                 Directory.Delete(CrossPlatformOperations.CURRENTPATH + "/oldLib", true);
             }
 
@@ -80,11 +79,11 @@ namespace AM2RLauncher
             }
 
             // Check settings if autoUpdateLauncher is set to true
-            bool autoUpdate = bool.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher"));
+            bool autoUpdate = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher"));
 
             if (autoUpdate)
             {
-                Log.Info("AutoUpdate Launcher set to true!");
+                log.Info("AutoUpdate Launcher set to true!");
 
                 // This is supposed to fix the updater throwing an exception on windows 7 and earlier(?)
                 // See this for information: https://stackoverflow.com/q/2859790 and https://stackoverflow.com/a/50977774
@@ -102,7 +101,7 @@ namespace AM2RLauncher
                 }
                 catch (WebException)
                 {
-                    Log.Error("WebException caught! Displaying MessageBox.");
+                    log.Error("WebException caught! Displaying MessageBox.");
                     MessageBox.Show(Language.Text.NoInternetConnection);
                     return;
                 }
@@ -116,24 +115,24 @@ namespace AM2RLauncher
 
                 for (int i = 0; i < localVersionArray.Length; i++)
                 {
-                    int onlineNum = int.Parse(onlineVersionArray[i]);
-                    int localNum = int.Parse(localVersionArray[i]);
+                    int onlineNum = Int32.Parse(onlineVersionArray[i]);
+                    int localNum = Int32.Parse(localVersionArray[i]);
                     if (onlineNum > localNum)
                     { 
                         isCurrentVersionOutdated = true;
                         break;
                     }
-                    else if (localNum > onlineNum)
+                    if (localNum > onlineNum)
                         break;
                 }
 
-                Log.Info((isCurrentVersionOutdated ? "Updating" : "Not Updating") + " from " + VERSION + " to " + onlineVersion);
+                log.Info((isCurrentVersionOutdated ? "Updating" : "Not Updating") + " from " + VERSION + " to " + onlineVersion);
 
                 // No new update, exiting
                 if (!isCurrentVersionOutdated)
                     return;
                 
-                Log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
+                log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
                 string tmpUpdatePath = CrossPlatformOperations.CURRENTPATH + "/tmpupdate/";
                 string zipPath = CrossPlatformOperations.CURRENTPATH + "/launcher.zip";
@@ -152,31 +151,31 @@ namespace AM2RLauncher
                         if (OS.IsWindows) platformSuffix = "_win";
                         else if (OS.IsLinux) platformSuffix = "_lin";
 
-                        Log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
+                        log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
 
                         client.DownloadFile("https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip", zipPath);
 
-                        Log.Info("File successfully downloaded.");
+                        log.Info("File successfully downloaded.");
                     }
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    Log.Error("UnauthorizedAccessException caught! Displaying MessageBox.");
+                    log.Error("UnauthorizedAccessException caught! Displaying MessageBox.");
                     MessageBox.Show(Language.Text.UnauthorizedAccessMessage);
                     return;
                 }
 
                 ZipFile.ExtractToDirectory(zipPath, tmpUpdatePath);
-                Log.Info("Updates successfully extracted to " + tmpUpdatePath);
+                log.Info("Updates successfully extracted to " + tmpUpdatePath);
 
                 File.Delete(zipPath);
-                File.Move(UpdatePath + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
+                File.Move(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
                 if (OS.IsWindows) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
 
                 foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                 {
-                    Log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
-                    File.Copy(file.FullName, UpdatePath + "/" + file.Name, true);
+                    log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
+                    File.Copy(file.FullName, updatePath + "/" + file.Name, true);
                 }
                 // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
                 if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
@@ -207,16 +206,16 @@ namespace AM2RLauncher
 
                 CrossPlatformOperations.CopyOldConfigToNewConfig();
 
-                Log.Info("Files extracted. Preparing to restart executable...");
+                log.Info("Files extracted. Preparing to restart executable...");
 
                 if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
 
-                System.Diagnostics.Process.Start(UpdatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
+                System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
                 Environment.Exit(0);
             }
             else
             {
-                Log.Info("AutoUpdate Launcher set to false. Exiting update check.");
+                log.Info("AutoUpdate Launcher set to false. Exiting update check.");
             }
         }
     }

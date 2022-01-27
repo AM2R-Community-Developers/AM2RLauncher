@@ -160,13 +160,14 @@ namespace AM2RLauncher
             bool enabled = false;
             switch (updateState)
             {
-                case UpdateState.Download: enabled = false; break;
-                case UpdateState.Downloading: enabled = false; break;
-                case UpdateState.Select11: enabled = false; break;
-                case UpdateState.Install: enabled = true; break;
-                case UpdateState.Installing: enabled = false; break;
-                case UpdateState.Play: enabled = true; break;
+                case UpdateState.Download:
+                case UpdateState.Downloading:
+                case UpdateState.Select11:
+                case UpdateState.Installing:
                 case UpdateState.Playing: enabled = false; break;
+                case UpdateState.Install:
+                case UpdateState.Play: enabled = true; break;
+
             }
             if (apkButtonState == ApkButtonState.Creating) enabled = false;
 

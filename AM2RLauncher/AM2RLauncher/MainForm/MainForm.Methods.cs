@@ -1,19 +1,9 @@
 ﻿using Eto.Forms;
-using LibGit2Sharp;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace AM2RLauncher
 {
     public partial class MainForm : Form
     {
-        
-
         /// <summary>
         /// Method that updates <see cref="progressBar"/>.
         /// </summary>
@@ -40,7 +30,6 @@ namespace AM2RLauncher
             UpdateProgressBar(value, 0, 100);
         }
 
-
         /// <summary>
         /// Safety check function before accessing <see cref="profileIndex"/>.
         /// </summary>
@@ -49,9 +38,5 @@ namespace AM2RLauncher
         {
             return profileIndex != null;
         }
-
-        
-
-        
     }
 }

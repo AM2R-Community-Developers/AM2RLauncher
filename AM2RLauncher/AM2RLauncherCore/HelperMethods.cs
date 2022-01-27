@@ -1,177 +1,163 @@
-﻿using LibGit2Sharp;
-using log4net;
+﻿using log4net;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 
-namespace AM2RLauncher.Core
+namespace AM2RLauncher.Core;
+
+/// <summary>
+/// Class that has various Helper functions. Basically anything that could be used outside the Launcher resides here.
+/// </summary>
+public static class HelperMethods
 {
+    // Load reference to logger
     /// <summary>
-    /// Class that has various Helper functions. Basically anything that could be used outside the Launcher resides here.
+    /// Our log object, that handles logging the current execution to a file.
     /// </summary>
-    public static class HelperMethods
+    private static readonly ILog log = Core.Log;
+
+    // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
+    // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
+    /// <summary>
+    /// This copies the contents of a specified Directory recursively to another Directory.
+    /// </summary>
+    /// <param name="sourceDirName">Full Path to the Directory that will be recursively copied.</param>
+    /// <param name="destDirName">Full Path to the Directory you want to copy to. If the Directory does not exist, it will be created.</param>
+    /// <param name="overwriteFiles">Specify if Files should be overwritten or not</param>
+    /// <param name="copySubDirs">Specify if you want to copy Sub-Directories as well.</param>
+    public static void DirectoryCopy(string sourceDirName, string destDirName, bool overwriteFiles = true, bool copySubDirs = true)
     {
-        // Load reference to logger
-        /// <summary>
-        /// Our log object, that handles logging the current execution to a file.
-        /// </summary>
-        private static readonly ILog Log = Core.Log;
+        // Get the subdirectories for the specified directory.
+        DirectoryInfo dir = new DirectoryInfo(sourceDirName);
 
-        // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
-        // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
-        /// <summary>
-        /// This copies the contents of a specified Directory recursively to another Directory.
-        /// </summary>
-        /// <param name="sourceDirName">Full Path to the Directory that will be recursively copied.</param>
-        /// <param name="destDirName">Full Path to the Directory you want to copy to. If the Directory does not exist, it will be created.</param>
-        /// <param name="overwriteFiles">Specify if Files should be overwritten or not</param>
-        /// <param name="copySubDirs">Specify if you want to copy Sub-Directories as well.</param>
-        public static void DirectoryCopy(string sourceDirName, string destDirName, bool overwriteFiles = true, bool copySubDirs = true)
+        if (!dir.Exists)
         {
-            // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    "Source directory does not exist or could not be found: "
-                    + sourceDirName);
-            }
-
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            // If the destination directory doesn't exist, create it.       
-            Directory.CreateDirectory(destDirName);
-
-            // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
-            {
-                string tempPath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(tempPath, overwriteFiles);
-            }
-
-            // If copying subdirectories, copy them and their contents to new location.
-            if (!copySubDirs)
-                return;
-
-            foreach (DirectoryInfo subDir in dirs)
-            {
-                string tempPath = Path.Combine(destDirName, subDir.Name);
-                DirectoryCopy(subDir.FullName, tempPath, overwriteFiles);
-            }
-
+            throw new DirectoryNotFoundException(
+                "Source directory does not exist or could not be found: "
+                + sourceDirName);
         }
 
+        DirectoryInfo[] dirs = dir.GetDirectories();
 
-        /// <summary>
-        /// This is a custom method, that deletes a Directory. The reason this is used, instead of <see cref="Directory.Delete(string)"/>,
-        /// is because this one sets the attributes of all files to be deletable, while <see cref="Directory.Delete(string)"/> does not do that on it's own.
-        /// It's needed, because sometimes there are read-only files being generated, that would normally need more code in order to reset the attributes.<br/>
-        /// Note, that this method acts recursively.
-        /// </summary>
-        /// <param name="targetDir">The directory to delete.</param>
-        public static void DeleteDirectory(string targetDir)
+        // If the destination directory doesn't exist, create it.
+        Directory.CreateDirectory(destDirName);
+
+        // Get the files in the directory and copy them to the new location.
+        FileInfo[] files = dir.GetFiles();
+        foreach (FileInfo file in files)
         {
-            if (!Directory.Exists(targetDir)) return;
-
-            File.SetAttributes(targetDir, FileAttributes.Normal);
-
-            foreach (string file in Directory.GetFiles(targetDir))
-            {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
-            }
-
-            foreach (string dir in Directory.GetDirectories(targetDir))
-            {
-                DeleteDirectory(dir);
-            }
-
-            Directory.Delete(targetDir, false);
+            string tempPath = Path.Combine(destDirName, file.Name);
+            file.CopyTo(tempPath, overwriteFiles);
         }
 
-        /// <summary>
-        /// Calculates an MD5 hash from a given file.
-        /// </summary>
-        /// <param name="filename">Full Path to the file whose MD5 hash is supposed to be calculated.</param>
-        /// <returns>The MD5 hash as a <see cref="string"/>, empty string if file does not exist.</returns>
-        public static string CalculateMD5(string filename)
-        {
-            // Check if File exists first
-            if (!File.Exists(filename))
-                return "";
+        // If copying subdirectories, copy them and their contents to new location.
+        if (!copySubDirs)
+            return;
 
-            using (var stream = File.OpenRead(filename))
-            {
-                using (var md5 = MD5.Create())
-                {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
+        foreach (DirectoryInfo subDir in dirs)
+        {
+            string tempPath = Path.Combine(destDirName, subDir.Name);
+            DirectoryCopy(subDir.FullName, tempPath, overwriteFiles);
         }
 
-        /// <summary>
-        /// Performs recursive rollover on a set of log files.
-        /// </summary>
-        /// <param name="logFile">The log file to begin the rollover from.</param>
-        /// <param name="max">The maximum amount of log files to retain. Default is 9, as that's the highest digit.</param>
-        public static void RecursiveRollover(string logFile, int max = 9)
+    }
+
+
+    /// <summary>
+    /// This is a custom method, that deletes a Directory. The reason this is used, instead of <see cref="Directory.Delete(string)"/>,
+    /// is because this one sets the attributes of all files to be deletable, while <see cref="Directory.Delete(string)"/> does not do that on it's own.
+    /// It's needed, because sometimes there are read-only files being generated, that would normally need more code in order to reset the attributes.<br/>
+    /// Note, that this method acts recursively.
+    /// </summary>
+    /// <param name="targetDir">The directory to delete.</param>
+    public static void DeleteDirectory(string targetDir)
+    {
+        if (!Directory.Exists(targetDir)) return;
+
+        File.SetAttributes(targetDir, FileAttributes.Normal);
+
+        foreach (string file in Directory.GetFiles(targetDir))
         {
-            int index = 1;
-            char endChar = logFile[logFile.Length - 1];
-            string fileName;
-
-            // If not the original file, set the new index and get the new fileName.
-            if (char.IsNumber(endChar))
-            {
-                index = int.Parse(endChar.ToString()) + 1;
-                fileName = logFile.Remove(logFile.Length - 1) + index;
-            }
-            else // Otherwise, if the original file, just set fileName to log.txt.1.
-                fileName = logFile + ".1";
-
-            // If new name already exists, run the rollover algorithm on it!
-            if (File.Exists(fileName))
-            {
-                RecursiveRollover(fileName, max);
-            }
-
-            //TODO: this can fail if one doesnt have permissions to move or delete the file
-            // If index is less than max, rename file.
-            if (index < max)
-            {
-                File.Move(logFile, fileName);
-            }
-            else // Otherwise, delete the file.
-                File.Delete(logFile);
+            File.SetAttributes(file, FileAttributes.Normal);
+            File.Delete(file);
         }
 
-        /// <summary>
-        /// Checks if we currently have an internet connection, by pinging github.
-        /// </summary>
-        /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
-        public static bool IsConnectedToInternet()
+        foreach (string dir in Directory.GetDirectories(targetDir))
         {
-            Log.Info("Checking internet connection...");
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
-            try
-            {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            }
-            catch (WebException)
-            {
-                Log.Info("Internet connection failed.");
-                return false;
-            }
-            Log.Info("Internet connection established!");
-            return true;
+            DeleteDirectory(dir);
         }
+
+        Directory.Delete(targetDir, false);
+    }
+
+    /// <summary>
+    /// Calculates an MD5 hash from a given file.
+    /// </summary>
+    /// <param name="filename">Full Path to the file whose MD5 hash is supposed to be calculated.</param>
+    /// <returns>The MD5 hash as a <see cref="string"/>, empty string if file does not exist.</returns>
+    public static string CalculateMD5(string filename)
+    {
+        // Check if File exists first
+        if (!File.Exists(filename))
+            return "";
+
+        using var stream = File.OpenRead(filename);
+        using var md5 = MD5.Create();
+        var hash = md5.ComputeHash(stream);
+        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Performs recursive rollover on a set of log files.
+    /// </summary>
+    /// <param name="logFile">The log file to begin the rollover from.</param>
+    /// <param name="max">The maximum amount of log files to retain. Default is 9, as that's the highest digit.</param>
+    public static void RecursiveRollover(string logFile, int max = 9)
+    {
+        int index = 1;
+        char endChar = logFile[logFile.Length - 1];
+        string fileName;
+
+        // If not the original file, set the new index and get the new fileName.
+        if (Char.IsNumber(endChar))
+        {
+            index = Int32.Parse(endChar.ToString()) + 1;
+            fileName = logFile.Remove(logFile.Length - 1) + index;
+        }
+        else // Otherwise, if the original file, just set fileName to log.txt.1.
+            fileName = logFile + ".1";
+
+        // If new name already exists, run the rollover algorithm on it!
+        if (File.Exists(fileName))
+            RecursiveRollover(fileName, max);
+        
+        //TODO: this can fail if one doesnt have permissions to move or delete the file
+        // If index is less than max, rename file.
+        if (index < max)
+            File.Move(logFile, fileName);
+        else // Otherwise, delete the file.
+            File.Delete(logFile);
+    }
+
+    /// <summary>
+    /// Checks if we currently have an internet connection, by pinging github.
+    /// </summary>
+    /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
+    public static bool IsConnectedToInternet()
+    {
+        log.Info("Checking internet connection...");
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
+        try
+        {
+            HttpWebResponse _ = (HttpWebResponse)request.GetResponse();
+        }
+        catch (WebException)
+        {
+            log.Info("Internet connection failed.");
+            return false;
+        }
+        log.Info("Internet connection established!");
+        return true;
     }
 }

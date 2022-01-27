@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -538,7 +537,7 @@ namespace AM2RLauncher
         {
             Log.Info("User requested to add mod. Requesting user input for new mod .zip...");
 
-            ProfileXML addedProfile = null;
+            ProfileXML addedProfile;
 
             OpenFileDialog fileFinder = new OpenFileDialog
             {
@@ -721,8 +720,8 @@ namespace AM2RLauncher
         private void DrawablePaintEvent(object sender, PaintEventArgs e)
         {
             // Get drawing variables
-            int height = drawable.Height;
-            int width = drawable.Width;
+            float height = drawable.Height;
+            float width = drawable.Width;
             float scaleDivisor = OS.IsWindows ? 955f : 715f; // Magic brute-forced values. Don't ask questions, because we don't have answers >_>
                                                                     // Also, seems like nix systems share the same scaleDivisor. Again, don't ask.
             float scale = height / scaleDivisor;

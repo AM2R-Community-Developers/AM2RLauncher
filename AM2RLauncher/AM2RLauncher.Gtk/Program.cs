@@ -9,12 +9,12 @@ namespace AM2RLauncher.Gtk;
 /// <summary>
 /// The main class for the GTK project.
 /// </summary>
-static class MainClass
+internal static class MainClass
 {
     /// <summary>
     /// The logger for <see cref="MainForm"/>, used to write any caught exceptions.
     /// </summary>
-    private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+    private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
     /// <summary>
     /// The main method for the GTK project.
     /// </summary>
@@ -36,14 +36,14 @@ static class MainClass
 
         try
         {
-            Application GTKLauncher = new Application(Eto.Platforms.Gtk);
+            Application gtkLauncher = new Application(Eto.Platforms.Gtk);
             LauncherUpdater.Main();
-            GTKLauncher.UnhandledException += GTKLauncher_UnhandledException;
-            GTKLauncher.Run(new MainForm());
+            gtkLauncher.UnhandledException += GTKLauncher_UnhandledException;
+            gtkLauncher.Run(new MainForm());
         }
         catch (Exception e)
         {
-            Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
+            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
             Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
             Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
         }
@@ -54,7 +54,7 @@ static class MainClass
     /// </summary>
     private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        Log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
         Application.Instance.Invoke(() =>
         {
             MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
@@ -101,4 +101,3 @@ static class MainClass
         return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
     }
 }
-
