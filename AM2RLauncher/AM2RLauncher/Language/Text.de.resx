@@ -127,7 +127,7 @@
     <value>Eine Modifikation zum installieren auswählen.</value>
   </data>
   <data name="ApkButtonDisabledToolTip" xml:space="preserve">
-    <value>APK konnte nicht erstellt werden.</value>
+    <value>APK kann nicht erstellt werden.</value>
   </data>
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>APK erstellen für $NAME</value>
@@ -280,7 +280,7 @@
     <value>Am installieren . . .</value>
   </data>
   <data name="PlayButtonInstallToolTip" xml:space="preserve">
-    <value>Installiere </value>
+    <value>Installiere $NAME</value>
   </data>
   <data name="PlayButtonPlayingToolTip" xml:space="preserve">
     <value>Spiel läuft bereits!</value>
