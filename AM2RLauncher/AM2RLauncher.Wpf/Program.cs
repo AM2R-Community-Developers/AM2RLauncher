@@ -35,6 +35,10 @@ internal static class MainClass
         // Configure logger
         XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
 
+        //Log Wine
+        if (Core.Core.IsThisRunningFromWine)
+            log.Info("Currently running from WINE!");
+
         // Try catch in case it ever crashes before actually getting to the Eto application
         try
         {

@@ -11,6 +11,7 @@ namespace AM2RLauncher
     /// <summary>
     /// Class that checks for Updates and then Updates the Launcher.
     /// </summary>
+    //TODO: Mac support for autoupdater in general
     public static class LauncherUpdater
     {
         // How often this was broken count: 6
@@ -23,9 +24,8 @@ namespace AM2RLauncher
         private static readonly string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
         /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
-        //TODO: for mac, this reports the path of the mac runner, not the actual .app
-        private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
-        //TODO: Mac support for this in general
+        private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH
+                                                                 : (OS.IsLinux ? Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory + "../../../"));
 
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.

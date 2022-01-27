@@ -88,7 +88,6 @@ namespace AM2RLauncher
             // If profile supports Android and if we are NOT already creating an APK...
             if (IsProfileIndexValid())
             {
-                //TODO: clean this up later
                 var profile = profileList[profileIndex.Value];
                 if (profile.SupportsAndroid && profile.Installable && (apkButtonState == ApkButtonState.Create))
                 {
@@ -103,18 +102,12 @@ namespace AM2RLauncher
                         case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
                         case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
                     }
-                }
-                else
-                {
-                    apkButton.Enabled = false;
-                    apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
+                    return;
                 }
             }
-            else // Otherwise, disable.
-            {
-                apkButton.Enabled = false;
-                apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
-            }
+
+            apkButton.Enabled = false;
+            apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
         }
 
         /// <summary>

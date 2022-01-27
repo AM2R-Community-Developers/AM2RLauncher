@@ -117,29 +117,6 @@ namespace AM2RLauncher
             Log.Info("Current Platform-ID is: " + Platform.ID);
             Log.Info("Current OS is: " + OS.Name);
 
-            //Log Wine
-            //TODO: move this to WPF project?
-            if (isThisRunningFromWine)
-            {
-                Log.Info("Currently running from WINE!");
-            }
-            // Log distro and version (if it exists)
-            //TODO: move this to GTK project?
-            else if (OS.IsLinux)
-            {
-                if (File.Exists("/etc/os-release"))
-                {
-                    string osRelease = File.ReadAllText("/etc/os-release");
-                    Regex lineRegex = new Regex(".*=.*");
-                    var results = lineRegex.Matches(osRelease).Cast<Match>();
-                    var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
-                    Log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME")).Value.Substring(5).Replace("\"", "") +
-                              (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
-                }
-                else
-                    Log.Error("Couldn't determine the currently running distro!");
-            }
-
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
             Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
             Log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
@@ -428,8 +405,7 @@ namespace AM2RLauncher
 
             changelogWebView = new WebView { Url = changelogUri };
 
-            //TODO: what happens if one would make this on unix instead of linux?
-            if (OS.IsLinux && !isInternetThere)
+            if (OS.IsUnix && !isInternetThere)
                 changelogWebView = new WebView();
 
             changelogNoConnectionLabel = new Label
@@ -456,8 +432,7 @@ namespace AM2RLauncher
             newsUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/news.html");
             newsWebView = new WebView { Url = newsUri };
 
-            //TODO: see todo above
-            if (OS.IsLinux && !isInternetThere)
+            if (OS.IsUnix && !isInternetThere)
                 newsWebView = new WebView();
 
             newsNoConnectionLabel = new Label
@@ -480,8 +455,7 @@ namespace AM2RLauncher
                 }
             };
 
-            //TODO: see todo above
-            if (OS.IsLinux && !isInternetThere)
+            if (OS.IsUnix && !isInternetThere)
             {
                 changelogPage.Content = new TableLayout
                 {
@@ -828,7 +802,7 @@ namespace AM2RLauncher
             if (OS.IsLinux)
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
-            //TODO: These don't work properly on mac? Maybe on other platforms too?
+            //TODO: Retest if these now work on mac
             newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
             changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
 
