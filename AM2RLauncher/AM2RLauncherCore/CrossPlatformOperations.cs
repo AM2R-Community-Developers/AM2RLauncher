@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 namespace AM2RLauncher.Core
 {
     /// <summary>
-    /// Class that does Operations that work cross-platform.
+    /// Class that does operations that work cross-platform.
     /// </summary>
     public static class CrossPlatformOperations
     {

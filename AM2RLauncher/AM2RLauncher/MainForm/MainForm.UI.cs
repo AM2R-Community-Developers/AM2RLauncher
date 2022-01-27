@@ -1,4 +1,5 @@
-﻿using AM2RLauncher.Core.XML;
+﻿using AM2RLauncher.Core;
+using AM2RLauncher.Core.XML;
 using Eto.Drawing;
 using Eto.Forms;
 using log4net;
@@ -35,7 +36,6 @@ namespace AM2RLauncher
         /// </summary>
         private static readonly Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
 
-        //TODO: this should be part of GUI
         /// <summary>
         /// An enum, that has possible states for our Launcher.
         /// </summary>
@@ -99,7 +99,7 @@ namespace AM2RLauncher
             if (!singleInstance)
             {
                 // If on Windows, set the original app to the foreground window to prevent confusion
-                if (Platform.IsWinForms)
+                if (OS.IsWindows)
                 {
                     Process current = Process.GetCurrentProcess();
                     foreach (Process process in Process.GetProcessesByName(current.ProcessName))
@@ -116,14 +116,17 @@ namespace AM2RLauncher
             Log.Info("Mutex check passed. Entering main thread.");
             Log.Info("Current Launcher Version: " + VERSION);
             Log.Info("Current Platform-ID is: " + Platform.ID);
+            Log.Info("Current OS is: " + OS.Name);
 
             //Log Wine
+            //TODO: move this to WPF project?
             if (isThisRunningFromWine)
             {
                 Log.Info("Currently running from WINE!");
             }
             // Log distro and version (if it exists)
-            else if (Platform.IsGtk)
+            //TODO: move this to GTK project?
+            else if (OS.IsLinux)
             {
                 if (File.Exists("/etc/os-release"))
                 {
@@ -139,7 +142,7 @@ namespace AM2RLauncher
             }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
-            Environment.CurrentDirectory = Core.CrossPlatformOperations.CURRENTPATH;
+            Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
             Log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
@@ -166,7 +169,7 @@ namespace AM2RLauncher
             };
 
             // Create menubar with defaults for mac
-            if (Platform.IsMac)
+            if (OS.IsMac)
                 Menu = new MenuBar();
 
             // Create array from validCount
@@ -195,7 +198,7 @@ namespace AM2RLauncher
             colInactive = Color.FromArgb(109, 109, 109);
             colBGNoAlpha = Color.FromArgb(10, 10, 10);
             colBG = Color.FromArgb(10, 10, 10, 80);
-            if (Platform.IsGtk) colBG = colBGNoAlpha;   // XORG can't display alpha anyway, and Wayland breaks with it.
+            if (OS.IsLinux) colBG = colBGNoAlpha;   // XORG can't display alpha anyway, and Wayland breaks with it.
             colBGHover = Color.FromArgb(17, 28, 13);
 
             Font smallButtonFont = new Font(SystemFont.Default, 10);
@@ -234,7 +237,7 @@ namespace AM2RLauncher
             // Drawable paint event
             drawable.Paint += DrawablePaintEvent;
             // Some systems don't call the paintEvent by default and only do so after actual resizing
-            if (Platform.IsMac)
+            if (OS.IsMac)
                 LoadComplete += (sender, e) => { Size = new Size(Size.Width + 1, Size.Height); Size = new Size(Size.Width - 1, Size.Height);};
 
             #region MAIN WINDOW
@@ -263,7 +266,7 @@ namespace AM2RLauncher
             centerInterface.AddRow(playButton);
 
             // 2px spacer between playButton and apkButton (Windows only)
-            if (Platform.IsWinForms) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 2 });
+            if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 2 });
 
             // APK button
             apkButton = new ColorButton
@@ -286,7 +289,7 @@ namespace AM2RLauncher
             };
 
             // 4px spacer between APK button and progressBar (Windows only)
-            if (Platform.IsWinForms) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 4 });
+            if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 4 });
 
             centerInterface.AddRow(progressBar);
 
@@ -302,7 +305,7 @@ namespace AM2RLauncher
             centerInterface.AddRow(progressLabel);
 
             // 3px spacer between progressBar and profile label (Windows only)
-            if (Platform.IsWinForms) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 3 });
+            if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 3 });
 
             profileLabel = new Label
             {
@@ -322,10 +325,10 @@ namespace AM2RLauncher
             profileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
+                BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
             };
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
                 profileDropDown = new DropDown();
 
             profileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
@@ -426,7 +429,8 @@ namespace AM2RLauncher
 
             changelogWebView = new WebView { Url = changelogUri };
 
-            if (Platform.IsGtk && !isInternetThere)
+            //TODO: what happens if one would make this on unix instead of linux?
+            if (OS.IsLinux && !isInternetThere)
                 changelogWebView = new WebView();
 
             changelogNoConnectionLabel = new Label
@@ -454,7 +458,8 @@ namespace AM2RLauncher
             newsUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/news.html");
             newsWebView = new WebView { Url = newsUri };
 
-            if (Platform.IsGtk && !isInternetThere)
+            //TODO: see todo above
+            if (OS.IsLinux && !isInternetThere)
                 newsWebView = new WebView();
 
             newsNoConnectionLabel = new Label
@@ -477,8 +482,8 @@ namespace AM2RLauncher
                 }
             };
 
-
-            if (Platform.IsGtk && !isInternetThere)
+            //TODO: see todo above
+            if (OS.IsLinux && !isInternetThere)
             {
                 changelogPage.Content = new TableLayout
                 {
@@ -529,9 +534,9 @@ namespace AM2RLauncher
             languageDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
+                BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
             };
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
                 languageDropDown = new DropDown();
 
             languageDropDown.Items.AddRange(languageList);
@@ -581,14 +586,14 @@ namespace AM2RLauncher
             // Create game debug logs
             profileDebugLogCheck = new CheckBox
             {
-                Checked = bool.Parse(Core.CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
+                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
                 Text = Language.Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
 
             // Custom environment variables label
             customEnvVarLabel = new Label();
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
             {
                 customEnvVarLabel = new Label
                 {
@@ -599,11 +604,11 @@ namespace AM2RLauncher
 
             // Custom environment variables textbox
             customEnvVarTextBox = null;
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
             {
                 customEnvVarTextBox = new TextBox
                 {
-                    Text = Core.CrossPlatformOperations.ReadFromConfig("CustomEnvVar"),
+                    Text = CrossPlatformOperations.ReadFromConfig("CustomEnvVar"),
                     BackgroundColor = colBGNoAlpha,
                     TextColor = colGreen
                 };
@@ -619,14 +624,14 @@ namespace AM2RLauncher
             mirrorDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
+                BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
             };
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
                 mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-            mirrorIndex = (Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
-                                                                                                                                  : 0;
+            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
+                                                                                                                            : 0;
             mirrorDropDown.SelectedIndex = mirrorIndex;
 
             currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
@@ -691,11 +696,11 @@ namespace AM2RLauncher
             settingsProfileDropDown = new DropDown
             {
                 TextColor = colGreen,
-                BackgroundColor = Platform.IsWinForms ? colBGNoAlpha : new Color()
+                BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
             };
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
                 settingsProfileDropDown = new DropDown();
 
             settingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
@@ -822,7 +827,7 @@ namespace AM2RLauncher
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
             profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
-            if (Platform.IsGtk)
+            if (OS.IsLinux)
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
             //TODO: These don't work properly on mac? Maybe on other platforms too?

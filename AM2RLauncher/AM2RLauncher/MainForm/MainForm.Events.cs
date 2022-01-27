@@ -33,7 +33,7 @@ namespace AM2RLauncher
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
             LoadProfiles();
-            if (!HelperMethods.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
+            if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
                 return;
             
             SetPlayButtonState(UpdateState.Downloading);
@@ -297,7 +297,7 @@ namespace AM2RLauncher
                             return;
                         }
 
-                        IsZipAM2R11ReturnCodes errorCode = HelperMethods.CheckIfZipIsAM2R11(fileFinder.FileName);
+                        IsZipAM2R11ReturnCodes errorCode = Profile.CheckIfZipIsAM2R11(fileFinder.FileName);
                         if (errorCode != IsZipAM2R11ReturnCodes.Successful)
                         {
                             Log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
@@ -350,7 +350,6 @@ namespace AM2RLauncher
                             Log.Error("Xdelta not found. Aborting installing a profile...");
                             break;
                         }
-                        //TODO: handle this until progress is set to 100
                         var progressIndicator = new Progress<int>(UpdateProgressBar);
                         bool useHqMusic = hqMusicPCCheck.Checked.Value;
                         await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHqMusic, progressIndicator));
@@ -377,7 +376,6 @@ namespace AM2RLauncher
                 #region Play
                 case UpdateState.Play:
 
-                    //TODO: put this block where this method would be called
                     if (!IsProfileIndexValid())
                         return;
 
@@ -401,7 +399,6 @@ namespace AM2RLauncher
                     string envVarText = customEnvVarTextBox?.Text;
                     bool createDebugLogs = profileDebugLogCheck.Checked.Value;
 
-                    //TODO: handle this with the env var text box
                     await Task.Run(() => Profile.RunGame(profile, createDebugLogs, envVarText));
 
                     this.ShowInTaskbar = true;
@@ -485,7 +482,6 @@ namespace AM2RLauncher
                 progressBar.Visible = true;
                 bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
 
-                //TODO: handle this until progress is set to 100
                 var progressIndicator = new Progress<int>(UpdateProgressBar);
                 await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
 
@@ -604,16 +600,11 @@ namespace AM2RLauncher
                 ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
 
                 // Check if the OS versions match
-                if ((Platform.IsWinForms && profile.OperatingSystem != "Windows") || (Platform.IsGtk && profile.OperatingSystem != "Linux") || (Platform.IsMac && profile.OperatingSystem != "Mac"))
+                if (OS.Name != profile.OperatingSystem)
                 {
-                    string currentOS = "";
-                    if (Platform.IsWinForms) currentOS = "Windows";
-                    else if (Platform.IsGtk) currentOS = "Linux";       // Teeeeechnically, any OS could run GTK applications as well but it'd break a lot and is thus unsupported.
-                    else if (Platform.IsMac) currentOS = "Mac";
+                    Log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
 
-                    Log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + Platform + ". Cancelling mod import.");
-
-                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", currentOS),
+                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
                                     Language.Text.ErrorWindowTitle, MessageBoxType.Error);
                     HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                     return;
@@ -675,10 +666,9 @@ namespace AM2RLauncher
         /// </summary>
         private void SettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: Eto bug, staying here until it gets fixed.
-            if (Platform.IsMac && settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
-            Log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
+            if (settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
 
+            Log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
             if (settingsProfileDropDown.SelectedIndex <= 0 || settingsProfileDropDown.Items.Count == 0)
             {
                 deleteModButton.Enabled = false;
@@ -733,7 +723,7 @@ namespace AM2RLauncher
             // Get drawing variables
             int height = drawable.Height;
             int width = drawable.Width;
-            float scaleDivisor = Platform.IsWinForms ? 955f : 715f; // Magic brute-forced values. Don't ask questions, because we don't have answers >_>
+            float scaleDivisor = OS.IsWindows ? 955f : 715f; // Magic brute-forced values. Don't ask questions, because we don't have answers >_>
                                                                     // Also, seems like nix systems share the same scaleDivisor. Again, don't ask.
             float scale = height / scaleDivisor;
 
@@ -783,8 +773,7 @@ namespace AM2RLauncher
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
         private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            //TODO: Eto bug, staying here until it gets fixed.
-            if (Platform.IsMac && profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
+            if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
 
             profileIndex = profileDropDown.SelectedIndex;
             Log.Info("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
@@ -835,7 +824,7 @@ namespace AM2RLauncher
             customMirrorTextBox.Enabled = enabled;
             mirrorDropDown.Enabled = !enabled;
             // Not sure why the dropdown menu needs this hack, but the textBox does not.
-            if (Platform.IsWinForms)
+            if (OS.IsWindows)
                 mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
             mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
 
@@ -934,7 +923,7 @@ namespace AM2RLauncher
             bool enabled = (bool)customMirrorCheck.Checked;
             customMirrorTextBox.Enabled = enabled;
             mirrorDropDown.Enabled = !enabled;
-            if (Platform.IsWinForms)
+            if (OS.IsWindows)
                 mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
         }
 

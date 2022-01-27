@@ -36,7 +36,7 @@ namespace AM2RLauncher
             {
                 playButton.Enabled = true;
                 // If PatchData is cloned...
-                if (HelperMethods.IsPatchDataCloned())
+                if (Profile.IsPatchDataCloned())
                 {
                     // If 1.1 is installed or if the current profile is invalid...
                     if (Profile.Is11Installed())
@@ -142,7 +142,7 @@ namespace AM2RLauncher
 
             Color col = profileDropDown.Enabled ? colGreen : colInactive;
 
-            if (Platform.IsWinForms)
+            if (OS.IsWindows)
                 profileDropDown.TextColor = col;
             profileAuthorLabel.TextColor = col;
             profileVersionLabel.TextColor = col;
@@ -190,7 +190,7 @@ namespace AM2RLauncher
 
             Color col = enabled ? colGreen : colInactive;
 
-            if (Platform.IsWinForms)
+            if (OS.IsWindows)
                 settingsProfileDropDown.TextColor = col;
 
             settingsProfileLabel.TextColor = col;

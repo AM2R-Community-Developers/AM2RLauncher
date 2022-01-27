@@ -46,6 +46,15 @@ namespace AM2RLauncher.Core
         };
 
         /// <summary>
+        /// Windows only splash strings
+        /// </summary>
+        private static readonly string[] windowsSplash =
+        {
+            ":(",
+            "All your machine are belong to MS"
+        };
+
+        /// <summary>
         /// Linux only splash strings
         /// </summary>
         private static readonly string[] linuxSplash =
@@ -72,6 +81,19 @@ namespace AM2RLauncher.Core
         };
 
         /// <summary>
+        /// Mac only splash strings
+        /// </summary>
+        private static readonly string[] macSplash =
+        {
+            "Does this even work?",
+            "You weren't supposed to do that!",
+            "Another Mac 2 Remake",
+            "This shouldn't even be possible",
+            "How long until this breaks?",
+            "Have fun trying to convince modders to support this!"
+        };
+
+        /// <summary>
         /// Combined splash strings
         /// </summary>
         private static readonly string[] combinedSplash = combineSplashes();
@@ -95,9 +117,12 @@ namespace AM2RLauncher.Core
         private static string[] combineSplashes()
         {
             string[] totalSplashes;
-            if (OS.IsLinux)
+            if (OS.IsWindows)
+                totalSplashes = generalSplash.Concat(windowsSplash).ToArray();
+            else if (OS.IsLinux)
                 totalSplashes = generalSplash.Concat(linuxSplash).ToArray();
-            // else if (Platform.Instance.IsMac) combinedSplash = GeneralSplash.Concat(MacSplash).ToArray();
+            else if (OS.IsMac)
+                totalSplashes = generalSplash.Concat(macSplash).ToArray();
             else
                 totalSplashes = generalSplash;
             return totalSplashes;

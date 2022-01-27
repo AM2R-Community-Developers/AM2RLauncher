@@ -20,16 +20,13 @@ namespace AM2RLauncher
         /// <summary>The Version that identifies this current release.</summary>
         public const string VERSION = Core.Core.VERSION;
 
-        /// <summary>The current Running platform.</summary>
-        private static readonly Platform CurrentPlatform = Platform.Instance;   // Needs to be declared here as well, because I can't access the one from eto,
-                                                                                // Since isn't loaded at this point
-
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         private static readonly string OldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
 
         /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
         //TODO: for mac, this reports the path of the mac runner, not the actual .app
-        private static readonly string UpdatePath = CurrentPlatform.IsWinForms ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+        private static readonly string UpdatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+        //TODO: Mac support for this in general
 
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
@@ -51,19 +48,19 @@ namespace AM2RLauncher
                 Log.Info("AM2RLauncher.bak detected. Removing file.");
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
             }
-            if (CurrentPlatform.IsWinForms && File.Exists(OldConfigPath))
+            if (OS.IsWindows && File.Exists(OldConfigPath))
             {
                 Log.Info(CrossPlatformOperations.LAUNCHERNAME + ".oldCfg detected. Removing file.");
                 File.Delete(OldConfigPath);
             }
-            if (CurrentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/oldLib"))
+            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/oldLib"))
             {
                 Log.Info("Old lib folder detected, removing folder.");
                 Directory.Delete(CrossPlatformOperations.CURRENTPATH + "/oldLib", true);
             }
 
             // Clean up old update libs
-            if (CurrentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
+            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
             {
                 foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
                 {
@@ -91,7 +88,7 @@ namespace AM2RLauncher
 
                 // This is supposed to fix the updater throwing an exception on windows 7 and earlier(?)
                 // See this for information: https://stackoverflow.com/q/2859790 and https://stackoverflow.com/a/50977774
-                if (CurrentPlatform.IsWinForms)
+                if (OS.IsWindows)
                 {
                     ServicePointManager.Expect100Continue = true;
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -152,8 +149,8 @@ namespace AM2RLauncher
                     using (var client = new WebClient())
                     {
                         string platformSuffix = "";
-                        if (CurrentPlatform.IsWinForms) platformSuffix = "_win";
-                        else if (CurrentPlatform.IsGtk) platformSuffix = "_lin";
+                        if (OS.IsWindows) platformSuffix = "_win";
+                        else if (OS.IsLinux) platformSuffix = "_lin";
 
                         Log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
 
@@ -174,7 +171,7 @@ namespace AM2RLauncher
 
                 File.Delete(zipPath);
                 File.Move(UpdatePath + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
-                if (CurrentPlatform.IsWinForms) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
+                if (OS.IsWindows) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
 
                 foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                 {
@@ -182,7 +179,7 @@ namespace AM2RLauncher
                     File.Copy(file.FullName, UpdatePath + "/" + file.Name, true);
                 }
                 // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
-                if (CurrentPlatform.IsWinForms && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
+                if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
                 {
                     // So, because Windows behavior is dumb...
 
@@ -212,7 +209,7 @@ namespace AM2RLauncher
 
                 Log.Info("Files extracted. Preparing to restart executable...");
 
-                if (CurrentPlatform.IsGtk) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
+                if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
 
                 System.Diagnostics.Process.Start(UpdatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
                 Environment.Exit(0);

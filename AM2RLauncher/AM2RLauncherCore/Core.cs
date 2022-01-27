@@ -7,10 +7,11 @@ using System.Runtime.InteropServices;
 namespace AM2RLauncher.Core
 {
 
-    //TODO: document a ton of these new movings
+    /// <summary>
+    /// Class that has core stuff that doesn't fit anywhere else
+    /// </summary>
     public static class Core
     {
-        // Load reference to logger
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
@@ -29,6 +30,10 @@ namespace AM2RLauncher.Core
         /// </summary>
         public static readonly bool isInternetThere = HelperMethods.IsConnectedToInternet();
 
+        /// <summary>
+        /// Checks if this is ran from WINE
+        /// </summary>
+        /// <returns><see langword="true"/> if run from WINE, <see langword="false"/> if not.</returns>
         private static bool CheckIfRunFromWINE()
         { 
             if (OS.IsWindows && Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null)
