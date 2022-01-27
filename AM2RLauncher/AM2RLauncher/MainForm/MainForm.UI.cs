@@ -24,7 +24,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
 
         /// <summary>
         /// The current Launcher version.
@@ -89,7 +89,7 @@ namespace AM2RLauncher
 
         // This mutex needs to CONTINUE existing for the entire application's lifetime, or else the rest of this won't ever work!
         // We're basically using it to key a thread and scan for other instances of that tag.
-        Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
+        private Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
 
         public MainForm()
         {
@@ -112,27 +112,27 @@ namespace AM2RLauncher
                 Environment.Exit(0);
             }
 
-            Log.Info("Mutex check passed. Entering main thread.");
-            Log.Info("Current Launcher Version: " + VERSION);
-            Log.Info("Current Platform-ID is: " + Platform.ID);
-            Log.Info("Current OS is: " + OS.Name);
+            log.Info("Mutex check passed. Entering main thread.");
+            log.Info("Current Launcher Version: " + VERSION);
+            log.Info("Current Platform-ID is: " + Platform.ID);
+            log.Info("Current OS is: " + OS.Name);
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
             Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
-            Log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
+            log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
-            Log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
+            log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
             string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
-            Log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
+            log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
 
             #region VARIABLE INITIALIZATION
-            Log.Info("Beginning UI initialization...");
+            log.Info("Beginning UI initialization...");
 
             // System tray indicator
             showButton = new ButtonMenuItem { Text = Language.Text.TrayButtonShow };
@@ -159,7 +159,7 @@ namespace AM2RLauncher
 
             // Custom splash texts
             string splash = Splash.GetSplash();
-            Log.Info("Randomly chosen splash: " + splash);
+            log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps
             redditIcon = new Bitmap(AM2RLauncher.Properties.Resources.redditIcon48);
@@ -205,7 +205,7 @@ namespace AM2RLauncher
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
-            Log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
+            log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
             if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
             drawable = new Drawable { BackgroundColor = colBGNoAlpha };
@@ -518,7 +518,7 @@ namespace AM2RLauncher
 
             if (languageDropDown.SelectedIndex == -1)
             {
-                Log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
+                log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
                 languageDropDown.SelectedIndex = 0;
             }
 
@@ -771,8 +771,8 @@ namespace AM2RLauncher
             };
 
             #region EVENTS
-            Log.Info("All UI objects have been initialized, UI has been set up.");
-            Log.Info("Beginning event linkage...");
+            log.Info("All UI objects have been initialized, UI has been set up.");
+            log.Info("Beginning event linkage...");
 
             Closing += MainformClosing;
             showButton.Click += ShowButtonClick;
@@ -806,7 +806,7 @@ namespace AM2RLauncher
             newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
             changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
 
-            Log.Info("Events linked successfully.");
+            log.Info("Events linked successfully.");
 
             #endregion
         }

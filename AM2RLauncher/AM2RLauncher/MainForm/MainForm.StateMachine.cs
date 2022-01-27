@@ -273,7 +273,7 @@ namespace AM2RLauncher
         /// </summary>
         private void DeleteProfile(ProfileXML profile, bool reloadProfileList = true)
         {
-            Log.Info("Attempting to delete profile " + profile.Name + "...");
+            log.Info("Attempting to delete profile " + profile.Name + "...");
 
             // Delete folder in Mods
             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
@@ -297,7 +297,7 @@ namespace AM2RLauncher
             if (reloadProfileList)
                 LoadProfiles();
 
-            Log.Info("Successfully deleted profile " + profile.Name + ".");
+            log.Info("Successfully deleted profile " + profile.Name + ".");
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace AM2RLauncher
         //TODO: Seperate this (and by extension, deleteProfile) from UI and backend
         private void LoadProfiles()
         {
-            Log.Info("Loading profiles...");
+            log.Info("Loading profiles...");
 
             // Reset loaded profiles
             profileDropDown.Items.Clear();
@@ -383,7 +383,7 @@ namespace AM2RLauncher
             settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
             settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
-            Log.Info("Loaded " + profileList.Count + " profile(s).");
+            log.Info("Loaded " + profileList.Count + " profile(s).");
 
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
