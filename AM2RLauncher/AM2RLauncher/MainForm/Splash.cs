@@ -7,7 +7,7 @@ namespace AM2RLauncher
     /// <summary>
     /// Class only for providing Splashes
     /// </summary>
-    static class Splash
+    public static class Splash
     {
         /// <summary>
         /// Cross-Platform splash strings
@@ -73,21 +73,35 @@ namespace AM2RLauncher
         };
 
         /// <summary>
+        /// Combined splash strings
+        /// </summary>
+        private static string[] combinedSplash = combineSplashes();
+
+        /// <summary>
         /// Get a random splash string, according to the current OS.
         /// </summary>
         /// <returns>The randomly chosen splash as a <see cref="string"/>.</returns>
         public static string GetSplash()
         {
-            string[] combinedSplash;
             Random rng = new Random();
-
-            if (Platform.Instance.IsGtk)
-                combinedSplash = GeneralSplash.Concat(LinuxSplash).ToArray();
-            else
-                combinedSplash = GeneralSplash;
 
             string splashString = combinedSplash[rng.Next(0, combinedSplash.Length)];
             return splashString;
+        }
+
+        /// <summary>
+        /// Creates a string srray which is <see cref="GeneralSplash"/> concatonated with the splash array for the current OS
+        /// </summary>
+        /// <returns>A string array where <see cref="GeneralSplash"/> and the splash array for the current OS have been concatonated.</returns>
+        private static string[] combineSplashes()
+        {
+            string[] totalSplashes;
+            if (Platform.Instance.IsGtk)
+                totalSplashes = GeneralSplash.Concat(LinuxSplash).ToArray();
+            // else if (Platform.Instance.IsMac) combinedSplash = GeneralSplash.Concat(MacSplash).ToArray();
+            else
+                totalSplashes = GeneralSplash;
+            return totalSplashes;
         }
     }
 }
