@@ -1,13 +1,15 @@
 ﻿using LibGit2Sharp;
 using log4net;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using System.Text;
 
-namespace AM2RLauncher.Helpers
+namespace AM2RLauncher.Core
 {
     /// <summary>
     /// An enum, that has possible return codes for <see cref="HelperMethods.CheckIfZipIsAM2R11"/>.
@@ -24,13 +26,13 @@ namespace AM2RLauncher.Helpers
     /// <summary>
     /// Class that has various Helper functions. Basically anything that could be used outside the Launcher GUI resides here.
     /// </summary>
-    static class HelperMethods
+    public static class HelperMethods
     {
         // Load reference to logger
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog Log = Core.Log;
 
         // Thank you, Microsoft docs: https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-copy-directories
         // Slightly modified by adding overwriteFiles bool, as we need to replace readme, music, etc.
@@ -69,13 +71,13 @@ namespace AM2RLauncher.Helpers
             // If copying subdirectories, copy them and their contents to new location.
             if (!copySubDirs)
                 return;
-            
+
             foreach (DirectoryInfo subDir in dirs)
             {
                 string tempPath = Path.Combine(destDirName, subDir.Name);
                 DirectoryCopy(subDir.FullName, tempPath, overwriteFiles);
             }
-            
+
         }
 
 
@@ -152,7 +154,7 @@ namespace AM2RLauncher.Helpers
             {
                 RecursiveRollover(fileName, max);
             }
-            
+
             //TODO: this can fail
             // If index is less than max, rename file.
             if (index < max)
@@ -251,5 +253,6 @@ namespace AM2RLauncher.Helpers
             Log.Info("AM2R_11 check successful!");
             return IsZipAM2R11ReturnCodes.Successful;
         }
+
     }
 }

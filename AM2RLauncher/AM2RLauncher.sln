@@ -5,11 +5,13 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher", "AM2RLauncher\AM2RLauncher.csproj", "{9B67055C-5AEF-4F83-AFE0-38E600183C9F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Core", "AM2RLauncherCore\AM2RLauncher.Core.csproj", "{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Gtk", "AM2RLauncher.Gtk\AM2RLauncher.Gtk.csproj", "{0A619FA8-61B4-48C6-9461-21B3FE137D03}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Wpf", "AM2RLauncher.Wpf\AM2RLauncher.Wpf.csproj", "{8A162932-BAA3-429A-84C4-B93A1C85DDE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM2RLauncher.Mac", "AM2RLauncher.Mac\AM2RLauncher.Mac.csproj", "{6F240F19-144E-4704-A16A-8FDAC3867EC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Mac", "AM2RLauncher.Mac\AM2RLauncher.Mac.csproj", "{6F240F19-144E-4704-A16A-8FDAC3867EC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B67055C-5AEF-4F83-AFE0-38E600183C9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A619FA8-61B4-48C6-9461-21B3FE137D03}.Release|Any CPU.ActiveCfg = Release|Any CPU

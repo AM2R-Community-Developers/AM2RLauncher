@@ -1,5 +1,5 @@
-﻿using AM2RLauncher.Helpers;
-using AM2RLauncher.XML;
+﻿using AM2RLauncher.Core;
+using AM2RLauncher.Core.XML;
 using Eto.Forms;
 using LibGit2Sharp;
 using System;
@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace AM2RLauncher
 {
+    /// <summary>
+    /// Methods for UI Events that get triggered go in here
+    /// </summary>
     public partial class MainForm : Form
     {
         /// <summary>This is used for <see cref="TransferProgressHandlerMethod"/> to get the current Git Object during cloning.</summary>
@@ -23,14 +26,6 @@ namespace AM2RLauncher
         /// This is a static variable, that <see cref="MainForm.TransferProgressHandlerMethod(TransferProgress)"/> uses, to check if it should cancel the current git process.
         /// </summary>
         private static bool isGitProcessGettingCancelled = false;
-
-        /// <summary>
-        /// This is used on Windows only. This sets a window to be in foreground, is used i.e. to fix am2r just being hidden.
-        /// </summary>
-        /// <param name="hWnd">Pointer to the process you want to have in the foreground.</param>
-        /// <returns></returns>
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         /// <summary>
         /// After the <see cref="playButton"/> has bee loaded, git pull if a repo has been cloned already.
@@ -50,7 +45,8 @@ namespace AM2RLauncher
             // Try to pull first.
             try
             {
-                await Task.Run(PullPatchData);
+                Log.Info("Attempting to pull repository " + currentMirror + "...");
+                await Task.Run(() => Profile.PullPatchData(TransferProgressHandlerMethod));
 
                 // Thank you druid, for this case that should never happen
                 if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
@@ -64,7 +60,12 @@ namespace AM2RLauncher
                     return;
                 }
             }
-            catch (UserCancelledException) { } // We deliberately cancelled this!
+            catch (UserCancelledException ex) 
+            {
+                Log.Info(ex.Message);
+                MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+            }
             catch (LibGit2SharpException ex)   // This is for any exceptions from libgit
             {
                 // Libgit2sharp error messages are always in english!
@@ -97,7 +98,7 @@ namespace AM2RLauncher
 
             // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
             // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
-            if (profileList.Count > 0 && IsProfileInstalled(profileList[0]))
+            if (profileList.Count > 0 && Profile.IsProfileInstalled(profileList[0]))
             {
                 ProfileXML currentXML = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)/profile.xml"));
 
@@ -145,8 +146,6 @@ namespace AM2RLauncher
                     profileDropDown.SelectedIndex = 0;
 
                     LoadProfiles();
-
-
                 }
             }
 
@@ -160,7 +159,6 @@ namespace AM2RLauncher
         private async void PlayButtonClickEvent(object sender, EventArgs e)
         {
             // State Check
-            InvalidateAM2R11InstallCache();
             UpdateStateMachine();
 
             switch (updateState)
@@ -342,7 +340,23 @@ namespace AM2RLauncher
                     // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
                     try
                     {
-                        await Task.Run(() => InstallProfile(profileList[profileIndex.Value]));
+                        // Check if xdelta is installed on linux´and exit if not
+                        if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+                        {
+                            MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                            
+                            SetPlayButtonState(UpdateState.Install);
+                            UpdateStateMachine();
+                            Log.Error("Xdelta not found. Aborting installing a profile...");
+                            break;
+                        }
+                        //TODO: handle this until progress is set to 100
+                        var progressIndicator = new Progress<int>(UpdateProgressBar);
+                        bool useHqMusic = hqMusicPCCheck.Checked.Value;
+                        await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHqMusic, progressIndicator));
+                        // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
+                        if (OS.IsWindows)
+                            Thread.Sleep(1000);
                     }
                     catch (Exception ex)
                     {
@@ -363,6 +377,12 @@ namespace AM2RLauncher
                 #region Play
                 case UpdateState.Play:
 
+                    //TODO: put this block where this method would be called
+                    if (!IsProfileIndexValid())
+                        return;
+
+                    ProfileXML profile = profileList[profileIndex.Value];
+
                     Visible = false;
 
                     SetPlayButtonState(UpdateState.Playing);
@@ -378,7 +398,11 @@ namespace AM2RLauncher
                         this.WindowState = WindowState.Normal;
                     Minimize();
 
-                    await Task.Run(RunGame);
+                    string envVarText = customEnvVarTextBox?.Text;
+                    bool createDebugLogs = profileDebugLogCheck.Checked.Value;
+
+                    //TODO: handle this with the env var text box
+                    await Task.Run(() => Profile.RunGame(profile, createDebugLogs, envVarText));
 
                     this.ShowInTaskbar = true;
                     trayIndicator.Visible = false;
@@ -431,6 +455,25 @@ namespace AM2RLauncher
         /// </summary>
         private async void ApkButtonClickEvent(object sender, EventArgs e)
         {
+            // Check for java, exit safely with a warning if not found!
+            if (!CrossPlatformOperations.IsJavaInstalled())
+            {
+                MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);   
+                SetApkButtonState(ApkButtonState.Create);
+                UpdateStateMachine();
+                Log.Error("Java not found! Aborting Android APK creation.");
+                return;
+            }
+            // Check if xdelta is installed on linux
+            if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            {
+                MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                SetApkButtonState(ApkButtonState.Create);
+                UpdateStateMachine();
+                Log.Error("Xdelta not found. Aborting Android APK creation...");
+                return;
+            }
+
             UpdateStateMachine();
 
             if (apkButtonState == ApkButtonState.Create)
@@ -440,8 +483,11 @@ namespace AM2RLauncher
                 UpdateStateMachine();
 
                 progressBar.Visible = true;
+                bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
 
-                await Task.Run(() => CreateAPK(profileList[profileIndex.Value]));
+                //TODO: handle this until progress is set to 100
+                var progressIndicator = new Progress<int>(UpdateProgressBar);
+                await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
 
                 SetApkButtonState(ApkButtonState.Create);
 

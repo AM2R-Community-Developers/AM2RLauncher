@@ -1,4 +1,4 @@
-﻿using AM2RLauncher.XML;
+﻿using AM2RLauncher.Core.XML;
 using Eto.Drawing;
 using Eto.Forms;
 using log4net;
@@ -26,9 +26,20 @@ namespace AM2RLauncher
         private static readonly ILog Log = LogManager.GetLogger(typeof(MainForm));
 
         /// <summary>
+        /// The current Launcher version.
+        /// </summary>
+        private const string VERSION = LauncherUpdater.VERSION;
+
+        /// <summary>
+        /// A <see cref="Bitmap"/> of the AM2R icon.
+        /// </summary>
+        private static readonly Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
+
+        //TODO: this should be part of GUI
+        /// <summary>
         /// An enum, that has possible states for our Launcher.
         /// </summary>
-        private enum UpdateState
+        public enum UpdateState
         {
             Download,
             Downloading,
@@ -42,25 +53,11 @@ namespace AM2RLauncher
         /// <summary>
         /// An enum, that has different states for <see cref="apkButton"/>.
         /// </summary>
-        private enum ApkButtonState
+        public enum ApkButtonState
         {
             Create,
             Creating
         }
-
-        // Splashes
-        /// <summary>
-        /// A <see cref="string"/>-<see cref="Array"/> of custom splashes.
-        /// </summary>
-        /// <summary>
-        /// The current Launcher version.
-        /// </summary>
-        private const string VERSION = LauncherUpdater.VERSION;
-
-        /// <summary>
-        /// A <see cref="Bitmap"/> of the AM2R icon.
-        /// </summary>
-        private static readonly Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
 
         /// <summary>
         /// This variable has the current global state of the Launcher.
@@ -84,25 +81,9 @@ namespace AM2RLauncher
         /// </summary>
         private static string currentMirror;
 
-        /// <summary>
-        /// Indicates whether or not we have established an internet connection.
-        /// </summary>
-        private static readonly bool isInternetThere = Helpers.HelperMethods.IsConnectedToInternet();
+        private static bool isInternetThere = Core.Core.isInternetThere;
 
-        /// <summary>
-        /// Caches the result of <see cref="Is11Installed"/> so that we don't extract and verify it too often.
-        /// </summary>
-        private static bool? isAM2R11InstalledCache = null;
-
-        /// <summary>
-        /// Caches the MD5 hash of the provided AM2R_11.zip so we don't end up checking the zip if it hasn't changed.
-        /// </summary>
-        private static string lastAM2R11ZipMD5 = "";
-
-        /// <summary>
-        /// Checks if the AM2RLauncher is run via WINE.
-        /// </summary>
-        private static bool isThisRunningFromWine = false; 
+        private static bool isThisRunningFromWine = Core.Core.isThisRunningFromWine;
 
         public MainForm()
         {
@@ -125,7 +106,7 @@ namespace AM2RLauncher
                     {
                         if (process.Id == current.Id)
                             continue;
-                        SetForegroundWindow(process.MainWindowHandle);
+                        Core.Core.SetForegroundWindow(process.MainWindowHandle);
                         break;
                     }
                 }
@@ -136,14 +117,10 @@ namespace AM2RLauncher
             Log.Info("Current Launcher Version: " + VERSION);
             Log.Info("Current Platform-ID is: " + Platform.ID);
 
-            // Log wine
-            if (Platform.IsWinForms)
+            //Log Wine
+            if (isThisRunningFromWine)
             {
-                if (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null)
-                {
-                    isThisRunningFromWine = true;
-                    Log.Info("Currently running from WINE!");
-                }
+                Log.Info("Currently running from WINE!");
             }
             // Log distro and version (if it exists)
             else if (Platform.IsGtk)
@@ -162,14 +139,14 @@ namespace AM2RLauncher
             }
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
-            Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
+            Environment.CurrentDirectory = Core.CrossPlatformOperations.CURRENTPATH;
             Log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless
             Log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
-            string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
+            string userLanguage = Core.CrossPlatformOperations.ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
@@ -202,7 +179,7 @@ namespace AM2RLauncher
             }
 
             // Custom splash texts
-            string splash = Splash.GetSplash();
+            string splash = Core.Splash.GetSplash();
             Log.Info("Randomly chosen splash: " + splash);
 
             // Load bitmaps
@@ -225,7 +202,7 @@ namespace AM2RLauncher
 
             // Create mirror list - eventually this should be platform specific!
             // We do this as a List<Uri> so we can add more dynamically on user input... if necessary.
-            mirrorList = CrossPlatformOperations.GenerateMirrorList();
+            mirrorList = Core.CrossPlatformOperations.GenerateMirrorList();
 
             // Create mirror list
             // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
@@ -244,13 +221,13 @@ namespace AM2RLauncher
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
             // TODO: for some reason, this sometimes doesn't work on Linux. Was reported at eto, stays here until its fixed
-            ClientSize = new Size(Int32.Parse(CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
+            ClientSize = new Size(Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
             Log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
-            if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
+            if (Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
             drawable = new Drawable { BackgroundColor = colBGNoAlpha };
 
@@ -559,7 +536,7 @@ namespace AM2RLauncher
 
             languageDropDown.Items.AddRange(languageList);
 
-            var tmpLanguage = CrossPlatformOperations.ReadFromConfig("Language");
+            var tmpLanguage = Core.CrossPlatformOperations.ReadFromConfig("Language");
             languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
 
             if (languageDropDown.SelectedIndex == -1)
@@ -571,7 +548,7 @@ namespace AM2RLauncher
             // autoUpdateAM2R checkbox
             autoUpdateAM2RCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
+                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
                 Text = Language.Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
@@ -580,7 +557,7 @@ namespace AM2RLauncher
             // autoUpdateLauncher checkbox
             autoUpdateLauncherCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
+                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
                 Text = Language.Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
@@ -588,7 +565,7 @@ namespace AM2RLauncher
             // HQ music, PC
             hqMusicPCCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
+                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
                 Text = Language.Text.HighQualityPC,
                 TextColor = colGreen
             };
@@ -596,7 +573,7 @@ namespace AM2RLauncher
             // HQ music, Android
             hqMusicAndroidCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
+                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
                 Text = Language.Text.HighQualityAndroid,
                 TextColor = colGreen
             };
@@ -604,7 +581,7 @@ namespace AM2RLauncher
             // Create game debug logs
             profileDebugLogCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
+                Checked = bool.Parse(Core.CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
                 Text = Language.Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
@@ -626,7 +603,7 @@ namespace AM2RLauncher
             {
                 customEnvVarTextBox = new TextBox
                 {
-                    Text = CrossPlatformOperations.ReadFromConfig("CustomEnvVar"),
+                    Text = Core.CrossPlatformOperations.ReadFromConfig("CustomEnvVar"),
                     BackgroundColor = colBGNoAlpha,
                     TextColor = colGreen
                 };
@@ -648,7 +625,7 @@ namespace AM2RLauncher
                 mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
+            mirrorIndex = (Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(Core.CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
                                                                                                                                   : 0;
             mirrorDropDown.SelectedIndex = mirrorIndex;
 
@@ -657,14 +634,14 @@ namespace AM2RLauncher
             // Custom mirror
             customMirrorCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
+                Checked = Boolean.Parse(Core.CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
                 Text = Language.Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
 
             customMirrorTextBox = new TextBox
             {
-                Text = CrossPlatformOperations.ReadFromConfig("CustomMirrorText"),
+                Text = Core.CrossPlatformOperations.ReadFromConfig("CustomMirrorText"),
                 BackgroundColor = colBGNoAlpha,
                 TextColor = colGreen
             };

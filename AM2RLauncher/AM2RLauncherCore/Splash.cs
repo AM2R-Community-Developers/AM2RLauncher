@@ -1,8 +1,7 @@
-using Eto;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace AM2RLauncher
+namespace AM2RLauncher.Core
 {
     /// <summary>
     /// Class only for providing Splashes
@@ -12,7 +11,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Cross-Platform splash strings
         /// </summary>
-        private static readonly string[] GeneralSplash =
+        private static readonly string[] generalSplash =
         {
             "The real Ridley is the friends we made along the way.",
             "Now with 100% more Septoggs!",
@@ -49,7 +48,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Linux only splash strings
         /// </summary>
-        private static readonly string[] LinuxSplash =
+        private static readonly string[] linuxSplash =
         {
             "Sorry this is ugly, but at least it works.",
             "GTK + QT = 💣",
@@ -75,7 +74,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Combined splash strings
         /// </summary>
-        private static string[] combinedSplash = combineSplashes();
+        private static readonly string[] combinedSplash = combineSplashes();
 
         /// <summary>
         /// Get a random splash string, according to the current OS.
@@ -90,17 +89,17 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Creates a string srray which is <see cref="GeneralSplash"/> concatonated with the splash array for the current OS
+        /// Creates a string srray which is <see cref="generalSplash"/> concatonated with the splash array for the current OS
         /// </summary>
-        /// <returns>A string array where <see cref="GeneralSplash"/> and the splash array for the current OS have been concatonated.</returns>
+        /// <returns>A string array where <see cref="generalSplash"/> and the splash array for the current OS have been concatonated.</returns>
         private static string[] combineSplashes()
         {
             string[] totalSplashes;
-            if (Platform.Instance.IsGtk)
-                totalSplashes = GeneralSplash.Concat(LinuxSplash).ToArray();
+            if (OS.IsLinux)
+                totalSplashes = generalSplash.Concat(linuxSplash).ToArray();
             // else if (Platform.Instance.IsMac) combinedSplash = GeneralSplash.Concat(MacSplash).ToArray();
             else
-                totalSplashes = GeneralSplash;
+                totalSplashes = generalSplash;
             return totalSplashes;
         }
     }

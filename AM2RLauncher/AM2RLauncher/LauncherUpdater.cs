@@ -1,4 +1,4 @@
-﻿using AM2RLauncher.Helpers;
+﻿using AM2RLauncher.Core;
 using Eto;
 using Eto.Forms;
 using log4net;
@@ -18,7 +18,7 @@ namespace AM2RLauncher
         // Auto updating is fun!
 
         /// <summary>The Version that identifies this current release.</summary>
-        public const string VERSION = "2.2.0";
+        public const string VERSION = Core.Core.VERSION;
 
         /// <summary>The current Running platform.</summary>
         private static readonly Platform CurrentPlatform = Platform.Instance;   // Needs to be declared here as well, because I can't access the one from eto,

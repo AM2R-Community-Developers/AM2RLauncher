@@ -1,12 +1,13 @@
-﻿using AM2RLauncher.Helpers;
-using Eto.Drawing;
+﻿using Eto.Drawing;
 using System;
 using System.IO;
+using AM2RLauncher.Core;
+using AM2RLauncher.Core.XML;
 
 namespace AM2RLauncher
 {
     /// <summary>
-    /// Everything state machine-related goes in here
+    /// Everything UI/Form state machine-related goes in here
     /// </summary>
     public partial class MainForm
     {
@@ -38,11 +39,11 @@ namespace AM2RLauncher
                 if (HelperMethods.IsPatchDataCloned())
                 {
                     // If 1.1 is installed or if the current profile is invalid...
-                    if (Is11Installed())
+                    if (Profile.Is11Installed())
                     {
                         var isProfileValid = IsProfileIndexValid();
                         // If current profile is installed...
-                        if (isProfileValid && IsProfileInstalled(profileList[profileIndex.Value]))
+                        if (isProfileValid && Profile.IsProfileInstalled(profileList[profileIndex.Value]))
                         {
                             // We're ready to play!
                             SetPlayButtonState(UpdateState.Play);
@@ -83,20 +84,30 @@ namespace AM2RLauncher
             // Safety check
             if (apkButton == null)
                 return;
-            var profile = profileList[profileIndex.Value];
+            
             // If profile supports Android and if we are NOT already creating an APK...
-            if (IsProfileIndexValid() && profile.SupportsAndroid && profile.Installable && (apkButtonState == ApkButtonState.Create))
+            if (IsProfileIndexValid())
             {
-                // Switch status based on main button's state
-                switch (updateState)
+                //TODO: clean this up later
+                var profile = profileList[profileIndex.Value];
+                if (profile.SupportsAndroid && profile.Installable && (apkButtonState == ApkButtonState.Create))
                 {
-                    case UpdateState.Download: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    case UpdateState.Downloading: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    case UpdateState.Select11: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    case UpdateState.Install: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                    case UpdateState.Installing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                    case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    // Switch status based on main button's state
+                    switch (updateState)
+                    {
+                        case UpdateState.Download: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                        case UpdateState.Downloading: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                        case UpdateState.Select11: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                        case UpdateState.Install: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                        case UpdateState.Installing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                        case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                        case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
+                    }
+                }
+                else
+                {
+                    apkButton.Enabled = false;
+                    apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
                 }
             }
             else // Otherwise, disable.
@@ -203,7 +214,7 @@ namespace AM2RLauncher
                 case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonDownloadToolTip; break;
                 case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
                 case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonSelect11ToolTip; break;
-                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break;
+                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break; //TODO: this broke?
                 case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonInstallingToolTip; break;
                 case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonPlayToolTip.Replace("$NAME", profileName); break;
                 case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonPlayingToolTip; break;
@@ -262,44 +273,132 @@ namespace AM2RLauncher
                 default: return null;
             }
         }
-        /// <summary>
-        /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
-        /// </summary>
-        /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-        public static bool Is11Installed()
-        {
-            // If we have a cache, return that instead
-            if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
 
-            string am2r11file = CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip";
-            // Return safely if file doesn't exist
-            if (!File.Exists(am2r11file)) return false;
-            lastAM2R11ZipMD5 = HelperMethods.CalculateMD5(am2r11file);
-            var returnCode = HelperMethods.CheckIfZipIsAM2R11(am2r11file);
-            // Check if it's valid, if not log it, rename it and silently leave
-            if (returnCode != IsZipAM2R11ReturnCodes.Successful)
+        /// <summary>
+        /// Deletes the given <paramref name="profile"/>. Reloads the <see cref="profileList"/> if <paramref name="reloadProfileList"/> is true.
+        /// </summary>
+        private void DeleteProfile(ProfileXML profile, bool reloadProfileList = true)
+        {
+            Log.Info("Attempting to delete profile " + profile.Name + "...");
+
+            // Delete folder in Mods
+            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
             {
-                Log.Info("Detected invalid AM2R_11 zip with following error code: " + returnCode);
-                HelperMethods.RecursiveRollover(am2r11file);
-                isAM2R11InstalledCache = false;
-                return false;
+                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
             }
-            isAM2R11InstalledCache = true;
-            return true;
+
+            // Delete the zip file in Mods
+            if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
+            {
+                File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal); // For some reason, it was set at read only, so we undo that here
+                File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
+            }
+
+            // Delete folder in Profiles
+            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+            {
+                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+            }
+
+            if (reloadProfileList)
+                LoadProfiles();
+
+            Log.Info("Successfully deleted profile " + profile.Name + ".");
         }
 
         /// <summary>
-        /// Invalidates <see cref="isAM2R11InstalledCache"/>.
+        /// Scans the PatchData and Mods folders for valid profile entries, and loads them.
         /// </summary>
-        public static void InvalidateAM2R11InstallCache()
+        //TODO: Seperate this (and by extension, deleteProfile) from UI and backend
+        private void LoadProfiles()
         {
-            // If the file exists, and its hash matches with ours, don't invalidate
-            if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
-                HelperMethods.CalculateMD5(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") == lastAM2R11ZipMD5)
-                return;
+            Log.Info("Loading profiles...");
 
-            isAM2R11InstalledCache = null;
+            // Reset loaded profiles
+            profileDropDown.Items.Clear();
+            profileList.Clear();
+            profileIndex = null;
+
+            // Check for and add the Community Updates profile
+            if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
+            {
+                profileList.Add(Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml")));
+                profileList[0].DataPath = "/PatchData/data";
+            }
+
+            // Safety check to generate the Mods folder if it does not exist
+            if (!Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods"))
+                Directory.CreateDirectory(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+            // Get Mods folder info
+            DirectoryInfo modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+            // Add all extracted profiles in Mods to the profileList.
+            foreach (DirectoryInfo dir in modsDir.GetDirectories())
+            {
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    if (file.Name != "profile.xml")
+                        continue;
+                    ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
+                    if (prof.Installable || Profile.IsProfileInstalled(prof)) // Safety check for non-installable profiles
+                    {
+                        prof.DataPath = "/Mods/" + dir.Name;
+                        profileList.Add(prof);
+                    }
+                    else if (!Profile.IsProfileInstalled(prof)) // If not installable and isn't installed, remove it
+                    {
+                        prof.DataPath = "/Mods/" + dir.Name;
+                        DeleteProfile(prof, false);
+                    }
+                }
+            }
+
+            // Add profile names to the profileDropDown
+            foreach (ProfileXML profile in profileList)
+            {
+                // Archive version notes
+                if (!profile.Installable)
+                    profile.ProfileNotes = Language.Text.ArchiveNotes;
+
+                profileDropDown.Items.Add(profile.Name);
+            }
+
+            // Read the value from the config
+            string profIndexString = CrossPlatformOperations.ReadFromConfig("ProfileIndex");
+
+            // Check if either no profile was found or the setting says that the last current profile didn't exist
+            if (profileDropDown.Items.Count == 0)
+                profileIndex = null;
+            else
+            {
+                // We know that profiles exist at this point, so we're going to point it to 0 instead so the following code doesn't fail
+                if (profIndexString == "null")
+                    profIndexString = "0";
+
+                // We parse from the settings, and check if profiles got deleted from the last time the launcher has been selected. if yes, we revert the last selection to 0;
+                int intParseResult = Int32.Parse(profIndexString);
+                profileIndex = intParseResult;
+                if (profileIndex >= profileDropDown.Items.Count)
+                    profileIndex = 0;
+                profileDropDown.SelectedIndex = profileIndex.Value;
+            }
+
+            // Update stored profiles in the Profile Settings tab
+            settingsProfileDropDown.Items.Clear();
+            settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
+            settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
+
+            Log.Info("Loaded " + profileList.Count + " profile(s).");
+
+            // Refresh the author and version label on the main tab
+            if (profileList.Count > 0)
+            {
+                profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+                profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+            }
+
+            UpdateStateMachine();
         }
-
     }
 }
