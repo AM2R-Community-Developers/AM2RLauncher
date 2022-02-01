@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace AM2RLauncher.Core;
@@ -22,6 +22,7 @@ public static class Splash
         "Also try Metroid II: Return of Samus!",
         "Also try Metroid: Samus Returns!",
         "Also try Prime 2D!",
+        "Also try Skippy the Bot!",
         "Trust me, it's an 'unintentional feature.'",
         "Coming soon to a PC near you!",
         "This ain't your parents' Metroid 2!",
