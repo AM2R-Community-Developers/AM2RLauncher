@@ -308,8 +308,9 @@ public static class Profile
             foreach (var file in new DirectoryInfo(profilePath).GetFiles())
                 if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
                     File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
-            // Loading custom fonts crashes on Mac, so we delete those
-            Directory.Delete(profilePath + "/lang/fonts", true);
+            // Loading custom fonts crashes on Mac, so we delete those if they exist
+            if (Directory.Exists(profilePath + "/lang/fonts"))
+                Directory.Delete(profilePath + "/lang/fonts", true);
             // Move Frameworks, Info.plist and PkgInfo over
             HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
             File.Copy(dataPath + "/Info.plist", profilePath.Replace("Resources", "") + "/Info.plist", true);
