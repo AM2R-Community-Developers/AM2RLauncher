@@ -5,12 +5,12 @@ on:
     branches: [ main ]
     paths-ignore: 
       - 'README.md'
-      - '.github/'
+      - '.github/**'
   pull_request:
     branches: [ main ]
     paths-ignore: 
       - 'README.md'
-      - '.github/'
+      - '.github/**'
 
 jobs:
   build:
