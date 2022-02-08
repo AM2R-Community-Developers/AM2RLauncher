@@ -492,7 +492,7 @@ public static class Profile
         {
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            log.Info("Is the environment textbox null or whitespace = " + String.IsNullOrWhiteSpace(envVars));
+            log.Info("User does " + (String.IsNullOrWhiteSpace(envVars) ? "not" : "") + " have custom environment variables set.");
 
             //TODO: make this more readable at one day
             if (!String.IsNullOrWhiteSpace(envVars))
@@ -524,7 +524,7 @@ public static class Profile
                     string value = envVars.Substring(0, valueSubstringLength);
                     envVars = envVars.Substring(value.Length);
 
-                    log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
+                    log.Info("Adding user variable \"" + variable + "\" with value \"" + value + "\"");
                     startInfo.EnvironmentVariables[variable] = value;
                 }
             }
@@ -538,10 +538,10 @@ public static class Profile
 
             log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
 
-            log.Info("Launching game with following variables: ");
+            log.Debug("Launching game with following variables: ");
             foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
             {
-                log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
+                log.Debug("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
             }
 
             using (Process p = new Process())

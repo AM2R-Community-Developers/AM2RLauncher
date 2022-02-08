@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using GLib;
+using log4net.Repository.Hierarchy;
 using Application = Eto.Forms.Application;
 using FileInfo = System.IO.FileInfo;
 
@@ -38,6 +38,11 @@ internal static class MainClass
 
         // Configure logger
         XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
+
+        // if we're on debug, always set loglevel to debug
+        #if DEBUG
+        ((Logger)log.Logger).Level = log4net.Core.Level.Debug;
+        #endif
 
         // Log distro and version (if it exists)
         if (File.Exists("/etc/os-release"))

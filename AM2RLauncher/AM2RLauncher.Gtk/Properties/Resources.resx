@@ -120,7 +120,7 @@
   <data name="log4netContents" xml:space="preserve">
     <value>&lt;log4net&gt;
   &lt;root&gt;
-    &lt;level value="ALL" /&gt;
+    &lt;level value="INFO" /&gt;
     &lt;appender-ref ref="file" /&gt;
   &lt;/root&gt;
   &lt;appender name="file" type="log4net.Appender.RollingFileAppender"&gt;
