@@ -207,7 +207,8 @@ namespace AM2RLauncher
                 CrossPlatformOperations.CopyOldConfigToNewConfig();
 
                 log.Info("Files extracted. Preparing to restart executable...");
-
+                
+                // TODO: This will fail if CWD is not where the launcher is located. Use absolute path here.
                 if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
 
                 System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
