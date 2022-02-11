@@ -43,7 +43,8 @@ public static class Splash
         "S P I D E R B A L L",
         "Fun is infinite with Community-Developers Inc.",
         "You may only proceed if you wear baggy pants.",
-        "Did you know that games take time to develop?"
+        "Did you know that games take time to develop?",
+        "Ask the wombat."
     };
 
     /// <summary>
