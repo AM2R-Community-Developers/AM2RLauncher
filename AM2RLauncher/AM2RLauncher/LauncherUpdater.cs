@@ -14,7 +14,7 @@ namespace AM2RLauncher
     //TODO: Mac support for autoupdater in general
     public static class LauncherUpdater
     {
-        // How often this was broken count: 6
+        // How often this was broken count: 7
         // Auto updating is fun!
 
         /// <summary>The Version that identifies this current release.</summary>
@@ -207,9 +207,7 @@ namespace AM2RLauncher
                 CrossPlatformOperations.CopyOldConfigToNewConfig();
 
                 log.Info("Files extracted. Preparing to restart executable...");
-                
-                // TODO: This will fail if CWD is not where the launcher is located. Use absolute path here.
-                if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x ./AM2RLauncher.Gtk");
+                if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");
 
                 System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
                 Environment.Exit(0);
