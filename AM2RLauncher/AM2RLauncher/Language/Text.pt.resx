@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>Criar um APK para $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>Isto é um arquivo de uma Atualização da Comunidade instalada previamente. Não é possível reinstalá-la e ela será removida automaticamente quando seus arquivos de jogo forem deletados. Os arquivos de save são compartilhados com a Atualização da Comunidade que está instalada no momento, então faça um backup de seus saves antes de executar este perfil!</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -379,5 +379,11 @@ Prossiga com cuidado.</value>
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>O arquivo Zip selecionado não contém o AM2R 1.1! Por favor, selecione outro arquivo Zip</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>Deseja arquivar $NAME?</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>Isso é uma versão arquivada de um Mod previamente instalado. Ele não pode ser reinstalado e será removido se seus arquivos de jogo forem deletados.</value>
   </data>
 </root>

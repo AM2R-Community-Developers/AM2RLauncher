@@ -998,14 +998,10 @@ namespace AM2RLauncher
 
                         // User wants to archive profile
                         if (archiveResult == DialogResult.Yes)
-                        {
                             ArchiveProfileAndAdjustLists(currentProfile);
-                            DeleteProfileAndAdjustLists(currentProfile);
-                        }
                     }
-                    // No archiving, Delete profile instead
-                    else
-                        DeleteProfileAndAdjustLists(currentProfile);
+                    // Now we delete the profile
+                    DeleteProfileAndAdjustLists(currentProfile);
 
                     // Rename directory to take the old one's place
                     string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");

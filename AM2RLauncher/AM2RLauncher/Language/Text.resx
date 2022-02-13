@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>Create an APK for $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>This is an archive of a previously installed Community Update. It cannot be re-installed and will remove itself if its game files are deleted. It shares saves with the currently installed Community Updates, so be sure to create a backup of your saves before running this profile!</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -384,5 +384,8 @@ Proceed with caution.</value>
   </data>
   <data name="ArchiveMod" xml:space="preserve">
     <value>Do you want to archive $NAME?</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>This is an archive of a previously installed Mod. It cannot be re-installed and will remove itself if its game files are deleted.</value>
   </data>
 </root>

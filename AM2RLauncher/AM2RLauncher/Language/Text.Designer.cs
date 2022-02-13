@@ -75,9 +75,9 @@ namespace AM2RLauncher.Language {
             }
         }
         
-        public static string ArchiveNotes {
+        public static string ArchiveNotesCommunityUpdates {
             get {
-                return ResourceManager.GetString("ArchiveNotes", resourceCulture);
+                return ResourceManager.GetString("ArchiveNotesCommunityUpdates", resourceCulture);
             }
         }
         
@@ -570,6 +570,12 @@ namespace AM2RLauncher.Language {
         public static string ArchiveMod {
             get {
                 return ResourceManager.GetString("ArchiveMod", resourceCulture);
+            }
+        }
+        
+        public static string ArchiveNotesMods {
+            get {
+                return ResourceManager.GetString("ArchiveNotesMods", resourceCulture);
             }
         }
     }

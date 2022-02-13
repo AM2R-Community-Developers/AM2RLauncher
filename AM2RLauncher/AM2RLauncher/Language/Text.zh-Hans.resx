@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>为 $NAME 创建 APK</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>这是先前安装过的社区更新版本的压缩文件，因此无法再重新安装一遍，并且在游戏文件被删除后也会自行删除。由于与当前安装的社区更新版本共用保存数据，所以请在运行该游戏实例前备份好保存数据！</value>
   </data>
   <data name="Author" xml:space="preserve">

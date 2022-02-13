@@ -175,7 +175,7 @@ namespace AM2RLauncher
             // Only enable these, when we're not on the community updates
             if (settingsProfileDropDown.SelectedIndex > 0)
             {
-                updateModButton.Enabled = enabled;
+                updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
                 updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
                 deleteModButton.Enabled = enabled;
                 deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
@@ -285,8 +285,13 @@ namespace AM2RLauncher
             {
                 // Archive version notes
                 if (!profile.Installable)
-                    //TODO: have different text for non-community archive
-                    profile.ProfileNotes = Language.Text.ArchiveNotes + "\n\n" + profile.ProfileNotes;
+                {
+                    //TODO: localizations
+                    if (profile.Name.Contains("Community Updates"))
+                        profile.ProfileNotes = Language.Text.ArchiveNotesCommunityUpdates;
+                    else
+                        profile.ProfileNotes = Language.Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
+                }
 
                 profileDropDown.Items.Add(profile.Name);
             }

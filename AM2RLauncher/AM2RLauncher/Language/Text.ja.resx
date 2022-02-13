@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>次のAPKを作成します： $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>これは以前インストールされたCommunity Updateのアーカイブです。再インストールはできませんし、ゲームファイルが削除されると自動的に削除されます。現在インストールされているCommunity Updateとセーブデータを共有しているため、このプロファイルを実行する前に必ずセーブデータのバックアップを作成してください</value>
   </data>
   <data name="Author" xml:space="preserve">
