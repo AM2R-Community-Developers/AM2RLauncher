@@ -49,7 +49,7 @@ internal static class MainClass
         {
             string osRelease = File.ReadAllText("/etc/os-release");
             Regex lineRegex = new Regex(".*=.*");
-            var results = lineRegex.Matches(osRelease).Cast<Match>().ToList();
+            var results = lineRegex.Matches(osRelease).ToList();
             var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
             log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME"))?.Value.Substring(5).Replace("\"", "") +
                      (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));

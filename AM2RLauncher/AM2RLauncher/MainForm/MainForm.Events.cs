@@ -31,7 +31,7 @@ namespace AM2RLauncher
         /// </summary>
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
-            LoadProfiles();
+            LoadProfilesAndAdjustLists();
             if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
                 return;
             
@@ -92,7 +92,7 @@ namespace AM2RLauncher
             {
                 progressBar.Visible = false;
                 progressLabel.Visible = false;
-                LoadProfiles();
+                LoadProfilesAndAdjustLists();
             }
 
             // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
@@ -144,7 +144,7 @@ namespace AM2RLauncher
 
                     profileDropDown.SelectedIndex = 0;
 
-                    LoadProfiles();
+                    LoadProfilesAndAdjustLists();
                 }
             }
 
@@ -159,6 +159,9 @@ namespace AM2RLauncher
         {
             // State Check
             UpdateStateMachine();
+
+            // Check if 1.1 is installed by forcing invalidation
+            Profile.Is11Installed(true);
 
             switch (updateState)
             {
@@ -240,7 +243,7 @@ namespace AM2RLauncher
                     SetPlayButtonState(UpdateState.Install);
 
                     // This needs to be run BEFORE the state check so that the Mod Settings tab doesn't weird out
-                    LoadProfiles();
+                    LoadProfilesAndAdjustLists();
 
                     // Do a state check
                     UpdateStateMachine();
@@ -438,7 +441,7 @@ namespace AM2RLauncher
                 progressBar.MaxValue = transferProgress.TotalObjects;
                 if (currentGitObject >= transferProgress.ReceivedObjects)
                     return;
-                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
+                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + ((int)transferProgress.ReceivedBytes / 1000000) + "MB) / " + transferProgress.TotalObjects + " objects";
                 currentGitObject = transferProgress.ReceivedObjects;
                 progressBar.Value = transferProgress.ReceivedObjects;
             });
@@ -461,7 +464,7 @@ namespace AM2RLauncher
                 return;
             }
             // Check if xdelta is installed on linux
-            if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
                 SetApkButtonState(ApkButtonState.Create);
@@ -626,11 +629,11 @@ namespace AM2RLauncher
             else
             {
                 log.Error("User did not supply valid input. Cancelling import.");
-                LoadProfiles();
+                LoadProfilesAndAdjustLists();
                 return;
             }
 
-            LoadProfiles();
+            LoadProfilesAndAdjustLists();
             settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == addedProfile.Name);
             if (settingsProfileDropDown.SelectedIndex == -1)
                 settingsProfileDropDown.SelectedIndex = 0;
@@ -653,11 +656,10 @@ namespace AM2RLauncher
         /// </summary>
         private void SaveButtonClickEvent(object sender, EventArgs e)
         {
-            if (IsProfileIndexValid())
-            {
-                log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-                CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-            }
+            if (!IsProfileIndexValid())
+                return;
+            log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+            CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
         }
 
         /// <summary>
@@ -775,10 +777,11 @@ namespace AM2RLauncher
             if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
 
             profileIndex = profileDropDown.SelectedIndex;
-            log.Info("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
+            log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
 
             profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+            // TODO: only write this on application quit
             CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
@@ -788,7 +791,6 @@ namespace AM2RLauncher
                 saveWarningLabel.Visible = false;
 
             UpdateStateMachine();
-            
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>
@@ -940,7 +942,7 @@ namespace AM2RLauncher
             if (result == DialogResult.Ok)
             {
                 log.Info("User did not cancel. Proceeding to delete " + profile);
-                DeleteProfile(profile);
+                DeleteProfileAndAdjustLists(profile);
                 log.Info(profile + " has been deleted");
                 MessageBox.Show(Language.Text.DeleteModButtonSuccess.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
             }
@@ -1020,7 +1022,7 @@ namespace AM2RLauncher
                     if (result == DialogResult.Ok)
                     {
                         // Delete profile
-                        DeleteProfile(currentProfile);
+                        DeleteProfileAndAdjustLists(currentProfile);
 
                         // Rename directory to take the old one's place
                         string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");
@@ -1047,7 +1049,7 @@ namespace AM2RLauncher
                 {
                     // File cleanup
                     HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                    LoadProfiles();
+                    LoadProfilesAndAdjustLists();
                     return;
                 }
 
@@ -1057,7 +1059,7 @@ namespace AM2RLauncher
             }
 
             ProfileXML currentSelectedProfile = profileList[settingsProfileDropDown.SelectedIndex];
-            LoadProfiles();
+            LoadProfilesAndAdjustLists();
             settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentSelectedProfile.Name);
             if (settingsProfileDropDown.SelectedIndex == -1)
                 settingsProfileDropDown.SelectedIndex = 0;

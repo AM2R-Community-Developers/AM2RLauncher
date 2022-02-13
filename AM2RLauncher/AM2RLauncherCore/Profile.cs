@@ -2,6 +2,7 @@
 using LibGit2Sharp;
 using log4net;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -44,13 +45,21 @@ public static class Profile
     /// </summary>
     private static string lastAM2R11ZipMD5 = "";
 
+    /*/// <summary>
+    /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
+    /// </summary>
+
+    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>*/
+
     /// <summary>
     /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
     /// </summary>
-    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-    public static bool Is11Installed()
+    /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated</param>
+    /// <returns></returns>
+    public static bool Is11Installed(bool invalidateCache = false)
     {
-        InvalidateAM2R11InstallCache();
+        // Only invalidate if we need to
+        if (invalidateCache) InvalidateAM2R11InstallCacheIfNecessary();
 
         // If we have a cache, return that instead
         if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
@@ -73,9 +82,9 @@ public static class Profile
     }
 
     /// <summary>
-    /// Invalidates <see cref="isAM2R11InstalledCache"/>.
+    /// Invalidates <see cref="isAM2R11InstalledCache"/> if necessary.
     /// </summary>
-    private static void InvalidateAM2R11InstallCache()
+    private static void InvalidateAM2R11InstallCacheIfNecessary()
     {
         // If the file exists, and its hash matches with ours, don't invalidate
         if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
@@ -121,6 +130,92 @@ public static class Profile
             }
         }
         log.Info("Repository pulled successfully.");
+    }
+/*
+    /// <summary>
+    /// Scans the PatchData and Mods folders for valid profile entries, and loads them.
+    /// </summary>*/
+
+    /// <summary>
+    /// Scans the PatchData and Mods folders for valid profile entries, creates and returns a list of them.
+    /// </summary>
+    /// <returns>A <see cref="List{ProfileXML}"/> containing all valid profile entries.</returns>
+    public static List<ProfileXML> LoadProfiles()
+    {
+        log.Info("Loading profiles...");
+
+        List<ProfileXML> profileList = new List<ProfileXML>();
+
+        // Check for and add the Community Updates profile
+        if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
+        {
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"));
+            profile.DataPath = "/PatchData/data";
+            profileList.Add(profile);
+        }
+
+        // Safety check to generate the Mods folder if it does not exist
+        if (!Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods"))
+            Directory.CreateDirectory(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+        // Get Mods folder info
+        DirectoryInfo modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+        // Add all extracted profiles in Mods to the profileList.
+        foreach (DirectoryInfo dir in modsDir.GetDirectories())
+        {
+            // If no profile.xml exists we don't add anything
+            if (!File.Exists(dir.FullName + "/profile.xml"))
+                continue;
+
+            ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
+            // Safety check for non-installable profiles
+            if (prof.Installable || IsProfileInstalled(prof))
+            {
+                prof.DataPath = "/Mods/" + dir.Name;
+                profileList.Add(prof);
+            }
+            // If not installable and isn't installed, remove it
+            else if (!IsProfileInstalled(prof))
+            {
+                prof.DataPath = "/Mods/" + dir.Name;
+                DeleteProfile(prof);
+            }
+        }
+
+        log.Info("Loaded " + profileList.Count + " profile(s).");
+        return profileList;
+    }
+
+    /// <summary>
+    /// Deletes a profile from the Mods and Profiles folder.
+    /// </summary>
+    /// <param name="profile">The profile to delete.</param>
+    public static void DeleteProfile(ProfileXML profile)
+    {
+        log.Info("Attempting to delete profile " + profile.Name + "...");
+
+        // Delete folder in Mods
+        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
+        }
+
+        // Delete the zip file in Mods
+        if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
+        {
+            // For some reason, it was set at read only, so we undo that here
+            File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal);
+            File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
+        }
+
+        // Delete folder in Profiles
+        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+        }
+
+        log.Info("Successfully deleted profile " + profile.Name + ".");
     }
 
     /// <summary>

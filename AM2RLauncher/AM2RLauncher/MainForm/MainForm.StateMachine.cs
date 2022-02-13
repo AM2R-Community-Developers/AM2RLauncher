@@ -1,6 +1,5 @@
 ﻿using Eto.Drawing;
 using System;
-using System.IO;
 using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
 
@@ -52,7 +51,7 @@ namespace AM2RLauncher
                         else if (isProfileValid && profileList[profileIndex.Value].Installable == false)
                         {
                             // We delete the profile, because we can't install it and it therefore holds no value!
-                            DeleteProfile(profileList[profileIndex.Value]);
+                            DeleteProfileAndAdjustLists(profileList[profileIndex.Value]);
                         }
                         // Otherwise, we still need to install.
                         else
@@ -269,84 +268,17 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Deletes the given <paramref name="profile"/>. Reloads the <see cref="profileList"/> if <paramref name="reloadProfileList"/> is true.
+        /// Loads valid profile entries and reloads the necessary UI components.
         /// </summary>
-        private void DeleteProfile(ProfileXML profile, bool reloadProfileList = true)
+        private void LoadProfilesAndAdjustLists()
         {
-            log.Info("Attempting to delete profile " + profile.Name + "...");
-
-            // Delete folder in Mods
-            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
-            {
-                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
-            }
-
-            // Delete the zip file in Mods
-            if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
-            {
-                File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal); // For some reason, it was set at read only, so we undo that here
-                File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
-            }
-
-            // Delete folder in Profiles
-            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-            {
-                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
-            }
-
-            if (reloadProfileList)
-                LoadProfiles();
-
-            log.Info("Successfully deleted profile " + profile.Name + ".");
-        }
-
-        /// <summary>
-        /// Scans the PatchData and Mods folders for valid profile entries, and loads them.
-        /// </summary>
-        //TODO: Seperate this (and by extension, deleteProfile) from UI and backend
-        private void LoadProfiles()
-        {
-            log.Info("Loading profiles...");
-
             // Reset loaded profiles
             profileDropDown.Items.Clear();
             profileList.Clear();
             profileIndex = null;
 
-            // Check for and add the Community Updates profile
-            if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
-            {
-                profileList.Add(Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml")));
-                profileList[0].DataPath = "/PatchData/data";
-            }
-
-            // Safety check to generate the Mods folder if it does not exist
-            if (!Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods"))
-                Directory.CreateDirectory(CrossPlatformOperations.CURRENTPATH + "/Mods");
-
-            // Get Mods folder info
-            DirectoryInfo modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods");
-
-            // Add all extracted profiles in Mods to the profileList.
-            foreach (DirectoryInfo dir in modsDir.GetDirectories())
-            {
-                foreach (FileInfo file in dir.GetFiles())
-                {
-                    if (file.Name != "profile.xml")
-                        continue;
-                    ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
-                    if (prof.Installable || Profile.IsProfileInstalled(prof)) // Safety check for non-installable profiles
-                    {
-                        prof.DataPath = "/Mods/" + dir.Name;
-                        profileList.Add(prof);
-                    }
-                    else if (!Profile.IsProfileInstalled(prof)) // If not installable and isn't installed, remove it
-                    {
-                        prof.DataPath = "/Mods/" + dir.Name;
-                        DeleteProfile(prof, false);
-                    }
-                }
-            }
+            // Load the profileList
+            profileList = Profile.LoadProfiles();
 
             // Add profile names to the profileDropDown
             foreach (ProfileXML profile in profileList)
@@ -383,8 +315,6 @@ namespace AM2RLauncher
             settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
             settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
-            log.Info("Loaded " + profileList.Count + " profile(s).");
-
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
             {
@@ -392,7 +322,20 @@ namespace AM2RLauncher
                 profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
             }
 
+            log.Info("Reloading UI components after loading successful.");
+
             UpdateStateMachine();
+        }
+
+
+        /// <summary>
+        /// Deletes a profile and reloads the necessary UI components.
+        /// </summary>
+        /// <param name="profile">The profile to delete.</param>
+        private void DeleteProfileAndAdjustLists(ProfileXML profile)
+        {
+            Profile.DeleteProfile(profile);
+            LoadProfilesAndAdjustLists();
         }
     }
 }
