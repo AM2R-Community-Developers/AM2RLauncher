@@ -739,11 +739,9 @@ namespace AM2RLauncher
 
             profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-            // TODO: only write this on application quit
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
-                profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
+                                                       profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
                 saveWarningLabel.Visible = true;
             else
                 saveWarningLabel.Visible = false;
@@ -1054,6 +1052,7 @@ namespace AM2RLauncher
             CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
             CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
             CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
+            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             switch (updateState)
             {
