@@ -285,7 +285,8 @@ namespace AM2RLauncher
             {
                 // Archive version notes
                 if (!profile.Installable)
-                    profile.ProfileNotes = Language.Text.ArchiveNotes;
+                    //TODO: have different text for non-community archive
+                    profile.ProfileNotes = Language.Text.ArchiveNotes + "\n\n" + profile.ProfileNotes;
 
                 profileDropDown.Items.Add(profile.Name);
             }
@@ -335,6 +336,12 @@ namespace AM2RLauncher
         private void DeleteProfileAndAdjustLists(ProfileXML profile)
         {
             Profile.DeleteProfile(profile);
+            LoadProfilesAndAdjustLists();
+        }
+
+        private void ArchiveProfileAndAdjustLists(ProfileXML profile)
+        {
+            Profile.ArchiveProfile(profile);
             LoadProfilesAndAdjustLists();
         }
     }

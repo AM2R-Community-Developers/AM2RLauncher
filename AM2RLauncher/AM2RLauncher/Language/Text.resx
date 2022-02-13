@@ -382,4 +382,7 @@ Proceed with caution.</value>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>The selected Zip is not AM2R 1.1! Please choose another Zip file.</value>
   </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>Do you want to archive $NAME?</value>
+  </data>
 </root>

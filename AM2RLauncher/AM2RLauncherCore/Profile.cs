@@ -45,12 +45,6 @@ public static class Profile
     /// </summary>
     private static string lastAM2R11ZipMD5 = "";
 
-    /*/// <summary>
-    /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
-    /// </summary>
-
-    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>*/
-
     /// <summary>
     /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
     /// </summary>
@@ -131,10 +125,6 @@ public static class Profile
         }
         log.Info("Repository pulled successfully.");
     }
-/*
-    /// <summary>
-    /// Scans the PatchData and Mods folders for valid profile entries, and loads them.
-    /// </summary>*/
 
     /// <summary>
     /// Scans the PatchData and Mods folders for valid profile entries, creates and returns a list of them.
@@ -185,6 +175,59 @@ public static class Profile
 
         log.Info("Loaded " + profileList.Count + " profile(s).");
         return profileList;
+    }
+
+    /// <summary>
+    /// Archives a given Profile by making a copy with "Name (version)". Does silently nothing if user archives already exist
+    /// </summary>
+    /// <param name="profile">The profile to archive</param>
+    public static void ArchiveProfile(ProfileXML profile)
+    {
+        // temporarily serialize and deserialize to essentially "clone" the variable as otherwise we'd modify references
+        File.WriteAllText(Path.GetTempPath() + "/" + profile.Name, Serializer.Serialize<ProfileXML>(profile));
+        profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(Path.GetTempPath() + "/" + profile.Name));
+
+        string originalName = profile.Name;
+        // Change name to include version and be unique
+        profile.Name += " (" + profile.Version + ")";
+        // if we're archiving community updates, remove the "latest" part
+        profile.Name = profile.Name.Replace("Community Updates Latest", "Community Updates");
+
+        log.Info("Archiving " + profile.Name);
+
+        string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+
+        // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
+        if (!Directory.Exists(profileArchivePath))
+        {
+            // Rename current profile if we have it installed
+            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName))
+                Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName, profileArchivePath);
+
+            // Set as non-installable so that it's just treated as a launching reference
+            profile.Installable = false;
+
+            string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + profile.Name;
+
+            // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
+            if (!Directory.Exists(modArchivePath))
+            {
+                Directory.CreateDirectory(modArchivePath);
+                File.WriteAllText(modArchivePath + "/profile.xml", Serializer.Serialize<ProfileXML>(profile));
+                log.Info("Finished archival.");
+            }
+            else
+            {
+                HelperMethods.DeleteDirectory(profileArchivePath);
+                log.Info("Cancelling archival! User-defined archive in Mods already exists.");
+            }
+        }
+        // If our desired rename already exists, it's probably a user archive... so we just delete the original folder and move on with installation of the new version.
+        else
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName);
+            log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
+        }
     }
 
     /// <summary>
