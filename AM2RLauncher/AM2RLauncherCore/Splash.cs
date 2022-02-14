@@ -18,6 +18,7 @@ public static class Splash
         "Now with 100% more Blob Throwers!",
         "Speedrun THIS, I dare you.",
         "The broken pipe is a lie.",
+        "I am altering the broken pipe. Pray I don't alter it any further.",
         "Overcommitting to April Fool's since 2018.",
         "Also try Metroid II: Return of Samus!",
         "Also try Metroid: Samus Returns!",
