@@ -132,8 +132,8 @@ namespace AM2RLauncher
                 if (!isCurrentVersionOutdated)
                     return;
 
-                // For mac, we just show a message box that a new version is available, because I don't want to support for it yet
-                // hardcoded string, since also temporarily until it gets supported one day
+                // For mac, we just show a message box that a new version is available, because I don't want to support it yet.
+                // hardcoded string, since also temporarily until it gets supported one day.
                 if (OS.IsMac)
                 {
                     MessageBox.Show("Your current version is outdated! The newest version is " + onlineVersion + "." +

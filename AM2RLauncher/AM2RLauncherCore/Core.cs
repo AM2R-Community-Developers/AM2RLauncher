@@ -7,6 +7,8 @@ namespace AM2RLauncher.Core;
 /// <summary>
 /// Class that has core stuff that doesn't fit anywhere else
 /// </summary>
+//TODO: "Core" is a really stupid name and either this should get renamed, or AM2RLauncher.Core should get renamed.
+// I am however bad at thinking of names
 public static class Core
 {
     /// <summary>

@@ -380,4 +380,10 @@
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>そのZIPファイルはAM2R v1.1ではありません！ 別のZIPファイルを選んで下さい</value>
   </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>$NAMEをアーカイブ化しますか？</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>これは既にインストールされているMODです。再インストールはできず、またゲームファイルを削除すると自動的に削除されます。</value>
+  </data>
 </root>
