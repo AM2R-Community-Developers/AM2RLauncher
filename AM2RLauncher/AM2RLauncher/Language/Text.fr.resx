@@ -305,7 +305,7 @@ ce profil !</value>
   <data name="ProfileNotes" xml:space="preserve">
     <value>Notes de profil :</value>
   </data>
-  <data name="ProfileSettingsTab" xml:space="preserve">
+  <data name="ModSettingsTab" xml:space="preserve">
     <value>Paramètres du mod</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">

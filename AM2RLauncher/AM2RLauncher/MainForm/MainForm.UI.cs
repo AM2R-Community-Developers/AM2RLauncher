@@ -678,7 +678,7 @@ namespace AM2RLauncher
                 Width = 275
             };
 
-            settingsProfileDropDown = new DropDown
+            modSettingsProfileDropDown = new DropDown
             {
                 TextColor = colGreen,
                 BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
@@ -686,9 +686,9 @@ namespace AM2RLauncher
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (OS.IsLinux)
-                settingsProfileDropDown = new DropDown();
+                modSettingsProfileDropDown = new DropDown();
 
-            settingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
+            modSettingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
 
             profileButton = new ColorButton
             {
@@ -755,14 +755,14 @@ namespace AM2RLauncher
 
             profileLayout.BeginHorizontal();
             profileLayout.AddSpace();
-            profileLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, settingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
+            profileLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, modSettingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
             profileLayout.AddSpace();
 
             profilePage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
                 Content = profileLayout,
-                Text = Text.ProfileSettingsTab
+                Text = Text.ModSettingsTab
             };
 
             #endregion
@@ -810,7 +810,7 @@ namespace AM2RLauncher
             addModButton.Click += AddModButtonClicked;
             profileButton.Click += ProfilesButtonClickEvent;
             saveButton.Click += SaveButtonClickEvent;
-            settingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
+            modSettingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
             profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
@@ -903,7 +903,7 @@ namespace AM2RLauncher
         private Label mirrorLabel;
         /// <summary>The <see cref="Label"/> that displays <see cref="VERSION"/>, aka the current launcher version.</summary>
         private Label versionLabel;
-        /// <summary>The <see cref="Label"/> that gives information for <see cref="settingsProfileDropDown"/>.</summary>
+        /// <summary>The <see cref="Label"/> that gives information for <see cref="modSettingsProfileDropDown"/>.</summary>
         private Label settingsProfileLabel;
         /// <summary>The <see cref="Label"/> that compliments <see cref="progressBar"/>.</summary>
         private Label progressLabel;
@@ -939,14 +939,14 @@ namespace AM2RLauncher
         private DropDown profileDropDown;
         /// <summary>A <see cref="DropDown"/> where profiles can be chosen (located in Profile Settings).</summary>
         //TODO: having a second profiledropdown is technically unnecessary since they're supposed to mirror each other at (almost) all times.
-        private DropDown settingsProfileDropDown;
+        private DropDown modSettingsProfileDropDown;
 
         /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>
         private TextBox customMirrorTextBox;
         /// <summary>A <see cref="TextBox"/>, where the user can input their custom environment variables.</summary>
         private TextBox customEnvVarTextBox;
 
-        /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="settingsProfileDropDown"/> are displayed.</summary>
+        /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="modSettingsProfileDropDown"/> are displayed.</summary>
         private TextArea profileNotesTextArea;
 
         /// <summary>A <see cref="ProgressBar"/> that can be used to show progress for a specific task.</summary>

@@ -592,9 +592,9 @@ namespace AM2RLauncher
 
             LoadProfilesAndAdjustLists();
             // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
-            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
-            if (settingsProfileDropDown.SelectedIndex == -1)
-                settingsProfileDropDown.SelectedIndex = 0;
+            modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
+            if (modSettingsProfileDropDown.SelectedIndex == -1)
+                modSettingsProfileDropDown.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -604,9 +604,9 @@ namespace AM2RLauncher
         {
             if (!IsProfileIndexValid())
                 return;
-            log.Info("User opened the profile directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name +
-                     ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
+            log.Info("User opened the profile directory for profile " + profileList[modSettingsProfileDropDown.SelectedIndex].Name +
+                     ", which is " + profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
+            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[modSettingsProfileDropDown.SelectedIndex].Name);
         }
 
         /// <summary>
@@ -616,8 +616,8 @@ namespace AM2RLauncher
         {
             if (!IsProfileIndexValid())
                 return;
-            log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-            CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+            log.Info("User opened the save directory for profile " + profileList[modSettingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
+            CrossPlatformOperations.OpenFolder(profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
         }
 
         /// <summary>
@@ -625,12 +625,12 @@ namespace AM2RLauncher
         /// </summary>
         private void SettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
+            if (modSettingsProfileDropDown.SelectedIndex == -1 && modSettingsProfileDropDown.Items.Count == 0) return;
 
-            string profileName = settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text;
+            string profileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
 
-            log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
-            if (settingsProfileDropDown.SelectedIndex <= 0 || settingsProfileDropDown.Items.Count == 0)
+            log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
+            if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
             {
                 deleteModButton.Enabled = false;
                 deleteModButton.ToolTip = null;
@@ -643,7 +643,7 @@ namespace AM2RLauncher
                 deleteModButton.Enabled = true;
                 deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, profileName);
                 // On non-installable profiles we want to disable updating
-                updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
+                updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
                 updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
             }
 
@@ -652,24 +652,24 @@ namespace AM2RLauncher
             saveButton.Enabled = true;
             saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
 
-            if (settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0)
+            if (modSettingsProfileDropDown.SelectedIndex < 0 || modSettingsProfileDropDown.Items.Count == 0)
                 return;
             profileNotesTextArea.TextColor = colGreen;
-            profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
+            profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[modSettingsProfileDropDown.SelectedIndex].ProfileNotes;
 
         }
 
         /// <summary>
-        /// Fires when the profile layout completes loading. This makes sure that if <see cref="settingsProfileDropDown"/> has nothing in it "on boot",
+        /// Fires when the profile layout completes loading. This makes sure that if <see cref="modSettingsProfileDropDown"/> has nothing in it "on boot",
         /// that everything is disabled.
         /// </summary>
         private void ProfileLayoutLoadComplete(object sender, EventArgs e)
         {
             // Safety check
-            if ((settingsProfileDropDown == null) || (settingsProfileDropDown.Items.Count != 0)) return;
+            if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.Items.Count != 0)) return;
             addModButton.Enabled = false;
             settingsProfileLabel.TextColor = colInactive;
-            settingsProfileDropDown.Enabled = false;
+            modSettingsProfileDropDown.Enabled = false;
             profileButton.Enabled = false;
             saveButton.Enabled = false;
             updateModButton.Enabled = false;
@@ -889,11 +889,11 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Gets called when <see cref="deleteModButton"/> gets clicked. Deletes the current selected <see cref="ProfileXML"/> in <see cref="settingsProfileDropDown"/>.
+        /// Gets called when <see cref="deleteModButton"/> gets clicked. Deletes the current selected <see cref="ProfileXML"/> in <see cref="modSettingsProfileDropDown"/>.
         /// </summary>
         private void DeleteModButtonClicked(object sender, EventArgs e)
         {
-            ProfileXML profile = profileList[settingsProfileDropDown.SelectedIndex];
+            ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
             log.Info("User is attempting to delete profile " + profile.Name + ".");
 
             DialogResult result = MessageBox.Show(HelperMethods.GetText(Text.DeleteModWarning, profile.Name), Text.WarningWindowTitle,
@@ -914,7 +914,7 @@ namespace AM2RLauncher
 
         /// <summary>
         /// Gets called, when <see cref="updateModButton"/> gets clicked. Opens a window, so the user can select a zip, which will be updated over
-        /// the current selected <see cref="ProfileXML"/> in <see cref="settingsProfileDropDown"/>.
+        /// the current selected <see cref="ProfileXML"/> in <see cref="modSettingsProfileDropDown"/>.
         /// </summary>
         private void UpdateModButtonClicked(object sender, EventArgs e)
         {
@@ -922,7 +922,7 @@ namespace AM2RLauncher
 
             bool abort = false;
 
-            ProfileXML currentProfile = profileList[settingsProfileDropDown.SelectedIndex];
+            ProfileXML currentProfile = profileList[modSettingsProfileDropDown.SelectedIndex];
 
             OpenFileDialog fileFinder = new OpenFileDialog
             {
@@ -1039,9 +1039,9 @@ namespace AM2RLauncher
 
             LoadProfilesAndAdjustLists();
 
-            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentProfile.Name);
-            if (settingsProfileDropDown.SelectedIndex == -1)
-                settingsProfileDropDown.SelectedIndex = 0;
+            modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentProfile.Name);
+            if (modSettingsProfileDropDown.SelectedIndex == -1)
+                modSettingsProfileDropDown.SelectedIndex = 0;
         }
 
         /// <summary>

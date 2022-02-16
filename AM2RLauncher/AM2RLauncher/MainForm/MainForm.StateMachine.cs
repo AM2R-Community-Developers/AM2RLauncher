@@ -19,7 +19,7 @@ namespace AM2RLauncher
             UpdatePlayState();
             UpdateApkState();
             UpdateProfileState();
-            UpdateProfileSettingsState();
+            UpdateModSettingsState();
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace AM2RLauncher
         /// </summary>
         private void UpdatePlayState()
         {
-            // If not downloading or installing...
+            // If we're downloading or installing, dont't change anything
             if ((updateState == UpdateState.Downloading) || (updateState == UpdateState.Installing))
                 return;
 
@@ -143,10 +143,10 @@ namespace AM2RLauncher
         /// <summary>
         /// Determines current conditions and enables or disables <see cref="profilePage"/> controls accordingly.
         /// </summary>
-        private void UpdateProfileSettingsState()
+        private void UpdateModSettingsState()
         {
             // Safety check
-            if (settingsProfileDropDown == null || settingsProfileDropDown.Items.Count <= 0) return;
+            if (modSettingsProfileDropDown == null || modSettingsProfileDropDown.Items.Count <= 0) return;
             
             bool enabled = false;
             switch (updateState)
@@ -162,10 +162,10 @@ namespace AM2RLauncher
             }
             if (apkButtonState == ApkButtonState.Creating) enabled = false;
 
-            string selectedProfileName = settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text;
+            string selectedProfileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
 
             settingsProfileLabel.TextColor = colGreen;
-            settingsProfileDropDown.Enabled = enabled;
+            modSettingsProfileDropDown.Enabled = enabled;
             profileButton.Enabled = enabled;
             //TODO: these .replace($NAME) are in a lot of places, replace them with some fuction.
             profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, selectedProfileName);
@@ -175,9 +175,9 @@ namespace AM2RLauncher
             addModButton.ToolTip = Text.AddNewModToolTip;
 
             // Only enable these, when we're not on the community updates
-            if (settingsProfileDropDown.SelectedIndex > 0)
+            if (modSettingsProfileDropDown.SelectedIndex > 0)
             {
-                updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
+                updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
                 updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, selectedProfileName);
                 deleteModButton.Enabled = enabled;
                 deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, selectedProfileName);
@@ -186,12 +186,12 @@ namespace AM2RLauncher
             Color col = enabled ? colGreen : colInactive;
 
             if (OS.IsWindows)
-                settingsProfileDropDown.TextColor = col;
+                modSettingsProfileDropDown.TextColor = col;
 
             settingsProfileLabel.TextColor = col;
 
             if (enabled)
-                settingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
+                modSettingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace AM2RLauncher
 
             playButton.Invalidate();
 
-            UpdateProfileSettingsState();
+            UpdateModSettingsState();
         }
 
         /// <summary>
@@ -317,9 +317,9 @@ namespace AM2RLauncher
             }
 
             // Update stored profiles in the Profile Settings tab
-            settingsProfileDropDown.Items.Clear();
-            settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
-            settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
+            modSettingsProfileDropDown.Items.Clear();
+            modSettingsProfileDropDown.Items.AddRange(profileDropDown.Items);
+            modSettingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)

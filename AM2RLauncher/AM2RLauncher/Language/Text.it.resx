@@ -303,7 +303,7 @@
   <data name="ProfileNotes" xml:space="preserve">
     <value>Note di profilo:</value>
   </data>
-  <data name="ProfileSettingsTab" xml:space="preserve">
+  <data name="ModSettingsTab" xml:space="preserve">
     <value>Impostazioni mod</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">
