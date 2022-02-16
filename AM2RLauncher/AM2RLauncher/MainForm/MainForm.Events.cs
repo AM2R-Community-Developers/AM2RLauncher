@@ -1,5 +1,6 @@
 ﻿using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
+using AM2RLauncher.Language;
 using Eto.Forms;
 using LibGit2Sharp;
 using System;
@@ -53,7 +54,7 @@ namespace AM2RLauncher
                     log.Error("Druid PatchData corruption occurred!");
                     await Application.Instance.InvokeAsync(() =>
                     {
-                        MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
                     });
                     HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                     return;
@@ -62,7 +63,7 @@ namespace AM2RLauncher
             catch (UserCancelledException ex) 
             {
                 log.Info(ex.Message);
-                MessageBox.Show(Language.Text.CorruptPatchData, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
                 HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
             }
             catch (LibGit2SharpException ex)   // This is for any exceptions from libgit
@@ -74,19 +75,19 @@ namespace AM2RLauncher
                     if (!(bool)autoUpdateAM2RCheck.Checked)
                     {
                         log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
-                        MessageBox.Show(Language.Text.InternetConnectionDrop, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                        MessageBox.Show(Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
                     }
                 }
                 else
                 {
                     log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                    MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                    MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
             }
             catch (Exception ex) // This is if somehow any other exception might get thrown as well.
             {
                 log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
             }
             finally
             {
@@ -170,12 +171,12 @@ namespace AM2RLauncher
                             ex.Message.ToLower().Contains("failed to resolve address"))
                         {
                             log.Error("Internet connection dropped while attempting to clone repository" + currentMirror + "!");
-                            MessageBox.Show(Language.Text.InternetConnectionDrop, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                            MessageBox.Show(Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
                         }
                         else
                         {
                             log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                            MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                            MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
                                 HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         }
@@ -184,7 +185,7 @@ namespace AM2RLauncher
                     catch (Exception ex)             // This is if somehow any other exception might get thrown as well.
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
 
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
                             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
@@ -216,7 +217,7 @@ namespace AM2RLauncher
                 #region Downloading
 
                 case UpdateState.Downloading:
-                    var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                    var result = MessageBox.Show(Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
                     if (result == DialogResult.No)
                         return;
                     else
@@ -241,10 +242,10 @@ namespace AM2RLauncher
                     {
                         Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
                         MultiSelect = false,
-                        Title = Language.Text.Select11FileDialog
+                        Title = Text.Select11FileDialog
                     };
 
-                    fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
+                    fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
 
                     if (fileFinder.ShowDialog(this) != DialogResult.Ok)
                     {
@@ -265,7 +266,7 @@ namespace AM2RLauncher
                         if (errorCode != IsZipAM2R11ReturnCodes.Successful)
                         {
                             log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
-                            MessageBox.Show(Language.Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                            MessageBox.Show(Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Text.ErrorWindowTitle, MessageBoxType.Error);
                             return;
                         }
 
@@ -307,7 +308,7 @@ namespace AM2RLauncher
                         // Check if xdelta is installed on linux´and exit if not
                         if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
                         {
-                            MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                            MessageBox.Show(Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                             
                             SetPlayButtonState(UpdateState.Install);
                             UpdateStateMachine();
@@ -324,7 +325,7 @@ namespace AM2RLauncher
                     catch (Exception ex)
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                     }
                     progressBar.Visible = false;
                     progressBar.Value = 0;
@@ -403,7 +404,7 @@ namespace AM2RLauncher
                 progressBar.MaxValue = transferProgress.TotalObjects;
                 if (currentGitObject >= transferProgress.ReceivedObjects)
                     return;
-                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + ((int)transferProgress.ReceivedBytes / 1000000) + "MB) / " + transferProgress.TotalObjects + " objects";
+                progressLabel.Text = Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + ((int)transferProgress.ReceivedBytes / 1000000) + "MB) / " + transferProgress.TotalObjects + " objects";
                 currentGitObject = transferProgress.ReceivedObjects;
                 progressBar.Value = transferProgress.ReceivedObjects;
             });
@@ -419,7 +420,7 @@ namespace AM2RLauncher
             // Check for java, exit safely with a warning if not found!
             if (!CrossPlatformOperations.IsJavaInstalled())
             {
-                MessageBox.Show(Language.Text.JavaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);   
+                MessageBox.Show(Text.JavaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);   
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
                 log.Error("Java not found! Aborting Android APK creation.");
@@ -428,7 +429,7 @@ namespace AM2RLauncher
             // Check if xdelta is installed on linux
             if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
-                MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                MessageBox.Show(Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
                 log.Error("Xdelta not found. Aborting Android APK creation...");
@@ -506,10 +507,10 @@ namespace AM2RLauncher
             {
                 Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
                 MultiSelect = false,
-                Title = Language.Text.SelectModFileDialog
+                Title = Text.SelectModFileDialog
             };
 
-            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
+            fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -546,7 +547,7 @@ namespace AM2RLauncher
                 ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
                 log.Error("Mod is already imported as " + extractedName + "! Cancelling mod import.");
 
-                MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile2.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile2.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
                 return;
             }
             // Directory doesn't exist -> extract!
@@ -558,7 +559,7 @@ namespace AM2RLauncher
             {
                 log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
 
-                MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
                 Directory.Delete(modsDir + "/" + extractedName, true);
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
                 return;
@@ -571,8 +572,8 @@ namespace AM2RLauncher
             {
                 log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
 
-                MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
-                                Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(HelperMethods.GetText(Text.ModIsForWrongOS, profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
+                                Text.ErrorWindowTitle, MessageBoxType.Error);
                 HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                 return;
             }
@@ -581,13 +582,13 @@ namespace AM2RLauncher
             if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
             {
                 log.Error(profile.Name + " is already installed.");
-                MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
                 HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                 return;
             }
 
             log.Info(profile.Name + " successfully installed.");
-            MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
+            MessageBox.Show(HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, profile.Name), Text.SuccessWindowTitle);
 
             LoadProfilesAndAdjustLists();
             // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
@@ -626,6 +627,8 @@ namespace AM2RLauncher
         {
             if (settingsProfileDropDown.SelectedIndex == -1 && settingsProfileDropDown.Items.Count == 0) return;
 
+            string profileName = settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text;
+
             log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + settingsProfileDropDown.SelectedIndex + ".");
             if (settingsProfileDropDown.SelectedIndex <= 0 || settingsProfileDropDown.Items.Count == 0)
             {
@@ -638,21 +641,21 @@ namespace AM2RLauncher
             else
             {
                 deleteModButton.Enabled = true;
-                deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, profileName);
                 // On non-installable profiles we want to disable updating
                 updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
-                updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
             }
 
-            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[settingsProfileDropDown.SelectedIndex].Name);
-            profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileName);
+            profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
             saveButton.Enabled = true;
-            saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+            saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
 
             if (settingsProfileDropDown.SelectedIndex < 0 || settingsProfileDropDown.Items.Count == 0)
                 return;
             profileNotesTextArea.TextColor = colGreen;
-            profileNotesTextArea.Text = Language.Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
+            profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[settingsProfileDropDown.SelectedIndex].ProfileNotes;
 
         }
 
@@ -738,8 +741,8 @@ namespace AM2RLauncher
             profileIndex = profileDropDown.SelectedIndex;
             log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
 
-            profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-            profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+            profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+            profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
                                                        profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
@@ -789,7 +792,7 @@ namespace AM2RLauncher
             // Create warning dialog when enabling
             if (enabled)
             {
-                MessageBox.Show(Language.Text.WarningWindowText, Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(Text.WarningWindowText, Text.WarningWindowTitle, MessageBoxType.Warning);
                 currentMirror = customMirrorTextBox.Text;
             }
             else
@@ -845,7 +848,7 @@ namespace AM2RLauncher
             if (!gitURLRegex.IsMatch(mirrorText))
             {
                 log.Info("User used " + mirrorText + " as a custom Mirror, didn't pass git validation test.");
-                MessageBox.Show(Language.Text.InvalidGitURL.Replace("$NAME", mirrorText), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(HelperMethods.GetText(Text.InvalidGitURL, mirrorText), Text.ErrorWindowTitle, MessageBoxType.Error);
                 return;
             }
 
@@ -893,7 +896,7 @@ namespace AM2RLauncher
             ProfileXML profile = profileList[settingsProfileDropDown.SelectedIndex];
             log.Info("User is attempting to delete profile " + profile.Name + ".");
 
-            DialogResult result = MessageBox.Show(Language.Text.DeleteModWarning.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle,
+            DialogResult result = MessageBox.Show(HelperMethods.GetText(Text.DeleteModWarning, profile.Name), Text.WarningWindowTitle,
                                                   MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
             if (result == DialogResult.Ok)
@@ -901,7 +904,7 @@ namespace AM2RLauncher
                 log.Info("User did not cancel. Proceeding to delete " + profile);
                 DeleteProfileAndAdjustLists(profile);
                 log.Info(profile + " has been deleted");
-                MessageBox.Show(Language.Text.DeleteModButtonSuccess.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
+                MessageBox.Show(HelperMethods.GetText(Text.DeleteModButtonSuccess, profile.Name), Text.SuccessWindowTitle);
             }
             else
             {
@@ -925,10 +928,10 @@ namespace AM2RLauncher
             {
                 Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
                 MultiSelect = false,
-                Title = Language.Text.SelectModFileDialog
+                Title = Text.SelectModFileDialog
             };
 
-            fileFinder.Filters.Add(new FileFilter(Language.Text.ZipArchiveText, ".zip"));
+            fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -972,7 +975,7 @@ namespace AM2RLauncher
             if (!File.Exists(extractedFolder + "/profile.xml"))
             {
                 log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
-                MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
                 Directory.Delete(extractedFolder, true);
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
                 return;
@@ -984,7 +987,7 @@ namespace AM2RLauncher
             if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
             {
                 // Mod is already installed, so we can update!
-                DialogResult updateResult = MessageBox.Show(Language.Text.UpdateModWarning.Replace("$NAME", currentProfile.Name), Language.Text.WarningWindowTitle,
+                DialogResult updateResult = MessageBox.Show(HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
                                                       MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
                 if (updateResult == DialogResult.Ok)
@@ -993,7 +996,7 @@ namespace AM2RLauncher
                     if (Profile.IsProfileInstalled(currentProfile))
                     {
                         //TODO: localize
-                        DialogResult archiveResult = MessageBox.Show(Language.Text.ArchiveMod.Replace("$NAME", currentProfile.Name + " " + Language.Text.VersionLabel + currentProfile.Version), Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                        DialogResult archiveResult = MessageBox.Show(HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
 
                         // User wants to archive profile
                         if (archiveResult == DialogResult.Yes)
@@ -1017,8 +1020,8 @@ namespace AM2RLauncher
                 // Cancel the operation!
                 // Show message to tell user that mod could not be found, install this separately
                 log.Error("Mod is not installed! Cancelling mod update.");
-                MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name),
-                                Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                MessageBox.Show(HelperMethods.GetText(Text.UpdateModButtonWrongMod, currentProfile.Name).Replace("$SELECT", profile.Name),
+                                Text.WarningWindowTitle, MessageBoxButtons.OK);
                 abort = true;
             }
 
@@ -1031,7 +1034,7 @@ namespace AM2RLauncher
             }
 
             log.Info("Successfully updated mod profile " + profile.Name + ".");
-            MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", currentProfile.Name), Language.Text.SuccessWindowTitle);
+            MessageBox.Show(HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, currentProfile.Name), Text.SuccessWindowTitle);
             UpdateStateMachine();
 
             LoadProfilesAndAdjustLists();
@@ -1059,7 +1062,7 @@ namespace AM2RLauncher
             {
                 case UpdateState.Downloading:
                 {
-                    var result = MessageBox.Show(Language.Text.CloseOnCloningText, Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                    var result = MessageBox.Show(Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
                                                  MessageBoxType.Warning, MessageBoxDefaultButton.No);
                     if (result == DialogResult.No)
                     {
@@ -1071,7 +1074,7 @@ namespace AM2RLauncher
                     break;
                 }
                 case UpdateState.Installing:
-                    MessageBox.Show(Language.Text.CloseOnInstallingText, Language.Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
+                    MessageBox.Show(Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
                     e.Cancel = true;
                     break;
             }

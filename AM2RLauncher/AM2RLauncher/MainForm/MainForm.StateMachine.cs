@@ -2,6 +2,7 @@
 using System;
 using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
+using AM2RLauncher.Language;
 
 namespace AM2RLauncher
 {
@@ -81,7 +82,7 @@ namespace AM2RLauncher
 
             // Our default values
             apkButton.Enabled = false;
-            apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
+            apkButton.ToolTip = Text.ApkButtonDisabledToolTip;
 
             // If profile supports Android and if we are NOT already creating an APK...
             if (!IsProfileIndexValid())
@@ -101,7 +102,7 @@ namespace AM2RLauncher
                 case UpdateState.Playing: return;
 
                 case UpdateState.Install:
-                case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
             }
         }
 
@@ -167,19 +168,19 @@ namespace AM2RLauncher
             settingsProfileDropDown.Enabled = enabled;
             profileButton.Enabled = enabled;
             //TODO: these .replace($NAME) are in a lot of places, replace them with some fuction.
-            profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", selectedProfileName);
+            profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, selectedProfileName);
             saveButton.Enabled = enabled;
-            saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", selectedProfileName);
+            saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, selectedProfileName);
             addModButton.Enabled = enabled;
-            addModButton.ToolTip = Language.Text.AddNewModToolTip;
+            addModButton.ToolTip = Text.AddNewModToolTip;
 
             // Only enable these, when we're not on the community updates
             if (settingsProfileDropDown.SelectedIndex > 0)
             {
                 updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
-                updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", selectedProfileName);
+                updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, selectedProfileName);
                 deleteModButton.Enabled = enabled;
-                deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", selectedProfileName);
+                deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, selectedProfileName);
             }
 
             Color col = enabled ? colGreen : colInactive;
@@ -203,13 +204,13 @@ namespace AM2RLauncher
             string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
-                case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonDownloadToolTip; break;
-                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
-                case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonSelect11ToolTip; break;
-                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break;
-                case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonInstallingToolTip; break;
-                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonPlayToolTip.Replace("$NAME", profileName); break;
-                case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonPlayingToolTip; break;
+                case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonDownloadToolTip; break;
+                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Text.PlayButtonDownladingToolTip; break;
+                case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonSelect11ToolTip; break;
+                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName); break;
+                case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Text.PlayButtonInstallingToolTip; break;
+                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName); break;
+                case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Text.PlayButtonPlayingToolTip; break;
             }
             playButton.Text = GetPlayButtonText();
 
@@ -241,13 +242,13 @@ namespace AM2RLauncher
         {
             switch (updateState)
             {
-                case UpdateState.Download: return Language.Text.Download;
-                case UpdateState.Downloading: return Language.Text.Abort;
-                case UpdateState.Select11: return Language.Text.Select11;
-                case UpdateState.Install: return Language.Text.Install;
-                case UpdateState.Installing: return Language.Text.Installing;
-                case UpdateState.Play: return Language.Text.Play;
-                case UpdateState.Playing: return Language.Text.Playing;
+                case UpdateState.Download: return Text.Download;
+                case UpdateState.Downloading: return Text.Abort;
+                case UpdateState.Select11: return Text.Select11;
+                case UpdateState.Install: return Text.Install;
+                case UpdateState.Installing: return Text.Installing;
+                case UpdateState.Play: return Text.Play;
+                case UpdateState.Playing: return Text.Playing;
                 default: return null;
             }
         }
@@ -260,8 +261,8 @@ namespace AM2RLauncher
         {
             switch (apkButtonState)
             {
-                case ApkButtonState.Create: return Language.Text.CreateAPK;
-                case ApkButtonState.Creating: return Language.Text.CreatingAPK;
+                case ApkButtonState.Create: return Text.CreateAPK;
+                case ApkButtonState.Creating: return Text.CreatingAPK;
                 default: return null;
             }
         }
@@ -287,9 +288,9 @@ namespace AM2RLauncher
                 {
                     //TODO: localizations
                     if (profile.Name.Contains("Community Updates"))
-                        profile.ProfileNotes = Language.Text.ArchiveNotesCommunityUpdates;
+                        profile.ProfileNotes = Text.ArchiveNotesCommunityUpdates;
                     else
-                        profile.ProfileNotes = Language.Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
+                        profile.ProfileNotes = Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
                 }
 
                 profileDropDown.Items.Add(profile.Name);
@@ -323,8 +324,8 @@ namespace AM2RLauncher
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
             {
-                profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-                profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+                profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+                profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
             }
 
             log.Info("Reloading UI components after loading successful.");

@@ -1,5 +1,6 @@
 ﻿using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
+using AM2RLauncher.Language;
 using Eto.Drawing;
 using Eto.Forms;
 using log4net;
@@ -134,7 +135,7 @@ namespace AM2RLauncher
             log.Info("Beginning UI initialization...");
 
             // System tray indicator
-            showButton = new ButtonMenuItem { Text = Language.Text.TrayButtonShow };
+            showButton = new ButtonMenuItem { Text = Text.TrayButtonShow };
             trayIndicator = new TrayIndicator
             {
                 Menu = new ContextMenu(showButton),
@@ -189,8 +190,8 @@ namespace AM2RLauncher
             foreach (var mirror in mirrorList)
             {
                 string text = mirror;
-                if (text.Contains("github.com")) text = Language.Text.MirrorGithubText;
-                else if (text.Contains("gitlab.com")) text = Language.Text.MirrorGitlabText;
+                if (text.Contains("github.com")) text = Text.MirrorGithubText;
+                else if (text.Contains("gitlab.com")) text = Text.MirrorGitlabText;
                 mirrorDescriptionList.Add(new ListItem() { Key = mirror, Text = text });
             }
             #endregion
@@ -246,7 +247,7 @@ namespace AM2RLauncher
             // APK button
             apkButton = new ColorButton
             {
-                Text = Language.Text.CreateAPK,
+                Text = Text.CreateAPK,
                 Height = 40,
                 Width = 250,
                 TextColor = colGreen,
@@ -286,7 +287,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 15,
-                Text = Language.Text.CurrentProfile,
+                Text = Text.CurrentProfile,
                 TextColor = colGreen
             };
 
@@ -315,7 +316,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 16,
-                Text = Language.Text.Author + " ",
+                Text = Text.Author + " ",
                 TextColor = colGreen
             };
 
@@ -325,7 +326,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 16,
-                Text = Language.Text.VersionLabel + " ",
+                Text = Text.VersionLabel + " ",
                 TextColor = colGreen
             };
 
@@ -337,7 +338,7 @@ namespace AM2RLauncher
                 BackgroundColor = colBG,
                 Width = 20,
                 Height = 55,
-                Text = Language.Text.SaveLocationWarning,
+                Text = Text.SaveLocationWarning,
                 TextColor = colRed
             };
 
@@ -345,16 +346,16 @@ namespace AM2RLauncher
 
 
             // Social buttons
-            var redditButton = new ImageButton { ToolTip = Language.Text.RedditToolTip, Image = redditIcon };
+            var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
             redditButton.Click += RedditIconOnClick;
 
-            var githubButton = new ImageButton { ToolTip = Language.Text.GithubToolTip, Image = githubIcon };
+            var githubButton = new ImageButton { ToolTip = Text.GithubToolTip, Image = githubIcon };
             githubButton.Click += GithubIconOnClick;
 
-            var youtubeButton = new ImageButton { ToolTip = Language.Text.YoutubeToolTip, Image = youtubeIcon };
+            var youtubeButton = new ImageButton { ToolTip = Text.YoutubeToolTip, Image = youtubeIcon };
             youtubeButton.Click += YoutubeIconOnClick;
 
-            var discordButton = new ImageButton { ToolTip = Language.Text.DiscordToolTip, Image = discordIcon };
+            var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
             discordButton.Click += DiscordIconOnClick;
 
 
@@ -395,7 +396,7 @@ namespace AM2RLauncher
             mainPage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
-                Text = Language.Text.PlayTab,
+                Text = Text.PlayTab,
                 Content = drawable
             };
             #endregion
@@ -411,14 +412,14 @@ namespace AM2RLauncher
 
             changelogNoConnectionLabel = new Label
             {
-                Text = Language.Text.NoInternetConnection,
+                Text = Text.NoInternetConnection,
                 TextColor = colGreen
             };
 
             changelogPage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
-                Text = Language.Text.ChangelogTab,
+                Text = Text.ChangelogTab,
 
                 Content = new TableLayout
                 {
@@ -442,13 +443,13 @@ namespace AM2RLauncher
 
             newsNoConnectionLabel = new Label
             {
-                Text = Language.Text.NoInternetConnection,
+                Text = Text.NoInternetConnection,
                 TextColor = colGreen
             };
 
             newsPage = new TabPage
             {
-                Text = Language.Text.NewsTab,
+                Text = Text.NewsTab,
                 BackgroundColor = colBGNoAlpha,
 
                 Content = new TableLayout
@@ -492,7 +493,7 @@ namespace AM2RLauncher
             // LanguageLabel
             languageLabel = new Label
             {
-                Text = Language.Text.LanguageNotice,
+                Text = Text.LanguageNotice,
                 TextColor = colGreen
             };
 
@@ -500,7 +501,7 @@ namespace AM2RLauncher
 
             List<ListItem> languageList = new List<ListItem>
             {
-                Language.Text.SystemLanguage,
+                Text.SystemLanguage,
                 "Deutsch",
                 "English",
                 "Español",
@@ -535,7 +536,7 @@ namespace AM2RLauncher
             autoUpdateAM2RCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
-                Text = Language.Text.AutoUpdateAM2R,
+                Text = Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
 
@@ -544,7 +545,7 @@ namespace AM2RLauncher
             autoUpdateLauncherCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
-                Text = Language.Text.AutoUpdateLauncher,
+                Text = Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
 
@@ -552,7 +553,7 @@ namespace AM2RLauncher
             hqMusicPCCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
-                Text = Language.Text.HighQualityPC,
+                Text = Text.HighQualityPC,
                 TextColor = colGreen
             };
 
@@ -560,7 +561,7 @@ namespace AM2RLauncher
             hqMusicAndroidCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
-                Text = Language.Text.HighQualityAndroid,
+                Text = Text.HighQualityAndroid,
                 TextColor = colGreen
             };
 
@@ -568,7 +569,7 @@ namespace AM2RLauncher
             profileDebugLogCheck = new CheckBox
             {
                 Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
-                Text = Language.Text.ProfileDebugCheckBox,
+                Text = Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
 
@@ -578,7 +579,7 @@ namespace AM2RLauncher
             {
                 customEnvVarLabel = new Label
                 {
-                    Text = Language.Text.CustomEnvVarLabel,
+                    Text = Text.CustomEnvVarLabel,
                     TextColor = colGreen
                 };
             }
@@ -598,7 +599,7 @@ namespace AM2RLauncher
             // Mirror list
             mirrorLabel = new Label
             {
-                Text = Language.Text.DownloadSource,
+                Text = Text.DownloadSource,
                 TextColor = colGreen
             };
 
@@ -621,7 +622,7 @@ namespace AM2RLauncher
             customMirrorCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
-                Text = Language.Text.CustomMirrorCheck,
+                Text = Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
 
@@ -641,7 +642,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBGNoAlpha,
                 Content = settingsLayout,
-                Text = Language.Text.LauncherSettingsTab
+                Text = Text.LauncherSettingsTab
             };
 
             #endregion
@@ -655,7 +656,7 @@ namespace AM2RLauncher
             addModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.AddNewMod,
+                Text = Text.AddNewMod,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -672,7 +673,7 @@ namespace AM2RLauncher
 
             settingsProfileLabel = new Label
             {
-                Text = Language.Text.CurrentProfile,
+                Text = Text.CurrentProfile,
                 TextColor = colGreen,
                 Width = 275
             };
@@ -692,7 +693,7 @@ namespace AM2RLauncher
             profileButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.OpenProfileFolder,
+                Text = Text.OpenProfileFolder,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -705,7 +706,7 @@ namespace AM2RLauncher
             saveButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.OpenSaveFolder,
+                Text = Text.OpenSaveFolder,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -718,7 +719,7 @@ namespace AM2RLauncher
             updateModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.UpdateModButtonText,
+                Text = Text.UpdateModButtonText,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -731,7 +732,7 @@ namespace AM2RLauncher
             deleteModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.DeleteModButtonText,
+                Text = Text.DeleteModButtonText,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -749,7 +750,7 @@ namespace AM2RLauncher
                 SpellCheck = false,
                 Width = 275,
                 Height = 150,
-                Text = Language.Text.ProfileNotes
+                Text = Text.ProfileNotes
             };
 
             profileLayout.BeginHorizontal();
@@ -761,7 +762,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBGNoAlpha,
                 Content = profileLayout,
-                Text = Language.Text.ProfileSettingsTab
+                Text = Text.ProfileSettingsTab
             };
 
             #endregion
