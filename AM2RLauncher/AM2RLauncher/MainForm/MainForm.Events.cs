@@ -682,6 +682,7 @@ namespace AM2RLauncher
             // Get drawing variables
             float height = drawable.Height;
             float width = drawable.Width;
+            //TODO: apparently winforms is the big outlier here. Works normal on wpf, I have *no* idea why, investigate and submit issue at eto
             float scaleDivisor = OS.IsWindows ? 955f : 715f; // Magic brute-forced values. Don't ask questions, because we don't have answers >_>
                                                                     // Also, seems like nix systems share the same scaleDivisor. Again, don't ask.
             float scale = height / scaleDivisor;

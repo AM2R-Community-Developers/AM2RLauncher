@@ -390,6 +390,7 @@ namespace AM2RLauncher
 
             #region TABS
 
+            #region MAIN PAGE
             // [MAIN PAGE]
             mainPage = new TabPage
             {
@@ -397,9 +398,10 @@ namespace AM2RLauncher
                 Text = Language.Text.PlayTab,
                 Content = drawable
             };
+            #endregion
 
+            #region CHANGELOG PAGE
             // [CHANGELOG]
-
             changelogUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/changelog.html");
 
             changelogWebView = new WebView { Url = changelogUri };
@@ -426,6 +428,10 @@ namespace AM2RLauncher
                     }
                 }
             };
+
+            #endregion
+
+            #region NEWS PAGE
 
             // [NEWS]
             newsUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/news.html");
@@ -475,6 +481,10 @@ namespace AM2RLauncher
                     }
                 };
             }
+
+            #endregion
+
+            #region SETTINGS PAGE
 
             // [LAUNCHER SETTINGS]
             DynamicLayout settingsLayout = new DynamicLayout();
@@ -634,8 +644,11 @@ namespace AM2RLauncher
                 Text = Language.Text.LauncherSettingsTab
             };
 
-            // [MOD SETTINGS]
+            #endregion
 
+            #region MODSETTINGS PAGE
+
+            // [MOD SETTINGS]
             DynamicLayout profileLayout = new DynamicLayout();
 
 
@@ -750,6 +763,8 @@ namespace AM2RLauncher
                 Content = profileLayout,
                 Text = Language.Text.ProfileSettingsTab
             };
+
+            #endregion
 
             #endregion
 
