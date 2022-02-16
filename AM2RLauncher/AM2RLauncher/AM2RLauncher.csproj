@@ -2,6 +2,7 @@
 	
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	<LangVersion>latest</LangVersion>
     <ApplicationIcon>Resources\LauncherIcon.ico</ApplicationIcon>
     <Authors>Lojemiru, Miepee</Authors>
     <Company>AM2R-Community-Developers</Company>
