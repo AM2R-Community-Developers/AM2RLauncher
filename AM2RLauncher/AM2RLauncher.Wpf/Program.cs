@@ -4,6 +4,7 @@ using log4net.Config;
 using System;
 using System.IO;
 using System.Reflection;
+using log4net.Repository.Hierarchy;
 
 namespace AM2RLauncher.Wpf;
 
@@ -34,6 +35,11 @@ internal static class MainClass
 
         // Configure logger
         XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
+
+        // if we're on debug, always set loglevel to debug
+        #if DEBUG
+        ((Logger)log.Logger).Level = log4net.Core.Level.Debug;
+        #endif
 
         //Log Wine
         if (Core.Core.IsThisRunningFromWine)

@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>Crea un APK per $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>Questo è un archivio di un Aggiornamento Comunità installato in precedenza. Non può essere reinstallato e si rimuoverà da solo se i file di gioco saranno cancellati. Condivide i salvataggi con gli Aggiornamenti Comunità, quindi assicurati di creare un backup dei tuoi salvataggi prima di usare questo profilo!</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -379,5 +379,11 @@ Procedi con cautela.</value>
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>Il Zip selezionato non è AM2R 1.1! Perfavore scegli un altro file Zip.</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>Vuoi archiviare $NAME?</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>Questo è un archivio di una Mod precedentemente installata. Non può essere re-installata e si rimuoverà da sola se i suoi file di gioco vengono rimossi.</value>
   </data>
 </root>

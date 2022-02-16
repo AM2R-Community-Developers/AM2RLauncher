@@ -39,7 +39,7 @@ On Arch Linux you can install them by running this:
 
 ### Fedora
 On Fedora you can install them by running this command:  
-`dnf install dotnet-runtime-6.0 libappindicator-gtk3 xdelta mesa-libGL.i686 pulseaudio-libs.1686 openal-soft.i686`
+`sudo dnf install dotnet-runtime-6.0 libappindicator-gtk3 xdelta mesa-libGL.i686 pulseaudio-libs.1686 openal-soft.i686 java-latest-openjdk`
 
 ### Other distros
 For other distros refer to your local package manager for instructions.   

@@ -2,6 +2,7 @@
 using LibGit2Sharp;
 using log4net;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -47,10 +48,12 @@ public static class Profile
     /// <summary>
     /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
     /// </summary>
-    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-    public static bool Is11Installed()
+    /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated</param>
+    /// <returns></returns>
+    public static bool Is11Installed(bool invalidateCache = false)
     {
-        InvalidateAM2R11InstallCache();
+        // Only invalidate if we need to
+        if (invalidateCache) InvalidateAM2R11InstallCacheIfNecessary();
 
         // If we have a cache, return that instead
         if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
@@ -73,9 +76,9 @@ public static class Profile
     }
 
     /// <summary>
-    /// Invalidates <see cref="isAM2R11InstalledCache"/>.
+    /// Invalidates <see cref="isAM2R11InstalledCache"/> if necessary.
     /// </summary>
-    private static void InvalidateAM2R11InstallCache()
+    private static void InvalidateAM2R11InstallCacheIfNecessary()
     {
         // If the file exists, and its hash matches with ours, don't invalidate
         if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
@@ -121,6 +124,141 @@ public static class Profile
             }
         }
         log.Info("Repository pulled successfully.");
+    }
+
+    /// <summary>
+    /// Scans the PatchData and Mods folders for valid profile entries, creates and returns a list of them.
+    /// </summary>
+    /// <returns>A <see cref="List{ProfileXML}"/> containing all valid profile entries.</returns>
+    public static List<ProfileXML> LoadProfiles()
+    {
+        log.Info("Loading profiles...");
+
+        List<ProfileXML> profileList = new List<ProfileXML>();
+
+        // Check for and add the Community Updates profile
+        if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
+        {
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"));
+            profile.DataPath = "/PatchData/data";
+            profileList.Add(profile);
+        }
+
+        // Safety check to generate the Mods folder if it does not exist
+        if (!Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods"))
+            Directory.CreateDirectory(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+        // Get Mods folder info
+        DirectoryInfo modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods");
+
+        // Add all extracted profiles in Mods to the profileList.
+        foreach (DirectoryInfo dir in modsDir.GetDirectories())
+        {
+            // If no profile.xml exists we don't add anything
+            if (!File.Exists(dir.FullName + "/profile.xml"))
+                continue;
+
+            ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText(dir.FullName + "/profile.xml"));
+            // Safety check for non-installable profiles
+            if (prof.Installable || IsProfileInstalled(prof))
+            {
+                prof.DataPath = "/Mods/" + dir.Name;
+                profileList.Add(prof);
+            }
+            // If not installable and isn't installed, remove it
+            else if (!IsProfileInstalled(prof))
+            {
+                prof.DataPath = "/Mods/" + dir.Name;
+                DeleteProfile(prof);
+            }
+        }
+
+        log.Info("Loaded " + profileList.Count + " profile(s).");
+        return profileList;
+    }
+
+    /// <summary>
+    /// Archives a given Profile by making a copy with "Name (version)". Does silently nothing if user archives already exist
+    /// </summary>
+    /// <param name="profile">The profile to archive</param>
+    public static void ArchiveProfile(ProfileXML profile)
+    {
+        // temporarily serialize and deserialize to essentially "clone" the variable as otherwise we'd modify references
+        File.WriteAllText(Path.GetTempPath() + "/" + profile.Name, Serializer.Serialize<ProfileXML>(profile));
+        profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(Path.GetTempPath() + "/" + profile.Name));
+
+        string originalName = profile.Name;
+        // Change name to include version and be unique
+        profile.Name += " (" + profile.Version + ")";
+        // if we're archiving community updates, remove the "latest" part
+        profile.Name = profile.Name.Replace("Community Updates Latest", "Community Updates");
+
+        log.Info("Archiving " + profile.Name);
+
+        string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+
+        // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
+        if (!Directory.Exists(profileArchivePath))
+        {
+            // Rename current profile if we have it installed
+            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName))
+                Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName, profileArchivePath);
+
+            // Set as non-installable so that it's just treated as a launching reference
+            profile.Installable = false;
+
+            string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + profile.Name;
+
+            // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
+            if (!Directory.Exists(modArchivePath))
+            {
+                Directory.CreateDirectory(modArchivePath);
+                File.WriteAllText(modArchivePath + "/profile.xml", Serializer.Serialize<ProfileXML>(profile));
+                log.Info("Finished archival.");
+            }
+            else
+            {
+                HelperMethods.DeleteDirectory(profileArchivePath);
+                log.Info("Cancelling archival! User-defined archive in Mods already exists.");
+            }
+        }
+        // If our desired rename already exists, it's probably a user archive... so we just delete the original folder and move on with installation of the new version.
+        else
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName);
+            log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
+        }
+    }
+
+    /// <summary>
+    /// Deletes a profile from the Mods and Profiles folder.
+    /// </summary>
+    /// <param name="profile">The profile to delete.</param>
+    public static void DeleteProfile(ProfileXML profile)
+    {
+        log.Info("Attempting to delete profile " + profile.Name + "...");
+
+        // Delete folder in Mods
+        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
+        }
+
+        // Delete the zip file in Mods
+        if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
+        {
+            // For some reason, it was set at read only, so we undo that here
+            File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal);
+            File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
+        }
+
+        // Delete folder in Profiles
+        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+        {
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+        }
+
+        log.Info("Successfully deleted profile " + profile.Name + ".");
     }
 
     /// <summary>
@@ -308,8 +446,9 @@ public static class Profile
             foreach (var file in new DirectoryInfo(profilePath).GetFiles())
                 if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
                     File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
-            // Loading custom fonts crashes on Mac, so we delete those
-            Directory.Delete(profilePath + "/lang/fonts", true);
+            // Loading custom fonts crashes on Mac, so we delete those if they exist
+            if (Directory.Exists(profilePath + "/lang/fonts"))
+                Directory.Delete(profilePath + "/lang/fonts", true);
             // Move Frameworks, Info.plist and PkgInfo over
             HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
             File.Copy(dataPath + "/Info.plist", profilePath.Replace("Resources", "") + "/Info.plist", true);
@@ -491,7 +630,7 @@ public static class Profile
         {
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            log.Info("Is the environment textbox null or whitespace = " + String.IsNullOrWhiteSpace(envVars));
+            log.Info("User does " + (String.IsNullOrWhiteSpace(envVars) ? "not" : "") + " have custom environment variables set.");
 
             //TODO: make this more readable at one day
             if (!String.IsNullOrWhiteSpace(envVars))
@@ -523,7 +662,7 @@ public static class Profile
                     string value = envVars.Substring(0, valueSubstringLength);
                     envVars = envVars.Substring(value.Length);
 
-                    log.Info("Adding variable \"" + variable + "\" with value \"" + value + "\"");
+                    log.Info("Adding user variable \"" + variable + "\" with value \"" + value + "\"");
                     startInfo.EnvironmentVariables[variable] = value;
                 }
             }
@@ -537,10 +676,10 @@ public static class Profile
 
             log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
 
-            log.Info("Launching game with following variables: ");
+            log.Debug("Launching game with following variables: ");
             foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
             {
-                log.Info("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
+                log.Debug("Key: \"" + item.Key + "\" Value: \"" + item.Value + "\"");
             }
 
             using (Process p = new Process())

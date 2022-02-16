@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>Создать APK-файл для $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>Этот архив содержит ранее установленное обновление сообщества. Оно не может быть переустановлено и автоматически удалится при удалении файлов игры. Оно имеет общие файлы сохранения с текущим обновлением сообщества, поэтому не забудьте создать копию сохранений перед запуском!</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -379,5 +379,11 @@
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>Указанный zip-файл не является файлом AM2R 1.1! Пожалуйста, выберите другой zip-файл.</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>Архивировать $NAME?</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>Это архив, содержащий ранее установленный мод. Он не может быть переустановлен, и, при удалении файлов игры, так же будет удалён.</value>
   </data>
 </root>

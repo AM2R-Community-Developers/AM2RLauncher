@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>APK erstellen für $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>Dies ist ein Archiv eines vorher installierten Community-Updates. Es kann nicht erneut installiert werden und wird automatisch entfernt wenn die archivierten Spieldaten gelöscht werden. Die Speicherstände sind allerdings weiterhin die aktuellen, bitte sicherheitshalber ein Backup anlegen vor dem benutzen dieses Profils!</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -379,5 +379,11 @@ Bitte äußerste Vorsicht walten lassen.</value>
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>Das ausgewählte Zip-Archiv ist nicht AM2R 1.1 oder falsch geformt! Bitte ein anderes Archiv auswählen.</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>$NAME archivieren?</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>Dies ist ein Archiv einer vorher installierten Mod. Es kann nicht erneut installiert werden und wird automatisch entfernt wenn die archivierten Spieldaten gelöscht werden.</value>
   </data>
 </root>

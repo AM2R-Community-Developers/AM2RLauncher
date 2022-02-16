@@ -31,7 +31,7 @@ namespace AM2RLauncher
         /// </summary>
         private async void PlayButtonLoadComplete(object sender, EventArgs e)
         {
-            LoadProfiles();
+            LoadProfilesAndAdjustLists();
             if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
                 return;
             
@@ -92,7 +92,7 @@ namespace AM2RLauncher
             {
                 progressBar.Visible = false;
                 progressLabel.Visible = false;
-                LoadProfiles();
+                LoadProfilesAndAdjustLists();
             }
 
             // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
@@ -104,47 +104,9 @@ namespace AM2RLauncher
                 if (currentXML.Version != profileList[0].Version)
                 {
                     log.Info("New game version (" + profileList[0].Version + ") detected! Beginning archival of version " + currentXML.Version + "...");
-
-                    string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (" + currentXML.Version + ")";
-
-                    // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
-                    if (!Directory.Exists(profileArchivePath))
-                    {
-                        // Rename current Community Updates
-                        Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)", profileArchivePath);
-
-                        currentXML.Name = "Community Updates (" + currentXML.Version + ")";
-
-                        // Set as non-installable so that it's just treated as a launching reference
-                        currentXML.Installable = false;
-                        currentXML.SupportsAndroid = false;
-
-                        string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + currentXML.Name;
-
-                        // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
-                        if (!Directory.Exists(modArchivePath))
-                        {
-                            Directory.CreateDirectory(modArchivePath);
-                            File.WriteAllText(modArchivePath + "/profile.xml", Serializer.Serialize<ProfileXML>(currentXML));
-                            log.Info("Finished archival.");
-                        }
-                        else
-                        {
-                            HelperMethods.DeleteDirectory(profileArchivePath);
-                            log.Info("Cancelling archival! User-defined archive in Mods already exists.");
-                        }
-
-
-                    }
-                    else // If our desired rename already exists, it's probably a user archive... so we just delete the folder and move on with installation of the new version.
-                    {
-                        HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)");
-                        log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
-                    }
-
+                    Profile.ArchiveProfile(currentXML);
                     profileDropDown.SelectedIndex = 0;
-
-                    LoadProfiles();
+                    LoadProfilesAndAdjustLists();
                 }
             }
 
@@ -159,6 +121,9 @@ namespace AM2RLauncher
         {
             // State Check
             UpdateStateMachine();
+
+            // Check if 1.1 is installed by forcing invalidation
+            Profile.Is11Installed(true);
 
             switch (updateState)
             {
@@ -240,7 +205,7 @@ namespace AM2RLauncher
                     SetPlayButtonState(UpdateState.Install);
 
                     // This needs to be run BEFORE the state check so that the Mod Settings tab doesn't weird out
-                    LoadProfiles();
+                    LoadProfilesAndAdjustLists();
 
                     // Do a state check
                     UpdateStateMachine();
@@ -438,7 +403,7 @@ namespace AM2RLauncher
                 progressBar.MaxValue = transferProgress.TotalObjects;
                 if (currentGitObject >= transferProgress.ReceivedObjects)
                     return;
-                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + (int)transferProgress.ReceivedBytes / 1000000 + "MB) / " + transferProgress.TotalObjects + " objects";
+                progressLabel.Text = Language.Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + ((int)transferProgress.ReceivedBytes / 1000000) + "MB) / " + transferProgress.TotalObjects + " objects";
                 currentGitObject = transferProgress.ReceivedObjects;
                 progressBar.Value = transferProgress.ReceivedObjects;
             });
@@ -461,7 +426,7 @@ namespace AM2RLauncher
                 return;
             }
             // Check if xdelta is installed on linux
-            if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+            if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
                 MessageBox.Show(Language.Text.XdeltaNotFound, Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
                 SetApkButtonState(ApkButtonState.Create);
@@ -537,8 +502,6 @@ namespace AM2RLauncher
         {
             log.Info("User requested to add mod. Requesting user input for new mod .zip...");
 
-            ProfileXML addedProfile;
-
             OpenFileDialog fileFinder = new OpenFileDialog
             {
                 Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
@@ -554,84 +517,81 @@ namespace AM2RLauncher
                 return;
             }
 
-            if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
-            {
-                log.Info("User selected \"" + fileFinder.FileName + "\"");
-
-                // If either a directory was selected or the file somehow went missing, cancel
-                if (!File.Exists(fileFinder.FileName))
-                {
-                    log.Error("Selected mod .zip file not found! Cancelling import.");
-                    return;
-                }
-
-                FileInfo modFile = new FileInfo(fileFinder.FileName);
-
-                string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
-                string extractedName = modFile.Name.Replace(".zip", "");
-
-                // Extract it and see if it contains a profile.xml. If not, this is invalid
-
-                // Check first, if the directory is already there, if yes, throw a message
-                if (Directory.Exists(modsDir + "/" + extractedName))
-                {
-                    ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
-                    log.Error("Mod is already imported as " + extractedName + "! Cancelling mod import.");
-
-                    MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile2.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
-                    return;
-                }
-                // Directory doesn't exist -> extract!
-                ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
-                log.Info("Imported and extracted mod .zip as " + extractedName);
-
-                // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
-                if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
-                {
-                    log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
-
-                    MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    Directory.Delete(modsDir + "/" + extractedName, true);
-                    File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
-                    return;
-                }
-
-                ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
-
-                // Check if the OS versions match
-                if (OS.Name != profile.OperatingSystem)
-                {
-                    log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
-
-                    MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
-                                    Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                    return;
-                }
-
-                // Check by *name*, if the mod was installed already
-                if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-                {
-                    log.Error(profile.Name + " is already installed.");
-                    MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
-                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                    return;
-                }
-
-                addedProfile = profile;
-                log.Info(profile.Name + " successfully installed.");
-                MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
-
-            }
-            else
+            if (String.IsNullOrWhiteSpace(fileFinder.FileName))
             {
                 log.Error("User did not supply valid input. Cancelling import.");
-                LoadProfiles();
+                LoadProfilesAndAdjustLists();
                 return;
             }
 
-            LoadProfiles();
-            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == addedProfile.Name);
+            log.Info("User selected \"" + fileFinder.FileName + "\"");
+
+            // If either a directory was selected or the file somehow went missing, cancel
+            if (!File.Exists(fileFinder.FileName))
+            {
+                log.Error("Selected mod .zip file not found! Cancelling import.");
+                return;
+            }
+
+            FileInfo modFile = new FileInfo(fileFinder.FileName);
+
+            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
+            string extractedName = modFile.Name.Replace(".zip", "");
+
+            // Extract it and see if it contains a profile.xml. If not, this is invalid
+
+            // Check first, if the directory is already there, if yes, throw a message
+            if (Directory.Exists(modsDir + "/" + extractedName))
+            {
+                ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
+                log.Error("Mod is already imported as " + extractedName + "! Cancelling mod import.");
+
+                MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile2.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                return;
+            }
+            // Directory doesn't exist -> extract!
+            ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
+            log.Info("Imported and extracted mod .zip as " + extractedName);
+
+            // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
+            if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
+            {
+                log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
+
+                MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                Directory.Delete(modsDir + "/" + extractedName, true);
+                File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
+                return;
+            }
+
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
+
+            // Check if the OS versions match
+            if (OS.Name != profile.OperatingSystem)
+            {
+                log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
+
+                MessageBox.Show(Language.Text.ModIsForWrongOS.Replace("$NAME", profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
+                                Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
+                return;
+            }
+
+            // Check by *name*, if the mod was installed already
+            if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+            {
+                log.Error(profile.Name + " is already installed.");
+                MessageBox.Show(Language.Text.ModIsAlreadyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.WarningWindowTitle, MessageBoxType.Warning);
+                HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
+                return;
+            }
+
+            log.Info(profile.Name + " successfully installed.");
+            MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
+
+            LoadProfilesAndAdjustLists();
+            // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
+            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
             if (settingsProfileDropDown.SelectedIndex == -1)
                 settingsProfileDropDown.SelectedIndex = 0;
         }
@@ -653,11 +613,10 @@ namespace AM2RLauncher
         /// </summary>
         private void SaveButtonClickEvent(object sender, EventArgs e)
         {
-            if (IsProfileIndexValid())
-            {
-                log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-                CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
-            }
+            if (!IsProfileIndexValid())
+                return;
+            log.Info("User opened the save directory for profile " + profileList[settingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
+            CrossPlatformOperations.OpenFolder(profileList[settingsProfileDropDown.SelectedIndex].SaveLocation);
         }
 
         /// <summary>
@@ -680,7 +639,8 @@ namespace AM2RLauncher
             {
                 deleteModButton.Enabled = true;
                 deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
-                updateModButton.Enabled = true;
+                // On non-installable profiles we want to disable updating
+                updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
                 updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
             }
 
@@ -775,20 +735,18 @@ namespace AM2RLauncher
             if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
 
             profileIndex = profileDropDown.SelectedIndex;
-            log.Info("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
+            log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
 
             profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
-                profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
+                                                       profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
                 saveWarningLabel.Visible = true;
             else
                 saveWarningLabel.Visible = false;
 
             UpdateStateMachine();
-            
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>
@@ -940,7 +898,7 @@ namespace AM2RLauncher
             if (result == DialogResult.Ok)
             {
                 log.Info("User did not cancel. Proceeding to delete " + profile);
-                DeleteProfile(profile);
+                DeleteProfileAndAdjustLists(profile);
                 log.Info(profile + " has been deleted");
                 MessageBox.Show(Language.Text.DeleteModButtonSuccess.Replace("$NAME", profile.Name), Language.Text.SuccessWindowTitle);
             }
@@ -977,88 +935,107 @@ namespace AM2RLauncher
                 return;
             }
 
-            if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
+            // Exit if nothing was selected
+            if (String.IsNullOrWhiteSpace(fileFinder.FileName))
             {
-                log.Info("User selected \"" + fileFinder.FileName + "\"");
-
-                // If either a directory was selected or the file somehow went missing, cancel
-                if (!File.Exists(fileFinder.FileName))
-                {
-                    log.Error("Selected mod .zip file not found! Cancelling mod update.");
-                    return;
-                }
-
-                FileInfo modFile = new FileInfo(fileFinder.FileName);
-
-                string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
-                string extractedName = modFile.Name.Replace(".zip", "_new");
-
-                // Extract it and see if it contains a profile.xml. If not, this is invalid
-
-                // Directory doesn't exist -> extract!
-                ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
-
-                // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
-                if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
-                {
-                    log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
-                    MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
-                    Directory.Delete(modsDir + "/" + extractedName, true);
-                    File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
-                    return;
-                }
-
-                // Check by *name*, if the mod was installed already
-                ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
-
-                if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-                {
-                    // Mod is already installed, so we can update!
-                    DialogResult result = MessageBox.Show(Language.Text.UpdateModWarning.Replace("$NAME", currentProfile.Name), Language.Text.WarningWindowTitle,
-                                                          MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
-
-                    if (result == DialogResult.Ok)
-                    {
-                        // Delete profile
-                        DeleteProfile(currentProfile);
-
-                        // Rename directory to take the old one's place
-                        string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");
-                        Directory.Move(modsDir + "/" + extractedName, originalFolder);
-
-                    }
-                    else // Cancel the operation!
-                    {
-                        log.Error("User has cancelled mod update!");
-                        abort = true;
-                    }
-                }
-                else
-                {
-                    // Cancel the operation!
-                    // Show message to tell user that mod could not be found, install this separately
-                    log.Error("Mod is not installed! Cancelling mod update.");
-                    MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name),
-                                    Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
-                    abort = true;
-                }
-
-                if (abort)
-                {
-                    // File cleanup
-                    HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                    LoadProfiles();
-                    return;
-                }
-
-                log.Info("Successfully updated mod profile " + profile.Name + ".");
-                MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", currentProfile.Name), Language.Text.SuccessWindowTitle);
-                UpdateStateMachine();
+                log.Info("Nothing was selected, cancelling mod update.");
+                LoadProfilesAndAdjustLists();
+                return;
             }
 
-            ProfileXML currentSelectedProfile = profileList[settingsProfileDropDown.SelectedIndex];
-            LoadProfiles();
-            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentSelectedProfile.Name);
+            log.Info("User selected \"" + fileFinder.FileName + "\"");
+
+            // If either a directory was selected or the file somehow went missing, cancel
+            if (!File.Exists(fileFinder.FileName))
+            {
+                log.Error("Selected mod .zip file not found! Cancelling mod update.");
+                return;
+            }
+
+            FileInfo modFile = new FileInfo(fileFinder.FileName);
+
+            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
+            string extractedName = modFile.Name.Replace(".zip", "_new");
+            string extractedFolder = modsDir + "/" + extractedName;
+
+            // Extract it and see if it contains a profile.xml. If not, this is invalid
+
+            // If for some reason old files remain, delete them
+            if (Directory.Exists(extractedFolder))
+                Directory.Delete(extractedFolder, true);
+
+            // Directory doesn't exist -> extract!
+            ZipFile.ExtractToDirectory(fileFinder.FileName, extractedFolder);
+
+            // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
+            if (!File.Exists(extractedFolder + "/profile.xml"))
+            {
+                log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
+                MessageBox.Show(Language.Text.ModIsInvalidMessage.Replace("$NAME", extractedName), Language.Text.ErrorWindowTitle, MessageBoxType.Error);
+                Directory.Delete(extractedFolder, true);
+                File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
+                return;
+            }
+
+            // Check by *name*, if the mod was installed already
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedFolder + "/profile.xml"));
+
+            if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+            {
+                // Mod is already installed, so we can update!
+                DialogResult updateResult = MessageBox.Show(Language.Text.UpdateModWarning.Replace("$NAME", currentProfile.Name), Language.Text.WarningWindowTitle,
+                                                      MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
+
+                if (updateResult == DialogResult.Ok)
+                {
+                    // If the profile isn't installed, don't ask about archiving it
+                    if (Profile.IsProfileInstalled(currentProfile))
+                    {
+                        //TODO: localize
+                        DialogResult archiveResult = MessageBox.Show(Language.Text.ArchiveMod.Replace("$NAME", currentProfile.Name + " " + Language.Text.VersionLabel + currentProfile.Version), Language.Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+
+                        // User wants to archive profile
+                        if (archiveResult == DialogResult.Yes)
+                            ArchiveProfileAndAdjustLists(currentProfile);
+                    }
+                    // Now we delete the profile
+                    DeleteProfileAndAdjustLists(currentProfile);
+
+                    // Rename directory to take the old one's place
+                    string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");
+                    Directory.Move(extractedFolder, originalFolder);
+                }
+                else // Cancel the operation!
+                {
+                    log.Error("User has cancelled mod update!");
+                    abort = true;
+                }
+            }
+            else
+            {
+                // Cancel the operation!
+                // Show message to tell user that mod could not be found, install this separately
+                log.Error("Mod is not installed! Cancelling mod update.");
+                MessageBox.Show(Language.Text.UpdateModButtonWrongMod.Replace("$NAME", currentProfile.Name).Replace("$SELECT", profile.Name),
+                                Language.Text.WarningWindowTitle, MessageBoxButtons.OK);
+                abort = true;
+            }
+
+            if (abort)
+            {
+                // File cleanup
+                HelperMethods.DeleteDirectory(extractedFolder);
+                LoadProfilesAndAdjustLists();
+                return;
+            }
+
+            log.Info("Successfully updated mod profile " + profile.Name + ".");
+            MessageBox.Show(Language.Text.ModSuccessfullyInstalledMessage.Replace("$NAME", currentProfile.Name), Language.Text.SuccessWindowTitle);
+            UpdateStateMachine();
+
+            LoadProfilesAndAdjustLists();
+
+            settingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentProfile.Name);
             if (settingsProfileDropDown.SelectedIndex == -1)
                 settingsProfileDropDown.SelectedIndex = 0;
         }
@@ -1075,6 +1052,7 @@ namespace AM2RLauncher
             CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
             CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
             CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
+            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             switch (updateState)
             {

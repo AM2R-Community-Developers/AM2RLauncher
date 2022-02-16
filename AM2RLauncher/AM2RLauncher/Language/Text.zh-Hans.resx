@@ -132,8 +132,8 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>为 $NAME 创建 APK</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
-    <value>这是先前安装过的社区更新版本的压缩文件，因此无法再重新安装一遍，并且在游戏文件被删除后也会自行删除。由于与当前安装的社区更新版本共用保存数据，所以请在运行该游戏实例前备份好保存数据！</value>
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
+    <value>此为以前安装过的社区更新版本的归档，无法重新安装，若对应的游戏文件被删除，该归档也会自行删除。由于和当前安装的社区更新版本共用保存数据，所以请在运行该游戏实例前备份好保存数据！</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>作者：</value>
@@ -381,5 +381,11 @@
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>选定的文件不是 AM2R_1.1 ！请选择其他 Zip 文件</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>是否要归档 $NAME？</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>此为以前安装过的 Mod 的归档，无法重新安装，若对应的游戏文件被删除，该归档也会自行删除。</value>
   </data>
 </root>

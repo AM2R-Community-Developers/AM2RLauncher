@@ -132,7 +132,7 @@
   <data name="ApkButtonEnabledToolTip" xml:space="preserve">
     <value>次のAPKを作成します： $NAME</value>
   </data>
-  <data name="ArchiveNotes" xml:space="preserve">
+  <data name="ArchiveNotesCommunityUpdates" xml:space="preserve">
     <value>これは以前インストールされたCommunity Updateのアーカイブです。再インストールはできませんし、ゲームファイルが削除されると自動的に削除されます。現在インストールされているCommunity Updateとセーブデータを共有しているため、このプロファイルを実行する前に必ずセーブデータのバックアップを作成してください</value>
   </data>
   <data name="Author" xml:space="preserve">
@@ -379,5 +379,11 @@
   </data>
   <data name="ZipIsNotAM2R11" xml:space="preserve">
     <value>そのZIPファイルはAM2R v1.1ではありません！ 別のZIPファイルを選んで下さい</value>
+  </data>
+  <data name="ArchiveMod" xml:space="preserve">
+    <value>$NAMEをアーカイブ化しますか？</value>
+  </data>
+  <data name="ArchiveNotesMods" xml:space="preserve">
+    <value>これは既にインストールされているMODです。再インストールはできず、またゲームファイルを削除すると自動的に削除されます。</value>
   </data>
 </root>

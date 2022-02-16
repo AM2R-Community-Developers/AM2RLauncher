@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 
 namespace AM2RLauncher.Core;
@@ -18,10 +18,12 @@ public static class Splash
         "Now with 100% more Blob Throwers!",
         "Speedrun THIS, I dare you.",
         "The broken pipe is a lie.",
+        "I am altering the broken pipe. Pray I don't alter it any further.",
         "Overcommitting to April Fool's since 2018.",
         "Also try Metroid II: Return of Samus!",
         "Also try Metroid: Samus Returns!",
         "Also try Prime 2D!",
+        "Also try Skippy the Bot!",
         "Trust me, it's an 'unintentional feature.'",
         "Coming soon to a PC near you!",
         "This ain't your parents' Metroid 2!",
@@ -42,7 +44,8 @@ public static class Splash
         "S P I D E R B A L L",
         "Fun is infinite with Community-Developers Inc.",
         "You may only proceed if you wear baggy pants.",
-        "Did you know that games take time to develop?"
+        "Did you know that games take time to develop?",
+        "Ask the wombat."
     };
 
     /// <summary>
