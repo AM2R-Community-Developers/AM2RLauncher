@@ -995,7 +995,6 @@ namespace AM2RLauncher
                     // If the profile isn't installed, don't ask about archiving it
                     if (Profile.IsProfileInstalled(currentProfile))
                     {
-                        //TODO: localize
                         DialogResult archiveResult = MessageBox.Show(HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
 
                         // User wants to archive profile

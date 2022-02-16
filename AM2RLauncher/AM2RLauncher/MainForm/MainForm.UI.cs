@@ -938,7 +938,7 @@ namespace AM2RLauncher
         /// <summary>A <see cref="DropDown"/> where profiles can be chosen.</summary>
         private DropDown profileDropDown;
         /// <summary>A <see cref="DropDown"/> where profiles can be chosen (located in Profile Settings).</summary>
-        //TODO: having a second profiledropdown is technically unnecessary since they're supposed to mirror each other at (almost) all times.
+        //TODO: Use MVVM bindings: https://github.com/picoe/Eto/wiki/Data-Binding#mvvm-binding
         private DropDown modSettingsProfileDropDown;
 
         /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>

@@ -167,7 +167,6 @@ namespace AM2RLauncher
             settingsProfileLabel.TextColor = colGreen;
             modSettingsProfileDropDown.Enabled = enabled;
             profileButton.Enabled = enabled;
-            //TODO: these .replace($NAME) are in a lot of places, replace them with some fuction.
             profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, selectedProfileName);
             saveButton.Enabled = enabled;
             saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, selectedProfileName);
@@ -204,6 +203,7 @@ namespace AM2RLauncher
             string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
+                //TODO: seperate this into a "onenabledchanged" delegate?
                 case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonDownloadToolTip; break;
                 case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Text.PlayButtonDownladingToolTip; break;
                 case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonSelect11ToolTip; break;
@@ -286,7 +286,6 @@ namespace AM2RLauncher
                 // Archive version notes
                 if (!profile.Installable)
                 {
-                    //TODO: localizations
                     if (profile.Name.Contains("Community Updates"))
                         profile.ProfileNotes = Text.ArchiveNotesCommunityUpdates;
                     else
