@@ -818,8 +818,8 @@ namespace AM2RLauncher
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
             //TODO: Retest if these now work on mac
-            newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
-            changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
+            newsWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(newsPage, newsNoConnectionLabel);
+            changelogWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(changelogPage, changelogNoConnectionLabel);
 
             log.Info("Events linked successfully.");
 

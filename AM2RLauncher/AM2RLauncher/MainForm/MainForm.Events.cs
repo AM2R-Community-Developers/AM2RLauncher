@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 
 namespace AM2RLauncher
 {
+    //TODO: comment a bunch of this stuf for readability
+
     /// <summary>
     /// Methods for UI Events that get triggered go in here
     /// </summary>
@@ -54,7 +56,7 @@ namespace AM2RLauncher
                     log.Error("Druid PatchData corruption occurred!");
                     await Application.Instance.InvokeAsync(() =>
                     {
-                        MessageBox.Show(Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
                     });
                     HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                     return;
@@ -63,7 +65,7 @@ namespace AM2RLauncher
             catch (UserCancelledException ex) 
             {
                 log.Info(ex.Message);
-                MessageBox.Show(Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
                 HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
             }
             catch (LibGit2SharpException ex)   // This is for any exceptions from libgit
@@ -75,19 +77,19 @@ namespace AM2RLauncher
                     if (!(bool)autoUpdateAM2RCheck.Checked)
                     {
                         log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
-                        MessageBox.Show(Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
+                        MessageBox.Show(this, Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
                     }
                 }
                 else
                 {
                     log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                    MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                    MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
             }
             catch (Exception ex) // This is if somehow any other exception might get thrown as well.
             {
                 log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
             }
             finally
             {
@@ -171,12 +173,12 @@ namespace AM2RLauncher
                             ex.Message.ToLower().Contains("failed to resolve address"))
                         {
                             log.Error("Internet connection dropped while attempting to clone repository" + currentMirror + "!");
-                            MessageBox.Show(Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
+                            MessageBox.Show(this, Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
                         }
                         else
                         {
                             log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                            MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                            MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                             if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
                                 HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
                         }
@@ -185,7 +187,7 @@ namespace AM2RLauncher
                     catch (Exception ex)             // This is if somehow any other exception might get thrown as well.
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
 
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
                             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
@@ -217,14 +219,13 @@ namespace AM2RLauncher
                 #region Downloading
 
                 case UpdateState.Downloading:
-                    var result = MessageBox.Show(Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
-                    if (result == DialogResult.No)
+                    var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                    if (result != DialogResult.Yes)
                         return;
-                    else
-                    {
-                        log.Info("User cancelled download!");
-                        isGitProcessGettingCancelled = true;
-                    }
+                    
+                    log.Info("User cancelled download!");
+                    isGitProcessGettingCancelled = true;
+                    
                     // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
                     // But we should probably wait a bit before proceeding, since cleanup can take a while
                     Thread.Sleep(1000);
@@ -238,14 +239,7 @@ namespace AM2RLauncher
 
                     log.Info("Requesting user input for AM2R_11.zip...");
 
-                    OpenFileDialog fileFinder = new OpenFileDialog
-                    {
-                        Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
-                        MultiSelect = false,
-                        Title = Text.Select11FileDialog
-                    };
-
-                    fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
+                    OpenFileDialog fileFinder = GetSingleZipDialog(Text.Select11FileDialog);
 
                     if (fileFinder.ShowDialog(this) != DialogResult.Ok)
                     {
@@ -253,41 +247,34 @@ namespace AM2RLauncher
                         return;
                     }
 
-                    if (!String.IsNullOrWhiteSpace(fileFinder.FileName)) // This is default
-                    {
-                        if (Directory.Exists(fileFinder.FileName))
-                        {
-                            // This can happen on linux, and maybe windows as well
-                            log.Error("User selected a Directory. Cancelling import.");
-                            return;
-                        }
-
-                        IsZipAM2R11ReturnCodes errorCode = Profile.CheckIfZipIsAM2R11(fileFinder.FileName);
-                        if (errorCode != IsZipAM2R11ReturnCodes.Successful)
-                        {
-                            log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
-                            MessageBox.Show(Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Text.ErrorWindowTitle, MessageBoxType.Error);
-                            return;
-                        }
-
-                        // If either a directory was selected or the file somehow went missing, cancel
-                        if (!File.Exists(fileFinder.FileName))
-                        {
-                            log.Error("Selected AM2R_11.zip file not found! Cancelling import.");
-                            break;
-                        }
-
-                        // We check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
-                        if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip"))
-                            File.Copy(fileFinder.FileName, CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
-
-                        log.Info("AM2R_11.zip successfully imported.");
-                    }
-                    else
+                    // Default filename is whitespace
+                    if (String.IsNullOrWhiteSpace(fileFinder.FileName)) 
                     {
                         log.Error("User did not supply valid input. Cancelling import.");
+                        return;
                     }
 
+                    // If either a directory was selected or the file somehow went missing, cancel
+                    if (!File.Exists(fileFinder.FileName))
+                    {
+                        log.Error("Selected AM2R_11.zip file not found! Cancelling import.");
+                        break;
+                    }
+
+                    IsZipAM2R11ReturnCodes errorCode = Profile.CheckIfZipIsAM2R11(fileFinder.FileName);
+                    if (errorCode != IsZipAM2R11ReturnCodes.Successful)
+                    {
+                        log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
+                        MessageBox.Show(this, Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Text.ErrorWindowTitle, MessageBoxType.Error);
+                        return;
+                    }
+
+                    // We check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
+                    if (fileFinder.FileName != CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")
+                        File.Copy(fileFinder.FileName, CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+
+                    log.Info("AM2R_11.zip successfully imported.");
+                    
                     UpdateStateMachine();
                     break;
                 #endregion
@@ -305,36 +292,34 @@ namespace AM2RLauncher
                     // If the file cannot be launched due to anti-virus shenanigans or any other reason, we try catch here
                     try
                     {
-                        // Check if xdelta is installed on linux´and exit if not
-                        if ((OS.IsUnix) && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
+                        // Check if xdelta is installed on unix and exit if not
+                        if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
                         {
-                            MessageBox.Show(Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
+                            MessageBox.Show(this, Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                             
                             SetPlayButtonState(UpdateState.Install);
                             UpdateStateMachine();
                             log.Error("Xdelta not found. Aborting installing a profile...");
-                            break;
+                            return;
                         }
                         var progressIndicator = new Progress<int>(UpdateProgressBar);
                         bool useHqMusic = hqMusicPCCheck.Checked.Value;
                         await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHqMusic, progressIndicator));
                         // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
                         if (OS.IsWindows)
-                            Thread.Sleep(1000);
+                            Thread.Sleep(500);
                     }
                     catch (Exception ex)
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                        MessageBox.Show(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                        MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                     }
                     progressBar.Visible = false;
                     progressBar.Value = 0;
 
                     // Just need to switch this to anything that isn't an "active" state so SetUpdateState() actually does something
                     SetPlayButtonState(UpdateState.Play);
-
                     UpdateStateMachine();
-
                     break;
                 #endregion
 
@@ -345,9 +330,7 @@ namespace AM2RLauncher
                         return;
 
                     ProfileXML profile = profileList[profileIndex.Value];
-
                     Visible = false;
-
                     SetPlayButtonState(UpdateState.Playing);
 
                     // Make sure the main interface state machines properly
@@ -357,8 +340,6 @@ namespace AM2RLauncher
                     this.ShowInTaskbar = false;
                     trayIndicator.Visible = true;
                     WindowState windowStateBeforeLaunching = this.WindowState;
-                    if (windowStateBeforeLaunching == WindowState.Maximized)
-                        this.WindowState = WindowState.Normal;
                     Minimize();
 
                     string envVarText = customEnvVarTextBox?.Text;
@@ -370,46 +351,17 @@ namespace AM2RLauncher
                     trayIndicator.Visible = false;
                     Show();
                     BringToFront();
-                    if (windowStateBeforeLaunching == WindowState.Maximized)
-                        Maximize();
+                    Visible = true;
+                    WindowState = windowStateBeforeLaunching;
 
                     SetPlayButtonState(UpdateState.Play);
-
                     UpdateStateMachine();
-
-                    Visible = true;
-
                     break;
 
                 #endregion
 
-                default: break;
+                default: throw new NotImplementedException("Encountered invalid update state: " + updateState + "!");
             }
-        }
-
-        /// <summary>
-        /// This is just a helper method for the git commands in order to have a progress bar display for them.
-        /// </summary>
-        private bool TransferProgressHandlerMethod(TransferProgress transferProgress)
-        {
-            // Thank you random issue on the gitlib2sharp repo!!!!
-            // Also tldr; rtfm
-            if (isGitProcessGettingCancelled) return false;
-
-            // This needs to be in an Invoke, in order to access the variables from the main thread
-            // Otherwise this will throw a runtime exception
-            Application.Instance.Invoke(() =>
-            {
-                progressBar.MinValue = 0;
-                progressBar.MaxValue = transferProgress.TotalObjects;
-                if (currentGitObject >= transferProgress.ReceivedObjects)
-                    return;
-                progressLabel.Text = Text.ProgressbarProgress + " " + transferProgress.ReceivedObjects + " (" + ((int)transferProgress.ReceivedBytes / 1000000) + "MB) / " + transferProgress.TotalObjects + " objects";
-                currentGitObject = transferProgress.ReceivedObjects;
-                progressBar.Value = transferProgress.ReceivedObjects;
-            });
-
-            return true;
         }
 
         /// <summary>
@@ -417,19 +369,23 @@ namespace AM2RLauncher
         /// </summary>
         private async void ApkButtonClickEvent(object sender, EventArgs e)
         {
+            // If we're currently creating something, exit
+            if (apkButtonState == ApkButtonState.Creating) return;
+
             // Check for java, exit safely with a warning if not found!
             if (!CrossPlatformOperations.IsJavaInstalled())
             {
-                MessageBox.Show(Text.JavaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);   
+                MessageBox.Show(this, Text.JavaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);   
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
                 log.Error("Java not found! Aborting Android APK creation.");
                 return;
             }
-            // Check if xdelta is installed on linux
+
+            // Check if xdelta is installed on unix, exit with a warning if not.
             if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
             {
-                MessageBox.Show(Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
+                MessageBox.Show(this, Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
                 log.Error("Xdelta not found. Aborting Android APK creation...");
@@ -441,7 +397,6 @@ namespace AM2RLauncher
             if (apkButtonState == ApkButtonState.Create)
             {
                 SetApkButtonState(ApkButtonState.Creating);
-
                 UpdateStateMachine();
 
                 progressBar.Visible = true;
@@ -451,49 +406,30 @@ namespace AM2RLauncher
                 await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
 
                 SetApkButtonState(ApkButtonState.Create);
-
                 progressBar.Visible = false;
-            }
-
-            UpdateStateMachine();
-        }
-
-        /// <summary>
-        /// Runs on <see cref="newsWebView"/>'s DocumentLoaded event. Manages the warning for no internet connection.
-        /// </summary>
-        private void NewsWebViewDocumentLoaded(object sender, WebViewLoadedEventArgs e)
-        {
-            if (!isInternetThere)
-            {
-                newsPage.Content = new TableLayout
-                {
-                    Rows =
-                    {
-                        null,
-                        newsNoConnectionLabel,
-                        null
-                    }
-                };
+                UpdateStateMachine();
             }
         }
 
         /// <summary>
-        /// Runs on <see cref="changelogWebView"/>'s DocumentLoaded event. Manages the warning for no internet connection.
+        /// If no internet access is available, this changes the content of <paramref name="tabPage"/> to an empty page only displaying <paramref name="errorLabel"/>.
         /// </summary>
-        private void ChangelogWebViewDocumentLoaded(object sender, WebViewLoadedEventArgs e)
+        /// <param name="tabPage">The <see cref="TabPage"/> to change the contents of.</param>
+        /// <param name="errorLabel">The <see cref="Label"/> that should be displayed.</param>
+        private void ChangeToEmptyPageOnNoInternet(TabPage tabPage, Label errorLabel)
         {
-            if (!isInternetThere)
+            if (isInternetThere)
+                return;
+
+            tabPage.Content = new TableLayout
             {
-                changelogPage.Content = new TableLayout
+                Rows =
                 {
-                    Rows =
-                    {
-                        null,
-                        changelogNoConnectionLabel,
-                        null
-                    }
-                };
-            }
+                    null,
+                    errorLabel,
+                    null
+                }
+            };
         }
 
         /// <summary>
@@ -503,14 +439,7 @@ namespace AM2RLauncher
         {
             log.Info("User requested to add mod. Requesting user input for new mod .zip...");
 
-            OpenFileDialog fileFinder = new OpenFileDialog
-            {
-                Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
-                MultiSelect = false,
-                Title = Text.SelectModFileDialog
-            };
-
-            fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
+            OpenFileDialog fileFinder = GetSingleZipDialog(Text.SelectModFileDialog);
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -547,7 +476,7 @@ namespace AM2RLauncher
                 ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
                 log.Error("Mod is already imported as " + extractedName + "! Cancelling mod import.");
 
-                MessageBox.Show(HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile2.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile2.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
                 return;
             }
             // Directory doesn't exist -> extract!
@@ -559,7 +488,7 @@ namespace AM2RLauncher
             {
                 log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
 
-                MessageBox.Show(HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
                 Directory.Delete(modsDir + "/" + extractedName, true);
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
                 return;
@@ -572,7 +501,7 @@ namespace AM2RLauncher
             {
                 log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
 
-                MessageBox.Show(HelperMethods.GetText(Text.ModIsForWrongOS, profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsForWrongOS, profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
                                 Text.ErrorWindowTitle, MessageBoxType.Error);
                 HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                 return;
@@ -582,13 +511,13 @@ namespace AM2RLauncher
             if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
             {
                 log.Error(profile.Name + " is already installed.");
-                MessageBox.Show(HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
                 HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
                 return;
             }
 
             log.Info(profile.Name + " successfully installed.");
-            MessageBox.Show(HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, profile.Name), Text.SuccessWindowTitle);
+            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, profile.Name), Text.SuccessWindowTitle);
 
             LoadProfilesAndAdjustLists();
             // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
@@ -779,7 +708,7 @@ namespace AM2RLauncher
             // Create warning dialog when enabling
             if (enabled)
             {
-                MessageBox.Show(Text.WarningWindowText, Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(this, Text.WarningWindowText, Text.WarningWindowTitle, MessageBoxType.Warning);
                 currentMirror = customMirrorTextBox.Text;
             }
             else
@@ -835,7 +764,7 @@ namespace AM2RLauncher
             if (!gitURLRegex.IsMatch(mirrorText))
             {
                 log.Info("User used " + mirrorText + " as a custom Mirror, didn't pass git validation test.");
-                MessageBox.Show(HelperMethods.GetText(Text.InvalidGitURL, mirrorText), Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(this, HelperMethods.GetText(Text.InvalidGitURL, mirrorText), Text.ErrorWindowTitle, MessageBoxType.Error);
                 return;
             }
 
@@ -883,7 +812,7 @@ namespace AM2RLauncher
             ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
             log.Info("User is attempting to delete profile " + profile.Name + ".");
 
-            DialogResult result = MessageBox.Show(HelperMethods.GetText(Text.DeleteModWarning, profile.Name), Text.WarningWindowTitle,
+            DialogResult result = MessageBox.Show(this, HelperMethods.GetText(Text.DeleteModWarning, profile.Name), Text.WarningWindowTitle,
                                                   MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
             if (result == DialogResult.Ok)
@@ -891,7 +820,7 @@ namespace AM2RLauncher
                 log.Info("User did not cancel. Proceeding to delete " + profile);
                 DeleteProfileAndAdjustLists(profile);
                 log.Info(profile + " has been deleted");
-                MessageBox.Show(HelperMethods.GetText(Text.DeleteModButtonSuccess, profile.Name), Text.SuccessWindowTitle);
+                MessageBox.Show(this, HelperMethods.GetText(Text.DeleteModButtonSuccess, profile.Name), Text.SuccessWindowTitle);
             }
             else
             {
@@ -911,14 +840,7 @@ namespace AM2RLauncher
 
             ProfileXML currentProfile = profileList[modSettingsProfileDropDown.SelectedIndex];
 
-            OpenFileDialog fileFinder = new OpenFileDialog
-            {
-                Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
-                MultiSelect = false,
-                Title = Text.SelectModFileDialog
-            };
-
-            fileFinder.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
+            OpenFileDialog fileFinder = GetSingleZipDialog(Text.SelectModFileDialog);
 
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
@@ -962,7 +884,7 @@ namespace AM2RLauncher
             if (!File.Exists(extractedFolder + "/profile.xml"))
             {
                 log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
-                MessageBox.Show(HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
                 Directory.Delete(extractedFolder, true);
                 File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
                 return;
@@ -974,7 +896,7 @@ namespace AM2RLauncher
             if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
             {
                 // Mod is already installed, so we can update!
-                DialogResult updateResult = MessageBox.Show(HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
+                DialogResult updateResult = MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
                                                       MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
                 if (updateResult == DialogResult.Ok)
@@ -982,7 +904,7 @@ namespace AM2RLauncher
                     // If the profile isn't installed, don't ask about archiving it
                     if (Profile.IsProfileInstalled(currentProfile))
                     {
-                        DialogResult archiveResult = MessageBox.Show(HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                        DialogResult archiveResult = MessageBox.Show(this, HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
 
                         // User wants to archive profile
                         if (archiveResult == DialogResult.Yes)
@@ -1006,7 +928,7 @@ namespace AM2RLauncher
                 // Cancel the operation!
                 // Show message to tell user that mod could not be found, install this separately
                 log.Error("Mod is not installed! Cancelling mod update.");
-                MessageBox.Show(HelperMethods.GetText(Text.UpdateModButtonWrongMod, currentProfile.Name).Replace("$SELECT", profile.Name),
+                MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModButtonWrongMod, currentProfile.Name).Replace("$SELECT", profile.Name),
                                 Text.WarningWindowTitle, MessageBoxButtons.OK);
                 abort = true;
             }
@@ -1020,7 +942,7 @@ namespace AM2RLauncher
             }
 
             log.Info("Successfully updated mod profile " + profile.Name + ".");
-            MessageBox.Show(HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, currentProfile.Name), Text.SuccessWindowTitle);
+            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, currentProfile.Name), Text.SuccessWindowTitle);
             UpdateStateMachine();
 
             LoadProfilesAndAdjustLists();
@@ -1048,7 +970,7 @@ namespace AM2RLauncher
             {
                 case UpdateState.Downloading:
                 {
-                    var result = MessageBox.Show(Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                    var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
                                                  MessageBoxType.Warning, MessageBoxDefaultButton.No);
                     if (result == DialogResult.No)
                     {
@@ -1060,7 +982,7 @@ namespace AM2RLauncher
                     break;
                 }
                 case UpdateState.Installing:
-                    MessageBox.Show(Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
+                    MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
                     e.Cancel = true;
                     break;
             }
