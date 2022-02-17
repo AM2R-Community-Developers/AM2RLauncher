@@ -697,19 +697,6 @@ namespace AM2RLauncher
             e.Graphics.DrawImage(formBG, ((width / 2) - (height / 1.4745f)) / scale, 0);
         }
 
-        #region ICON EVENTS
-
-        /// <summary>Gets called when <see cref="redditIcon"/> gets clicked.</summary>
-        private void RedditIconOnClick(object sender, EventArgs e) { CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R"); }
-        /// <summary>Gets called when <see cref="githubIcon"/> gets clicked.</summary>
-        private void GithubIconOnClick(object sender, EventArgs e) { CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers"); }
-        /// <summary>Gets called when <see cref="youtubeIcon"/> gets clicked.</summary>
-        private void YoutubeIconOnClick(object sender, EventArgs e) { CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates"); }
-        /// <summary>Gets called when <see cref="discordIcon"/> gets clicked.</summary>
-        private void DiscordIconOnClick(object sender, EventArgs e) { CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u"); }
-
-        #endregion
-
         /// <summary>Gets called when <see cref="showButton"/> gets clicked and shows the <see cref="MainForm"/> and brings it to the front again.</summary>
         private void ShowButtonClick(object sender, EventArgs e)
         {

@@ -347,16 +347,16 @@ namespace AM2RLauncher
 
             // Social buttons
             var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
-            redditButton.Click += RedditIconOnClick;
+            redditButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R");
 
             var githubButton = new ImageButton { ToolTip = Text.GithubToolTip, Image = githubIcon };
-            githubButton.Click += GithubIconOnClick;
+            githubButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers");
 
             var youtubeButton = new ImageButton { ToolTip = Text.YoutubeToolTip, Image = youtubeIcon };
-            youtubeButton.Click += YoutubeIconOnClick;
+            youtubeButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates");
 
             var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
-            discordButton.Click += DiscordIconOnClick;
+            discordButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
 
 
             // Social button panel

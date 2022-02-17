@@ -118,18 +118,15 @@ namespace AM2RLauncher
             {
                 case UpdateState.Download:
                 case UpdateState.Downloading:
+                case UpdateState.Select11:
                 case UpdateState.Installing:
                 case UpdateState.Playing: profileDropDown.Enabled = false; break;
 
-                case UpdateState.Select11:
                 case UpdateState.Install:
                 case UpdateState.Play: profileDropDown.Enabled = true; break;
                 
             }
-            switch (apkButtonState)
-            {
-                case ApkButtonState.Creating: profileDropDown.Enabled = false; break;
-            }
+            if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
 
             Color col = profileDropDown.Enabled ? colGreen : colInactive;
 
@@ -156,6 +153,7 @@ namespace AM2RLauncher
                 case UpdateState.Select11:
                 case UpdateState.Installing:
                 case UpdateState.Playing: enabled = false; break;
+
                 case UpdateState.Install:
                 case UpdateState.Play: enabled = true; break;
 
@@ -200,19 +198,19 @@ namespace AM2RLauncher
         private void SetPlayButtonState(UpdateState state)
         {
             updateState = state;
-            string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
-                //TODO: seperate this into a "onenabledchanged" delegate?
-                case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonDownloadToolTip; break;
-                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Text.PlayButtonDownladingToolTip; break;
-                case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Text.PlayButtonSelect11ToolTip; break;
-                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName); break;
-                case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Text.PlayButtonInstallingToolTip; break;
-                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName); break;
-                case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Text.PlayButtonPlayingToolTip; break;
+                case UpdateState.Download: 
+                case UpdateState.Downloading: 
+                case UpdateState.Select11: 
+                case UpdateState.Install: 
+                case UpdateState.Play: playButton.Enabled = true; break;
+
+                case UpdateState.Installing: 
+                case UpdateState.Playing: playButton.Enabled = false; break;
             }
             playButton.Text = GetPlayButtonText();
+            playButton.ToolTip = GetPlayButtonTooltip();
 
             playButton.Invalidate();
 
@@ -249,6 +247,26 @@ namespace AM2RLauncher
                 case UpdateState.Installing: return Text.Installing;
                 case UpdateState.Play: return Text.Play;
                 case UpdateState.Playing: return Text.Playing;
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// This returns the tooltip that <see cref="playButton"/> should have depending on the global updateState.
+        /// </summary>
+        /// <returns>The tooltip as a <see cref="String"/>, or <see langword="null"/> if the current State is invalid.</returns>
+        private string GetPlayButtonTooltip()
+        {
+            string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
+            switch (updateState)
+            {
+                case UpdateState.Download: return Text.PlayButtonDownloadToolTip;
+                case UpdateState.Downloading: return Text.PlayButtonDownloadToolTip;
+                case UpdateState.Select11: return Text.PlayButtonSelect11ToolTip;
+                case UpdateState.Install: return playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName);
+                case UpdateState.Installing: return Text.PlayButtonInstallingToolTip;
+                case UpdateState.Play: return HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName);
+                case UpdateState.Playing: return Text.PlayButtonPlayingToolTip;
                 default: return null;
             }
         }
