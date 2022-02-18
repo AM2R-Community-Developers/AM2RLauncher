@@ -85,5 +85,18 @@ namespace AM2RLauncher
             fileDialog.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
             return fileDialog;
         }
+
+        /// <summary>Enables and changes colors for <see cref="customMirrorTextBox"/> and <see cref="mirrorDropDown"/> accordingly.</summary>
+        private void EnableMirrorControlsAccordingly()
+        {
+            bool enabled = (bool)customMirrorCheck.Checked;
+            customMirrorTextBox.Enabled = enabled;
+            mirrorDropDown.Enabled = !enabled;
+            // Not sure why the dropdown menu needs this hack, but the textBox does not.
+            //TODO: eto issue?
+            if (OS.IsWindows)
+                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
+            mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
+        }
     }
 }

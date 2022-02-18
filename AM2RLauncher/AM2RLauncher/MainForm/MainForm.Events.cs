@@ -175,24 +175,24 @@ namespace AM2RLauncher
             {
                 // If we're currently still downloading, ask first if user really wants to close and cancel the event if necessary
                 case UpdateState.Downloading:
-                    {
-                        var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
-                                                     MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                {
+                    var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                                                    MessageBoxType.Warning, MessageBoxDefaultButton.No);
 
-                        if (result == DialogResult.No)
-                            e.Cancel = true;
-                        else
-                            isGitProcessGettingCancelled = true;
-                        // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
-                        break;
-                    }
+                    if (result == DialogResult.No)
+                        e.Cancel = true;
+                    else
+                        isGitProcessGettingCancelled = true;
+                    // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
+                    break;
+                }
                 // We can't close during installing, so we cancel the event.
                 case UpdateState.Installing:
-                    {
-                        MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
-                        e.Cancel = true;
-                        break;
-                    }
+                {
+                    MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
+                    e.Cancel = true;
+                    break;
+                }
             }
 
             // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
@@ -634,16 +634,10 @@ namespace AM2RLauncher
             log.Info("Use Custom Mirror option has been set to " + customMirrorCheck.Checked + ".");
             CrossPlatformOperations.WriteToConfig("CustomMirrorEnabled", (bool)customMirrorCheck.Checked);
 
-            bool enabled = (bool)customMirrorCheck.Checked;
-            customMirrorTextBox.Enabled = enabled;
-            mirrorDropDown.Enabled = !enabled;
-            // Not sure why the dropdown menu needs this hack, but the textBox does not.
-            if (OS.IsWindows)
-                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
-            mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
+            EnableMirrorControlsAccordingly();
 
             // Create warning dialog when enabling
-            if (enabled)
+            if ((bool)customMirrorCheck.Checked)
             {
                 MessageBox.Show(this, Text.WarningWindowText, Text.WarningWindowTitle, MessageBoxType.Warning);
                 currentMirror = customMirrorTextBox.Text;
@@ -653,18 +647,6 @@ namespace AM2RLauncher
                 // Revert mirror to selected index in mirror dropdown
                 currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
             }
-        }
-
-        //TODO: why exactly do we need this?
-        /// <summary>Gets called when <see cref="customMirrorCheck"/> gets loaded.
-        /// Enables and changes colors for <see cref="customMirrorTextBox"/> and <see cref="mirrorDropDown"/> accordingly.</summary>
-        private void CustomMirrorCheckLoadComplete(object sender, EventArgs e)
-        {
-            bool enabled = (bool)customMirrorCheck.Checked;
-            customMirrorTextBox.Enabled = enabled;
-            mirrorDropDown.Enabled = !enabled;
-            if (OS.IsWindows)
-                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
         }
 
         /// <summary>

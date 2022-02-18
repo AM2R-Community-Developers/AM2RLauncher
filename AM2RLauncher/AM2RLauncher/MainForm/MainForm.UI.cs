@@ -634,6 +634,8 @@ namespace AM2RLauncher
                 TextColor = colGreen
             };
 
+            EnableMirrorControlsAccordingly();
+
             settingsLayout.BeginHorizontal();
             settingsLayout.AddSpace();
             settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, profileDebugLogCheck, customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
@@ -799,7 +801,6 @@ namespace AM2RLauncher
             hqMusicAndroidCheck.CheckedChanged += HqMusicAndroidCheckChanged;
             hqMusicPCCheck.CheckedChanged += HqMusicPCCheckChanged;
             customMirrorCheck.CheckedChanged += CustomMirrorCheckChanged;
-            customMirrorCheck.LoadComplete += CustomMirrorCheckLoadComplete;
             apkButton.Click += ApkButtonClickEvent;
             apkButton.LoadComplete += (sender, e) => UpdateApkState();
             profileDropDown.LoadComplete += (sender, e) => UpdateProfileState();
