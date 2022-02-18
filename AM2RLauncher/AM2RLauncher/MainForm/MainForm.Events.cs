@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace AM2RLauncher
 {
-    //TODO: comment a bunch of this stuf for readability
+    //TODO: comment a bunch of this stuff for readability
 
     /// <summary>
     /// Methods for UI Events that get triggered go in here
@@ -205,7 +205,7 @@ namespace AM2RLauncher
                 log.Info("Successfully closed MainForm. Exiting main thread.");
         }
 
-        /// <summary>Gets called when <see cref="showButton"/> gets clicked and shows the <see cref="MainForm"/> and brings it to the front again.</summary>
+        /// <summary>Shows the <see cref="MainForm"/> and brings it to the front again.</summary>
         private void ShowButtonClick(object sender, EventArgs e)
         {
             log.Info("User has opened the launcher from system tray.");
@@ -495,21 +495,20 @@ namespace AM2RLauncher
 
             UpdateStateMachine();
 
-            if (apkButtonState == ApkButtonState.Create)
-            {
-                SetApkButtonState(ApkButtonState.Creating);
-                UpdateStateMachine();
+            if (apkButtonState != ApkButtonState.Create) return;
+            
+            SetApkButtonState(ApkButtonState.Creating);
+            UpdateStateMachine();
 
-                progressBar.Visible = true;
-                bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
+            progressBar.Visible = true;
+            bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
 
-                var progressIndicator = new Progress<int>(UpdateProgressBar);
-                await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
+            var progressIndicator = new Progress<int>(UpdateProgressBar);
+            await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
 
-                SetApkButtonState(ApkButtonState.Create);
-                progressBar.Visible = false;
-                UpdateStateMachine();
-            }
+            SetApkButtonState(ApkButtonState.Create);
+            progressBar.Visible = false;
+            UpdateStateMachine();
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
@@ -900,7 +899,7 @@ namespace AM2RLauncher
             string extractedName = Path.GetFileNameWithoutExtension(modFile.Name) + "_new";
             string extractedModDir = modsDir + "/" + extractedName;
 
-            // If for some reason old files remain, delete them so that extraction doesnt throw
+            // If for some reason old files remain, delete them so that extraction doesn't throw
             if (Directory.Exists(extractedModDir))
                 Directory.Delete(extractedModDir, true);
 

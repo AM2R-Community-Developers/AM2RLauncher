@@ -272,7 +272,7 @@ ce profil !</value>
   <data name="Play" xml:space="preserve">
     <value>JOUER</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>Téléchargement en cours...</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">

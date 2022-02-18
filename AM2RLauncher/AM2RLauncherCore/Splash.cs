@@ -19,7 +19,7 @@ public static class Splash
         "Speedrun THIS, I dare you.",
         "The broken pipe is a lie.",
         "I am altering the broken pipe. Pray I don't alter it any further.",
-        "Overcommitting to April Fool's since 2018.",
+        "Over committing to April Fool's since 2018.",
         "Also try Metroid II: Return of Samus!",
         "Also try Metroid: Samus Returns!",
         "Also try Prime 2D!",
@@ -54,7 +54,8 @@ public static class Splash
     private static readonly string[] windowsSplash =
     {
         ":(",
-        "All your machine are belong to MS"
+        "All your machine are belong to MS",
+        "All your data are belong to us"
     };
 
     /// <summary>
@@ -114,9 +115,9 @@ public static class Splash
     }
 
     /// <summary>
-    /// Creates a string srray which is <see cref="generalSplash"/> concatonated with the splash array for the current OS
+    /// Creates a string array which is <see cref="generalSplash"/> concatenated with the splash array for the current OS
     /// </summary>
-    /// <returns>A string array where <see cref="generalSplash"/> and the splash array for the current OS have been concatonated.</returns>
+    /// <returns>A string array where <see cref="generalSplash"/> and the splash array for the current OS have been concatenated.</returns>
     private static string[] CombineSplashes()
     {
         string[] totalSplashes;

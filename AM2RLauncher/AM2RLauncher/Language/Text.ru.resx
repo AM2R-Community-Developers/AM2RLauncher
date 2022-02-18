@@ -154,7 +154,7 @@
     <value>К сожалению, закрытие во время установки невозможно. Пожалуйста, подождите окончания установки!</value>
   </data>
   <data name="CorruptPatchData" xml:space="preserve">
-    <value>Обнаружена ошибка с папкой патчей (Patchdata). Она была удалена. Пожалуйста, загрузите её снова.</value>
+    <value>Обнаружена ошибка с папкой патчей (PatchData). Она была удалена. Пожалуйста, загрузите её снова.</value>
   </data>
   <data name="CreateAPK" xml:space="preserve">
     <value>СОЗДАТЬ APK</value>
@@ -270,7 +270,7 @@
   <data name="Play" xml:space="preserve">
     <value>ИГРАТЬ</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>Загружается...</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">

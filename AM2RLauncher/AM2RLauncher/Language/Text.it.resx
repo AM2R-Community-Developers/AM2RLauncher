@@ -270,7 +270,7 @@
   <data name="Play" xml:space="preserve">
     <value>GIOCA</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>Download in corso. . .</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">

@@ -78,9 +78,9 @@ namespace AM2RLauncher
         /// </summary>
         private static string currentMirror;
 
-        private static bool isInternetThere = Core.Core.IsInternetThere;
+        private static readonly bool isInternetThere = Core.Core.IsInternetThere;
 
-        private static bool isThisRunningFromWine = Core.Core.IsThisRunningFromWine;
+        private static readonly bool isThisRunningFromWine = Core.Core.IsThisRunningFromWine;
 
         private static bool singleInstance;
 
@@ -127,7 +127,7 @@ namespace AM2RLauncher
             #region VARIABLE INITIALIZATION
             log.Info("Beginning UI initialization...");
 
-            Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
+            Bitmap am2rIcon = new Bitmap(Resources.AM2RIcon);
 
             // System tray indicator
             ButtonMenuItem showButton = new ButtonMenuItem { Text = Text.TrayButtonShow };
@@ -139,7 +139,7 @@ namespace AM2RLauncher
                 Image = am2rIcon
             };
 
-            // Create menubar with defaults for mac
+            // Create MenuBar with defaults for mac
             if (OS.IsMac)
                 Menu = new MenuBar();
 
@@ -166,13 +166,13 @@ namespace AM2RLauncher
             // Create mirror list
             // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
             mirrorDescriptionList = new List<ListItem>();
-            // Add each entry dynamically instead of harcoding it to two. If we have neither a github or gitlab mirror, we use the mirror itself as text
+            // Add each entry dynamically instead of hard-coding it to two. If we have neither a github or gitlab mirror, we use the mirror itself as text
             foreach (var mirror in mirrorList)
             {
                 string text = mirror;
                 if (text.Contains("github.com")) text = Text.MirrorGithubText;
                 else if (text.Contains("gitlab.com")) text = Text.MirrorGitlabText;
-                mirrorDescriptionList.Add(new ListItem() { Key = mirror, Text = text });
+                mirrorDescriptionList.Add(new ListItem { Key = mirror, Text = text });
             }
             #endregion
 
@@ -194,7 +194,7 @@ namespace AM2RLauncher
             drawable.Paint += DrawablePaintEvent;
             // Some systems don't call the paintEvent by default and only do so after actual resizing
             if (OS.IsMac)
-                LoadComplete += (sender, e) => { Size = new Size(Size.Width + 1, Size.Height); Size = new Size(Size.Width - 1, Size.Height);};
+                LoadComplete += (_, _) => { Size = new Size(Size.Width + 1, Size.Height); Size = new Size(Size.Width - 1, Size.Height);};
 
             #region MAIN WINDOW
 
@@ -328,19 +328,19 @@ namespace AM2RLauncher
             // Social buttons
             Bitmap redditIcon = new Bitmap(Resources.redditIcon48);
             var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
-            redditButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R");
+            redditButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R");
 
             Bitmap githubIcon = new Bitmap(Resources.githubIcon48);
             var githubButton = new ImageButton { ToolTip = Text.GithubToolTip, Image = githubIcon };
-            githubButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers");
+            githubButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers");
 
             Bitmap youtubeIcon = new Bitmap(Resources.youtubeIcon48);
             var youtubeButton = new ImageButton { ToolTip = Text.YoutubeToolTip, Image = youtubeIcon };
-            youtubeButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates");
+            youtubeButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates");
 
             Bitmap discordIcon = new Bitmap(Resources.discordIcon48);
             var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
-            discordButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
+            discordButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
 
 
             // Social button panel
@@ -371,7 +371,7 @@ namespace AM2RLauncher
             mainLayout.AddColumn(null, centerInterface, null);
             mainLayout.AddSpace();
 
-            // Yes, I'm hardcoding this string. Linux users can english.
+            // Yes, I'm hard-coding this string. Linux users can english.
             mainLayout.AddColumn(versionLabel, isThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = colRed, TextAlignment = TextAlignment.Right } : null);
 
             drawable.Content = mainLayout;
@@ -398,10 +398,12 @@ namespace AM2RLauncher
             if (OS.IsUnix && !isInternetThere)
                 changelogWebView = new WebView();
 
+            //TODO: these clip on gtk, test on other platforms. maybe eto bug.
             Label changelogNoConnectionLabel = new Label
             {
                 Text = Text.NoInternetConnection,
-                TextColor = colGreen
+                TextColor = colGreen,
+                TextAlignment = TextAlignment.Center,
             };
 
             TabPage changelogPage = new TabPage
@@ -433,7 +435,8 @@ namespace AM2RLauncher
             Label newsNoConnectionLabel = new Label
             {
                 Text = Text.NoInternetConnection,
-                TextColor = colGreen
+                TextColor = colGreen,
+                TextAlignment = TextAlignment.Center
             };
 
             TabPage newsPage = new TabPage
@@ -558,7 +561,7 @@ namespace AM2RLauncher
             // Create game debug logs
             profileDebugLogCheck = new CheckBox
             {
-                Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
+                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
                 Text = Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
@@ -791,8 +794,8 @@ namespace AM2RLauncher
             hqMusicPCCheck.CheckedChanged += HqMusicPCCheckChanged;
             customMirrorCheck.CheckedChanged += CustomMirrorCheckChanged;
             apkButton.Click += ApkButtonClickEvent;
-            apkButton.LoadComplete += (sender, e) => UpdateApkState();
-            profileDropDown.LoadComplete += (sender, e) => UpdateProfileState();
+            apkButton.LoadComplete += (_, _) => UpdateApkState();
+            profileDropDown.LoadComplete += (_, _) => UpdateProfileState();
             playButton.Click += PlayButtonClickEvent;
             playButton.LoadComplete += PlayButtonLoadComplete;
             customMirrorTextBox.LostFocus += CustomMirrorTextBoxLostFocus;
@@ -809,8 +812,8 @@ namespace AM2RLauncher
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
             //TODO: Retest if these now work on mac
-            newsWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(newsPage, newsNoConnectionLabel);
-            changelogWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(changelogPage, changelogNoConnectionLabel);
+            newsWebView.DocumentLoaded += (_, _) => ChangeToEmptyPageOnNoInternet(newsPage, newsNoConnectionLabel);
+            changelogWebView.DocumentLoaded += (_, _) => ChangeToEmptyPageOnNoInternet(changelogPage, changelogNoConnectionLabel);
 
             log.Info("Events linked successfully.");
 
@@ -826,9 +829,9 @@ namespace AM2RLauncher
 
         /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
         //TODO: this should be moved into AM2RLauncher.Core
-        List<ProfileXML> profileList;
+        private List<ProfileXML> profileList;
         /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
-        List<ListItem> profileNames;
+        private List<ListItem> profileNames;
 
         /// <summary>The planet Background.</summary>
         private readonly Bitmap formBG = new Bitmap(Resources.bgCentered);
@@ -889,17 +892,17 @@ namespace AM2RLauncher
         /// <summary>The <see cref="Label"/> that gives a warning if the current selected <see cref="ProfileXML"/> shares the same save location has default AM2R.</summary>
         private Label saveWarningLabel;
 
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update AM2R or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to automatically update AM2R or not.</summary>
         private CheckBox autoUpdateAM2RCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update the AM2RLauncher or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to automatically update the AM2RLauncher or not.</summary>
         private CheckBox autoUpdateLauncherCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to use a custom mirror or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to use a custom mirror or not.</summary>
         private CheckBox customMirrorCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to use HQ Music when patching to PC or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to use HQ Music when patching to PC or not.</summary>
         private CheckBox hqMusicPCCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to use HQ Music when paching to Android or not.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to use HQ Music when patching to Android or not.</summary>
         private CheckBox hqMusicAndroidCheck;
-        /// <summary>A <see cref="CheckBox"/>, that indicates wether to create debug logs for profiles.</summary>
+        /// <summary>A <see cref="CheckBox"/>, that indicates whether to create debug logs for profiles.</summary>
         private CheckBox profileDebugLogCheck;
 
         /// <summary>A <see cref="DropDown"/> where languages can be chosen.</summary>

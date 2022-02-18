@@ -38,7 +38,6 @@ namespace AM2RLauncher
         /// Safety check function before accessing <see cref="profileIndex"/>.
         /// </summary>
         /// <returns><see langword="true"/> if it is valid, <see langword="false"/> if not.</returns>
-        //TODO: this should get a "membernotnullwhen" atttribute whenever i figure out how to apply it here
         private bool IsProfileIndexValid()
         {
             return profileIndex != null;

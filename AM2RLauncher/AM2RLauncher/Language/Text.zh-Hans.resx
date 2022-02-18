@@ -270,7 +270,7 @@
   <data name="Play" xml:space="preserve">
     <value>PLAY</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>正在下载……</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">

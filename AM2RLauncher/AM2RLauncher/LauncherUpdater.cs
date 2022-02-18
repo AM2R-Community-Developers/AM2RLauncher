@@ -11,7 +11,7 @@ namespace AM2RLauncher
     /// <summary>
     /// Class that checks for Updates and then Updates the Launcher.
     /// </summary>
-    //TODO: Mac support for autoupdater in general
+    //TODO: Mac support for auto updater in general
     public static class LauncherUpdater
     {
         // How often this was broken count: 7
@@ -67,7 +67,7 @@ namespace AM2RLauncher
                         file.Delete();
                 }
 
-                // Do the same for each subdir
+                // Do the same for each subdirectory
                 foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
                 {
                     foreach (FileInfo file in dir.GetFiles())
@@ -154,18 +154,16 @@ namespace AM2RLauncher
 
                 try
                 {
-                    using (var client = new WebClient())
-                    {
-                        string platformSuffix = "";
-                        if (OS.IsWindows) platformSuffix = "_win";
-                        else if (OS.IsLinux) platformSuffix = "_lin";
+                    using var client = new WebClient();
+                    string platformSuffix = "";
+                    if (OS.IsWindows) platformSuffix = "_win";
+                    else if (OS.IsLinux) platformSuffix = "_lin";
 
-                        log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
+                    log.Info("Downloading https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip to " + zipPath + ".");
 
-                        client.DownloadFile("https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip", zipPath);
+                    client.DownloadFile("https://github.com/AM2R-Community-Developers/AM2RLauncher/releases/latest/download/AM2RLauncher_" + onlineVersion + platformSuffix + ".zip", zipPath);
 
-                        log.Info("File successfully downloaded.");
-                    }
+                    log.Info("File successfully downloaded.");
                 }
                 catch (UnauthorizedAccessException)
                 {
@@ -197,7 +195,7 @@ namespace AM2RLauncher
                         file.CopyTo(file.Directory + "/" +  file.Name + ".bak");
                     }
 
-                    // Do the same for each subdir
+                    // Do the same for each sub directory
                     foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
                     {
                         foreach (FileInfo file in dir.GetFiles())

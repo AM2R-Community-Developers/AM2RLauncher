@@ -12,7 +12,7 @@ namespace AM2RLauncher
     public partial class MainForm
     {
         /// <summary>
-        /// Updates <see cref="updateState"/>, <see cref="playButton"/>, <see cref="apkButtonState"/>, and <see cref="apkButton"/> according to the current conditiions.
+        /// Updates <see cref="updateState"/>, <see cref="playButton"/>, <see cref="apkButtonState"/>, and <see cref="apkButton"/> according to the current conditions.
         /// </summary>
         private void UpdateStateMachine()
         {
@@ -27,7 +27,7 @@ namespace AM2RLauncher
         /// </summary>
         private void UpdatePlayState()
         {
-            // If we're downloading or installing, dont't change anything
+            // If we're downloading or installing, don't change anything
             if ((updateState == PlayButtonState.Downloading) || (updateState == PlayButtonState.Installing))
                 return;
 
@@ -61,7 +61,7 @@ namespace AM2RLauncher
                 return;
             }
             // Otherwise, if profile is NOT installable, we delete the profile because we can't install it and therefore holds no value!
-            else if (isProfileValid && profileList[profileIndex.Value].Installable == false)
+            if (isProfileValid && profileList[profileIndex.Value].Installable == false)
             {
                 DeleteProfileAndAdjustLists(profileList[profileIndex.Value]);
                 return;
@@ -138,7 +138,7 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Determines current conditions and enables or disables <see cref="profilePage"/> controls accordingly.
+        /// Determines current conditions and enables or disabled the mainPage controls accordingly.
         /// </summary>
         private void UpdateModSettingsState()
         {

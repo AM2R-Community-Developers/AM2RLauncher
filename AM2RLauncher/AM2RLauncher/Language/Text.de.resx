@@ -223,7 +223,7 @@
     <value>$NAME ist eine ungültige git URL!</value>
   </data>
   <data name="JavaNotFound" xml:space="preserve">
-    <value>Java wurde nicht gefunden! Ohne installiertes Java kann keine APK erstellt werden. Bitte sicherstellen das Java installiert, und in der PATH Systemvariable eingetragen ist.</value>
+    <value>Java wurde nicht gefunden! Ohne installiertes Java kann keine APK erstellt werden. Bitte sicherstellen das Java installiert, und in der PATH Umgebungsvariable eingetragen ist.</value>
   </data>
   <data name="LanguageNotice" xml:space="preserve">
     <value>Launcher Sprache: (Benötigt Launcher neustart)</value>
@@ -253,7 +253,7 @@
     <value>Neuigkeiten</value>
   </data>
   <data name="NoInternetConnection" xml:space="preserve">
-    <value>Internetverbindung konnte nicht hergestellt werden! AM2R kann weiterhin gespielt werden, aber Aktualisierungen können erst stattfinden nachdem der Launcher neugestartet wurde und sich mit dem Internet verbunden hat.</value>
+    <value>Internetverbindung konnte nicht hergestellt werden! AM2R kann weiterhin gespielt werden, aber Aktualisierungen können erst stattfinden nachdem der Launcher neu gestartet wurde und sich mit dem Internet verbunden hat.</value>
   </data>
   <data name="OpenProfileFolder" xml:space="preserve">
     <value>ÖFFNE PROFILORDNER</value>
@@ -270,7 +270,7 @@
   <data name="Play" xml:space="preserve">
     <value>SPIELEN</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>Am downloaden . . .</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">
@@ -369,7 +369,7 @@ Bitte äußerste Vorsicht walten lassen.</value>
     <value>WARNUNG</value>
   </data>
   <data name="XdeltaNotFound" xml:space="preserve">
-    <value>Xdelta nicht gefunden! Profile können ohne dieses Werkzeug nicht installiert werden! Bitte xdelta3 von einem Packetmanager installieren.</value>
+    <value>Xdelta nicht gefunden! Profile können ohne dieses Werkzeug nicht installiert werden! Bitte xdelta3 von einem Paketmanager installieren.</value>
   </data>
   <data name="YoutubeToolTip" xml:space="preserve">
     <value>Der YouTube-Kanal der Community-Entwickler</value>

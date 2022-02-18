@@ -39,7 +39,7 @@ internal static class MainClass
         // Configure logger
         XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
 
-        // if we're on debug, always set loglevel to debug
+        // if we're on debug, always set log level to debug
         #if DEBUG
         ((Logger)log.Logger).Level = log4net.Core.Level.Debug;
         #endif
@@ -74,7 +74,7 @@ internal static class MainClass
     }
 
     /// <summary>
-    /// This method gets fired when an unhandled excpetion occurs in <see cref="MainForm"/>.
+    /// This method gets fired when an unhandled exception occurs in <see cref="MainForm"/>.
     /// </summary>
     private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {

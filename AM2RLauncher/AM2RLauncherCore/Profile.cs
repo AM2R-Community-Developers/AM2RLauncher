@@ -320,7 +320,7 @@ public static class Profile
     /// Installs <paramref name="profile"/>.
     /// </summary>
     /// <param name="profile"><see cref="ProfileXML"/> to be installed.</param>
-    /// <param name="useHqMusic">Wether to patch this with high quality music or not.</param>
+    /// <param name="useHqMusic">Whether to patch this with high quality music or not.</param>
     /// <param name="progress">Provides the current progress of this method.</param>
     public static void InstallProfile(ProfileXML profile, bool useHqMusic, IProgress<int> progress)
     {
@@ -332,8 +332,7 @@ public static class Profile
         // Failsafe for Profiles directory
         if (!Directory.Exists(profilesHomePath))
             Directory.CreateDirectory(profilesHomePath);
-
-
+        
         // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
         if (Directory.Exists(profilePath))
             Directory.Delete(profilePath, true);
@@ -370,7 +369,7 @@ public static class Profile
         progress.Report(33);
         log.Info("Profile folder created and AM2R_11.zip extracted.");
 
-        // Set local datapath for installation files
+        // Set local dataPath for installation files
         var dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
 
         string datawin = null, exe = null;
@@ -383,7 +382,7 @@ public static class Profile
         else if (OS.IsLinux)
         {
             datawin = "game.unx";
-            // Use the exe name based on the desktop file in the appimage, rather than hardcoding it.
+            // Use the exe name based on the desktop file in the AppImage, rather than hard coding it.
             string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
             exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
             log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
@@ -420,7 +419,7 @@ public static class Profile
         {
             CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
             CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
-            // Just in case the resulting file isn't chmoddded...
+            // Just in case the resulting file isn't chmod-ed...
             Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"")?.WaitForExit();
 
             // These are not needed by linux or Mac at all, so we delete them
@@ -441,7 +440,7 @@ public static class Profile
 
         // Applied patch
         if (OS.IsWindows || OS.IsMac) progress.Report(66);
-        else if (OS.IsLinux) progress.Report(44); // Linux will take a bit longer, due to appimage creation
+        else if (OS.IsLinux) progress.Report(44); // Linux will take a bit longer, due to AppImage creation
         log.Info("xdelta patch(es) applied.");
 
         // Install new datafiles
@@ -470,7 +469,7 @@ public static class Profile
             Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/");
             Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/assets/");
 
-            // Copy game assets to the appimageDir
+            // Copy game assets to the AppImageDir
             HelperMethods.DirectoryCopy(assetsPath, profilePath + "/AM2R.AppDir/usr/bin/assets/");
             File.Copy(profilePath + "/" + exe, profilePath + "/AM2R.AppDir/usr/bin/" + exe);
 
@@ -542,7 +541,7 @@ public static class Profile
     /// Creates an APK of the selected <paramref name="profile"/>.
     /// </summary>
     /// <param name="profile"><see cref="ProfileXML"/> to be compiled into an APK.</param>
-    /// <param name="useHqMusic">Wether to create the APK with high quality music or not.</param>
+    /// <param name="useHqMusic">Whether to create the APK with high quality music or not.</param>
     /// <param name="progress">Provides the current progress of this method.</param>
     public static void CreateAPK(ProfileXML profile, bool useHqMusic, IProgress<int> progress)
     {
@@ -836,6 +835,6 @@ public static class Profile
     public static bool IsPatchDataCloned()
     {
         // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
-        return Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData") && File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml");
+        return File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml") && Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData");
     }
 }

@@ -30,7 +30,7 @@ public class ProfileXML
     [XmlAttribute("Author")]
     public string Author
     { get; set; }
-    /// <summary>Indicates wether or not the mod uses custom music.</summary>
+    /// <summary>Indicates whether or not the mod uses custom music.</summary>
     [XmlAttribute("UsesCustomMusic")]
     public bool UsesCustomMusic
     { get; set; }
@@ -38,11 +38,11 @@ public class ProfileXML
     [XmlAttribute("SaveLocation")]
     public string SaveLocation
     { get; set; }
-    /// <summary>Indicates wether or not the mod supports Android.</summary>
+    /// <summary>Indicates whether or not the mod supports Android.</summary>
     [XmlAttribute("SupportsAndroid")]
     public bool SupportsAndroid
     { get; set; }
-    /// <summary>Indicates wether or not the mod was compiled with YYC.</summary>
+    /// <summary>Indicates whether or not the mod was compiled with YYC.</summary>
     [XmlAttribute("UsesYYC")]
     public bool UsesYYC
     { get; set; }
@@ -54,7 +54,7 @@ public class ProfileXML
     [XmlAttribute("ProfileNotes")]
     public string ProfileNotes
     { get; set; }
-    /// <summary>This gets calculated at runtime, by <see cref="MainForm.LoadProfiles"/>. Indicates where the install data for the mod is stored.</summary>
+    /// <summary>This gets calculated at runtime, by the MainForm. Indicates where the install data for the mod is stored.</summary>
     [XmlIgnore]
     public string DataPath
     { get; set; }
@@ -73,11 +73,11 @@ public class ProfileXML
     /// <param name="version">The version of the mod.</param>
     /// <param name="name">The mod name.</param>
     /// <param name="author">The mod author.</param>
-    /// <param name="usesCustomMusic">Wether or not the mod uses custom music.</param>
+    /// <param name="usesCustomMusic">Whether or not the mod uses custom music.</param>
     /// <param name="saveLocation">The save location of the mod.</param>
-    /// <param name="android">Wether or not the mod works for android.</param>
-    /// <param name="usesYYC">Wether or not the mod was made with YYC.</param>
-    /// <param name="installable">Wether or not the mod is installable.</param>
+    /// <param name="android">Whether or not the mod works for android.</param>
+    /// <param name="usesYYC">Whether or not the mod was made with YYC.</param>
+    /// <param name="installable">Whether or not the mod is installable.</param>
     /// <param name="profileNotes">The notes of the mod.</param>
     public ProfileXML(string operatingSystem, int xmlVersion, string version, string name, string author,
                       bool usesCustomMusic, string saveLocation, bool android, bool usesYYC,

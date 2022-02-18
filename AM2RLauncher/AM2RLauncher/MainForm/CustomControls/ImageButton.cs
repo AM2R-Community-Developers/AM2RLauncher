@@ -35,7 +35,7 @@ namespace Pablo.Controls
         }
 
         /// <summary>
-        /// Default contructor, assigns no special attributes.
+        /// Default constructor, assigns no special attributes.
         /// </summary>
         public ImageButton() { }
 

@@ -1,7 +1,6 @@
 ﻿using log4net;
 using System;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 
@@ -133,7 +132,7 @@ public static class HelperMethods
         if (File.Exists(fileName))
             RecursiveRollover(fileName, max);
         
-        //TODO: this can fail if one doesnt have permissions to move or delete the file
+        //TODO: this can fail if one doesn't have permissions to move or delete the file
         // If index is less than max, rename file.
         if (index < max)
             File.Move(logFile, fileName);

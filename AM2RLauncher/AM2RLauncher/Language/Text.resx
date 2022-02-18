@@ -154,7 +154,7 @@
     <value>Sorry, you can't close this while it's installing! Please wait until it's finished.</value>
   </data>
   <data name="CorruptPatchData" xml:space="preserve">
-    <value>There was a problem with your Patchdata folder. It has been deleted, please download it again.</value>
+    <value>There was a problem with your PatchData folder. It has been deleted, please download it again.</value>
   </data>
   <data name="CreateAPK" xml:space="preserve">
     <value>CREATE APK</value>
@@ -270,7 +270,7 @@
   <data name="Play" xml:space="preserve">
     <value>PLAY</value>
   </data>
-  <data name="PlayButtonDownladingToolTip" xml:space="preserve">
+  <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
     <value>Currently downloading . . .</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">
