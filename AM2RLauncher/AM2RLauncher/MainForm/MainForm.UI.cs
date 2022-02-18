@@ -175,6 +175,7 @@ namespace AM2RLauncher
             colBGNoAlpha = Color.FromArgb(10, 10, 10);
             colBG = Color.FromArgb(10, 10, 10, 80);
             if (OS.IsLinux) colBG = colBGNoAlpha;   // XORG can't display alpha anyway, and Wayland breaks with it.
+                                                    // TODO: that sounds like an Eto bug. investigate, try to open eto issue.
             colBGHover = Color.FromArgb(17, 28, 13);
 
             Font smallButtonFont = new Font(SystemFont.Default, 10);
@@ -808,9 +809,9 @@ namespace AM2RLauncher
             mirrorDropDown.SelectedIndexChanged += MirrorDropDownSelectedIndexChanged;
             profileLayout.LoadComplete += ProfileLayoutLoadComplete;
             addModButton.Click += AddModButtonClicked;
-            profileButton.Click += ProfilesButtonClickEvent;
+            profileButton.Click += ProfileDataButtonClickEvent;
             saveButton.Click += SaveButtonClickEvent;
-            modSettingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
+            modSettingsProfileDropDown.SelectedIndexChanged += ModSettingsProfileDropDownSelectedIndexChanged;
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
             profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
@@ -836,6 +837,7 @@ namespace AM2RLauncher
         ButtonMenuItem showButton;
 
         /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
+        //TODO: this should be moved into AM2RLauncher.Core
         List<ProfileXML> profileList;
         /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
         List<ListItem> profileNames;

@@ -117,6 +117,107 @@ namespace AM2RLauncher
             UpdateStateMachine();
         }
 
+        #region Misc events
+
+        /// <summary>
+        /// Fires when the profile layout completes loading. This makes sure that if <see cref="modSettingsProfileDropDown"/> has nothing in it "on boot",
+        /// that everything is disabled.
+        /// </summary>
+        private void ProfileLayoutLoadComplete(object sender, EventArgs e)
+        {
+            // Safety check
+            if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.Items.Count != 0)) return;
+            addModButton.Enabled = false;
+            settingsProfileLabel.TextColor = colInactive;
+            modSettingsProfileDropDown.Enabled = false;
+            profileButton.Enabled = false;
+            saveButton.Enabled = false;
+            updateModButton.Enabled = false;
+            deleteModButton.Enabled = false;
+            profileNotesTextArea.TextColor = colInactive;
+        }
+
+        /// <summary>
+        /// The <see cref="MainForm"/> calls this when you're resizing, in order to resize and scale the application accordingly.
+        /// </summary>
+        private void DrawablePaintEvent(object sender, PaintEventArgs e)
+        {
+            // Get drawing variables
+            float height = drawable.Height;
+            float width = drawable.Width;
+            //TODO: apparently winforms is the big outlier here. Works normal on wpf, I have *no* idea why, seems related to our image. issue has been submitted at eto
+            float scaleDivisor = OS.IsWindows ? formBG.Width : formBG.Height;
+
+            float scale = height / scaleDivisor;
+
+            // Do the actual scaling
+            e.Graphics.ScaleTransform(scale);
+
+            // Draw the image, change x offset with some absurd wizardry written at 5 AM
+            e.Graphics.DrawImage(formBG, ((width / 2) - (height / 1.4745f)) / scale, 0);
+        }
+
+        /// <summary>
+        /// Gets called when user tries to close <see cref="MainForm"/>. This does a few things:<br/>
+        /// 1) Writes the Width, Height, the check if <see cref="MainForm"/> is currently maximized and the ProfileIndex to the Config<br/>
+        /// 2) Checks if current <see cref="updateState"/> is <see cref="UpdateState.Downloading"/>. If yes, it creates a Warning to the end user.
+        /// </summary>
+        private void MainformClosing(object sender, CancelEventArgs e)
+        {
+            log.Info("Attempting to close MainForm!");
+
+            CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
+            CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
+            CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
+            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
+
+            switch (updateState)
+            {
+                // If we're currently still downloading, ask first if user really wants to close and cancel the event if necessary
+                case UpdateState.Downloading:
+                    {
+                        var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                                                     MessageBoxType.Warning, MessageBoxDefaultButton.No);
+
+                        if (result == DialogResult.No)
+                            e.Cancel = true;
+                        else
+                            isGitProcessGettingCancelled = true;
+                        // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
+                        break;
+                    }
+                // We can't close during installing, so we cancel the event.
+                case UpdateState.Installing:
+                    {
+                        MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
+                        e.Cancel = true;
+                        break;
+                    }
+            }
+
+            // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
+            //TODO: this sounds like an eto bug. check if this can get reproduced.
+            trayIndicator.Visible = false;
+
+            if (e.Cancel)
+                log.Info("Cancelled MainForm closing event during UpdateState." + updateState + ".");
+            else
+                log.Info("Successfully closed MainForm. Exiting main thread.");
+        }
+
+        /// <summary>Gets called when <see cref="showButton"/> gets clicked and shows the <see cref="MainForm"/> and brings it to the front again.</summary>
+        private void ShowButtonClick(object sender, EventArgs e)
+        {
+            log.Info("User has opened the launcher from system tray.");
+
+            this.Show();
+            this.BringToFront();
+        }
+
+        #endregion
+
+        #region MAIN TAB
+
         /// <summary>
         /// Does a bunch of stuff, depending on the current state of <see cref="updateState"/>.
         /// </summary>
@@ -411,6 +512,28 @@ namespace AM2RLauncher
             }
         }
 
+        /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
+        private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
+
+            profileIndex = profileDropDown.SelectedIndex;
+            log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
+
+            profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+            profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+
+            if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
+                                                       profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
+                saveWarningLabel.Visible = true;
+            else
+                saveWarningLabel.Visible = false;
+
+            UpdateStateMachine();
+        }
+
+        #endregion
+
         /// <summary>
         /// If no internet access is available, this changes the content of <paramref name="tabPage"/> to an empty page only displaying <paramref name="errorLabel"/>.
         /// </summary>
@@ -432,242 +555,7 @@ namespace AM2RLauncher
             };
         }
 
-        /// <summary>
-        /// Runs when <see cref="addModButton"/> is clicked. Brings up a file select to select a mod, and adds that to the mod directory.
-        /// </summary>
-        private void AddModButtonClicked(object sender, EventArgs e)
-        {
-            log.Info("User requested to add mod. Requesting user input for new mod .zip...");
-
-            OpenFileDialog fileFinder = GetSingleZipDialog(Text.SelectModFileDialog);
-
-            if (fileFinder.ShowDialog(this) != DialogResult.Ok)
-            {
-                log.Info("User cancelled the Mod selection.");
-                return;
-            }
-
-            if (String.IsNullOrWhiteSpace(fileFinder.FileName))
-            {
-                log.Error("User did not supply valid input. Cancelling import.");
-                LoadProfilesAndAdjustLists();
-                return;
-            }
-
-            log.Info("User selected \"" + fileFinder.FileName + "\"");
-
-            // If either a directory was selected or the file somehow went missing, cancel
-            if (!File.Exists(fileFinder.FileName))
-            {
-                log.Error("Selected mod .zip file not found! Cancelling import.");
-                return;
-            }
-
-            FileInfo modFile = new FileInfo(fileFinder.FileName);
-
-            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
-            string extractedName = modFile.Name.Replace(".zip", "");
-
-            // Extract it and see if it contains a profile.xml. If not, this is invalid
-
-            // Check first, if the directory is already there, if yes, throw a message
-            if (Directory.Exists(modsDir + "/" + extractedName))
-            {
-                ProfileXML profile2 = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
-                log.Error("Mod is already imported as " + extractedName + "! Cancelling mod import.");
-
-                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile2.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
-                return;
-            }
-            // Directory doesn't exist -> extract!
-            ZipFile.ExtractToDirectory(fileFinder.FileName, modsDir + "/" + extractedName);
-            log.Info("Imported and extracted mod .zip as " + extractedName);
-
-            // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
-            if (!File.Exists(modsDir + "/" + extractedName + "/profile.xml"))
-            {
-                log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod import.");
-
-                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
-                Directory.Delete(modsDir + "/" + extractedName, true);
-                File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
-                return;
-            }
-
-            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(modsDir + "/" + extractedName + "/profile.xml"));
-
-            // Check if the OS versions match
-            if (OS.Name != profile.OperatingSystem)
-            {
-                log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
-
-                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsForWrongOS, profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
-                                Text.ErrorWindowTitle, MessageBoxType.Error);
-                HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                return;
-            }
-
-            // Check by *name*, if the mod was installed already
-            if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-            {
-                log.Error(profile.Name + " is already installed.");
-                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
-                HelperMethods.DeleteDirectory(modsDir + "/" + extractedName);
-                return;
-            }
-
-            log.Info(profile.Name + " successfully installed.");
-            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, profile.Name), Text.SuccessWindowTitle);
-
-            LoadProfilesAndAdjustLists();
-            // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
-            modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
-            if (modSettingsProfileDropDown.SelectedIndex == -1)
-                modSettingsProfileDropDown.SelectedIndex = 0;
-        }
-
-        /// <summary>
-        /// This opens the game files directory for the current profile.
-        /// </summary>
-        private void ProfilesButtonClickEvent(object sender, EventArgs e)
-        {
-            if (!IsProfileIndexValid())
-                return;
-            log.Info("User opened the profile directory for profile " + profileList[modSettingsProfileDropDown.SelectedIndex].Name +
-                     ", which is " + profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
-            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileList[modSettingsProfileDropDown.SelectedIndex].Name);
-        }
-
-        /// <summary>
-        /// This opens the save directory for the current profile.
-        /// </summary>
-        private void SaveButtonClickEvent(object sender, EventArgs e)
-        {
-            if (!IsProfileIndexValid())
-                return;
-            log.Info("User opened the save directory for profile " + profileList[modSettingsProfileDropDown.SelectedIndex].Name + ", which is " + profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
-            CrossPlatformOperations.OpenFolder(profileList[modSettingsProfileDropDown.SelectedIndex].SaveLocation);
-        }
-
-        /// <summary>
-        /// Enabled / disables <see cref="updateModButton"/> and <see cref="deleteModButton"/> accordingly.
-        /// </summary>
-        private void SettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (modSettingsProfileDropDown.SelectedIndex == -1 && modSettingsProfileDropDown.Items.Count == 0) return;
-
-            string profileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
-
-            log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
-            if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
-            {
-                deleteModButton.Enabled = false;
-                deleteModButton.ToolTip = null;
-                updateModButton.Enabled = false;
-                updateModButton.ToolTip = null;
-                profileNotesTextArea.TextColor = colInactive;
-            }
-            else
-            {
-                deleteModButton.Enabled = true;
-                deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, profileName);
-                // On non-installable profiles we want to disable updating
-                updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
-                updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
-            }
-
-            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileName);
-            profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
-            saveButton.Enabled = true;
-            saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
-
-            if (modSettingsProfileDropDown.SelectedIndex < 0 || modSettingsProfileDropDown.Items.Count == 0)
-                return;
-            profileNotesTextArea.TextColor = colGreen;
-            profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[modSettingsProfileDropDown.SelectedIndex].ProfileNotes;
-
-        }
-
-        /// <summary>
-        /// Fires when the profile layout completes loading. This makes sure that if <see cref="modSettingsProfileDropDown"/> has nothing in it "on boot",
-        /// that everything is disabled.
-        /// </summary>
-        private void ProfileLayoutLoadComplete(object sender, EventArgs e)
-        {
-            // Safety check
-            if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.Items.Count != 0)) return;
-            addModButton.Enabled = false;
-            settingsProfileLabel.TextColor = colInactive;
-            modSettingsProfileDropDown.Enabled = false;
-            profileButton.Enabled = false;
-            saveButton.Enabled = false;
-            updateModButton.Enabled = false;
-            deleteModButton.Enabled = false;
-            profileNotesTextArea.TextColor = colInactive;
-        }
-
-        /// <summary>
-        /// The <see cref="MainForm"/> calls this when you're resizing, in order to resize and scale the application accordingly.
-        /// </summary>
-        private void DrawablePaintEvent(object sender, PaintEventArgs e)
-        {
-            // Get drawing variables
-            float height = drawable.Height;
-            float width = drawable.Width;
-            //TODO: apparently winforms is the big outlier here. Works normal on wpf, I have *no* idea why, seems related to our image. issue has been submitted at eto
-            float scaleDivisor = OS.IsWindows ? formBG.Width : formBG.Height;
-
-            float scale = height / scaleDivisor;
-
-            // Do the actual scaling
-            e.Graphics.ScaleTransform(scale);
-
-            // Draw the image, change x offset with some absurd wizardry written at 5 AM
-            e.Graphics.DrawImage(formBG, ((width / 2) - (height / 1.4745f)) / scale, 0);
-        }
-
-        /// <summary>Gets called when <see cref="showButton"/> gets clicked and shows the <see cref="MainForm"/> and brings it to the front again.</summary>
-        private void ShowButtonClick(object sender, EventArgs e)
-        {
-            log.Info("User has opened the launcher from system tray.");
-
-            this.Show();
-            this.BringToFront();
-        }
-
-        /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>
-        private void HqMusicPCCheckChanged(object sender, EventArgs e)
-        {
-            log.Info("PC HQ Music option has been changed to " + hqMusicPCCheck.Checked);
-            CrossPlatformOperations.WriteToConfig("MusicHQPC", hqMusicPCCheck.Checked);
-        }
-
-        /// <summary>Gets called when <see cref="hqMusicAndroidCheck"/> gets clicked and writes its new value to the config.</summary>
-        private void HqMusicAndroidCheckChanged(object sender, EventArgs e)
-        {
-            log.Info("Android HQ Music option has been changed to " + hqMusicAndroidCheck.Checked);
-            CrossPlatformOperations.WriteToConfig("MusicHQAndroid", hqMusicAndroidCheck.Checked);
-        }
-
-        /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
-        private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
-
-            profileIndex = profileDropDown.SelectedIndex;
-            log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
-
-            profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-            profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-
-            if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
-                                                       profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
-                saveWarningLabel.Visible = true;
-            else
-                saveWarningLabel.Visible = false;
-
-            UpdateStateMachine();
-        }
+        #region SETTINGS
 
         /// <summary>Gets called when user selects a different item from <see cref="languageDropDown"/> and writes that to the config.</summary>
         private void LanguageDropDownSelectedIndexChanged(object sender, EventArgs e)
@@ -688,6 +576,55 @@ namespace AM2RLauncher
         {
             log.Info("Auto Update Launcher has been set to " + autoUpdateAM2RCheck.Checked + ".");
             CrossPlatformOperations.WriteToConfig("AutoUpdateLauncher", (bool)autoUpdateAM2RCheck.Checked);
+        }
+
+        /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>
+        private void HqMusicPCCheckChanged(object sender, EventArgs e)
+        {
+            log.Info("PC HQ Music option has been changed to " + hqMusicPCCheck.Checked);
+            CrossPlatformOperations.WriteToConfig("MusicHQPC", hqMusicPCCheck.Checked);
+        }
+
+        /// <summary>Gets called when <see cref="hqMusicAndroidCheck"/> gets clicked and writes its new value to the config.</summary>
+        private void HqMusicAndroidCheckChanged(object sender, EventArgs e)
+        {
+            log.Info("Android HQ Music option has been changed to " + hqMusicAndroidCheck.Checked);
+            CrossPlatformOperations.WriteToConfig("MusicHQAndroid", hqMusicAndroidCheck.Checked);
+        }
+
+        /// <summary>
+        /// Gets called when <see cref="profileDebugLogCheck"/> gets clicked, and writes it's new value to the config.
+        /// </summary>
+        private void ProfileDebugLogCheckedChanged(object sender, EventArgs e)
+        {
+            log.Info("Create Game Debug Logs option has been set to " + profileDebugLogCheck.Checked + ".");
+            CrossPlatformOperations.WriteToConfig("ProfileDebugLog", profileDebugLogCheck.Checked);
+        }
+
+        /// <summary>Gets called when user selects a different item from <see cref="mirrorDropDown"/>.
+        /// It then writes that to the config, and if <see cref="updateState"/> is not <see cref="UpdateState.Downloading"/>
+        /// it also overwrites the upstream URL in .git/config.</summary>
+        private void MirrorDropDownSelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
+
+            log.Info("Current mirror has been set to " + currentMirror + ".");
+
+            CrossPlatformOperations.WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
+
+            // Don't overwrite the git config while we download!!!
+            if (updateState == UpdateState.Downloading) return;
+
+            log.Info("Overwriting mirror in gitconfig.");
+
+            // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
+            string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
+            if (!File.Exists(gitConfigPath)) return;
+            string gitConfig = File.ReadAllText(gitConfigPath);
+            Regex gitURLRegex = new Regex("https://.*\\.git");
+            Match match = gitURLRegex.Match(gitConfig);
+            gitConfig = gitConfig.Replace(match.Value, currentMirror);
+            File.WriteAllText(gitConfigPath, gitConfig);
         }
 
         /// <summary>Gets called when <see cref="customMirrorCheck"/> gets clicked, displays a warning <see cref="MessageBox"/>
@@ -718,39 +655,16 @@ namespace AM2RLauncher
             }
         }
 
-        /// <summary>Gets called when user selects a different item from <see cref="mirrorDropDown"/>.
-        /// It then writes that to the config, and if <see cref="updateState"/> is not <see cref="UpdateState.Downloading"/>
-        /// it also overwrites the upstream URL in .git/config.</summary>
-        private void MirrorDropDownSelectedIndexChanged(object sender, EventArgs e)
+        //TODO: why exactly do we need this?
+        /// <summary>Gets called when <see cref="customMirrorCheck"/> gets loaded.
+        /// Enables and changes colors for <see cref="customMirrorTextBox"/> and <see cref="mirrorDropDown"/> accordingly.</summary>
+        private void CustomMirrorCheckLoadComplete(object sender, EventArgs e)
         {
-            currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
-
-            log.Info("Current mirror has been set to " + currentMirror + ".");
-
-            CrossPlatformOperations.WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
-
-            // Don't overwrite the git config while we download!!!
-            if (updateState == UpdateState.Downloading) return;
-
-            log.Info("Overwriting mirror in gitconfig.");
-
-            // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
-            string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
-            if (!File.Exists(gitConfigPath)) return;
-            string gitConfig = File.ReadAllText(gitConfigPath);
-            Regex gitURLRegex = new Regex("https://.*\\.git");
-            Match match = gitURLRegex.Match(gitConfig);
-            gitConfig = gitConfig.Replace(match.Value, currentMirror);
-            File.WriteAllText(gitConfigPath, gitConfig);
-        }
-
-        /// <summary>
-        /// Gets called when <see cref="profileDebugLogCheck"/> gets clicked, and writes it's new value to the config.
-        /// </summary>
-        private void ProfileDebugLogCheckedChanged(object sender, EventArgs e)
-        {
-            log.Info("Create Game Debug Logs option has been set to " + profileDebugLogCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("ProfileDebugLog", profileDebugLogCheck.Checked);
+            bool enabled = (bool)customMirrorCheck.Checked;
+            customMirrorTextBox.Enabled = enabled;
+            mirrorDropDown.Enabled = !enabled;
+            if (OS.IsWindows)
+                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
         }
 
         /// <summary>
@@ -793,15 +707,157 @@ namespace AM2RLauncher
             CrossPlatformOperations.WriteToConfig("CustomEnvVar", customEnvVarTextBox.Text);
         }
 
-        /// <summary>Gets called when <see cref="customMirrorCheck"/> gets loaded.
-        /// Enables and changes colors for <see cref="customMirrorTextBox"/> and <see cref="mirrorDropDown"/> accordingly.</summary>
-        private void CustomMirrorCheckLoadComplete(object sender, EventArgs e)
+        #endregion
+
+        #region MOD SETTINGS
+
+        /// <summary>
+        /// Runs when <see cref="addModButton"/> is clicked. Brings up a file select to select a mod, and adds that to the mod directory.
+        /// </summary>
+        private void AddModButtonClicked(object sender, EventArgs e)
         {
-            bool enabled = (bool)customMirrorCheck.Checked;
-            customMirrorTextBox.Enabled = enabled;
-            mirrorDropDown.Enabled = !enabled;
-            if (OS.IsWindows)
-                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
+            log.Info("User requested to add mod. Requesting user input for new mod .zip...");
+
+            OpenFileDialog fileFinder = GetSingleZipDialog(Text.SelectModFileDialog);
+
+            // If user didn't press ok, cancel
+            if (fileFinder.ShowDialog(this) != DialogResult.Ok)
+            {
+                log.Info("User cancelled the Mod selection.");
+                return;
+            }
+
+            log.Info("User selected \"" + fileFinder.FileName + "\"");
+
+            // If either a directory was selected, user pressed OK without selecting anything or the file somehow went missing, cancel
+            if (!File.Exists(fileFinder.FileName))
+            {
+                log.Error("Selected mod .zip file not found! Cancelling import.");
+                return;
+            }
+
+            //TODO: move most of this into AM2RLauncher.Profile?
+
+            FileInfo modFile = new FileInfo(fileFinder.FileName);
+            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
+            string modFileName = Path.GetFileNameWithoutExtension(modFile.Name);
+            string extractedModDir = modsDir + "/" + modFileName;
+
+            // Check first, if the directory is already there, if yes, throw error
+            if (Directory.Exists(extractedModDir))
+            {
+                string existingProfileName = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedModDir + "/profile.xml")).Name;
+                log.Error("Mod is already imported as " + modFileName + "! Cancelling mod import.");
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, existingProfileName), Text.WarningWindowTitle, MessageBoxType.Warning);
+                return;
+            }
+
+            // Directory doesn't exist -> extract!
+            ZipFile.ExtractToDirectory(modFile.FullName, extractedModDir);
+            log.Info("Imported and extracted mod .zip as " + modFileName);
+
+            // If profile.xml doesn't exist, throw an error and cleanup
+            if (!File.Exists(extractedModDir + "/profile.xml"))
+            {
+                log.Error(modFile.Name + " does not contain profile.xml! Cancelling mod import.");
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, modFileName), Text.ErrorWindowTitle, MessageBoxType.Error);
+                Directory.Delete(extractedModDir, true);
+                return;
+            }
+
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedModDir + "/profile.xml"));
+
+            // If OS versions mismatch, throw error and cleanup
+            if (OS.Name != profile.OperatingSystem)
+            {
+                log.Error("Mod is for " + profile.OperatingSystem + " while current OS is " + OS.Name + ". Cancelling mod import.");
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsForWrongOS, profile.Name).Replace("$OS", profile.OperatingSystem).Replace("$CURRENTOS", OS.Name),
+                                Text.ErrorWindowTitle, MessageBoxType.Error);
+                HelperMethods.DeleteDirectory(extractedModDir);
+                return;
+            }
+
+            // If mod was installed/added by *name* already, throw error and cleanup
+            if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null)
+            {
+                log.Error(profile.Name + " is already installed.");
+                MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
+                HelperMethods.DeleteDirectory(extractedModDir);
+                return;
+            }
+
+            // Reload list so mod gets recognized
+            LoadProfilesAndAdjustLists();
+            // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
+            modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
+            if (modSettingsProfileDropDown.SelectedIndex == -1)
+                modSettingsProfileDropDown.SelectedIndex = 0;
+
+            log.Info(profile.Name + " successfully added.");
+            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, profile.Name), Text.SuccessWindowTitle);
+        }
+
+        /// <summary>
+        /// Enabled / disables <see cref="updateModButton"/> and <see cref="deleteModButton"/> accordingly.
+        /// </summary>
+        private void ModSettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (modSettingsProfileDropDown.SelectedIndex == -1 && modSettingsProfileDropDown.Items.Count == 0) return;
+
+            string profileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
+
+            log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
+            if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
+            {
+                deleteModButton.Enabled = false;
+                deleteModButton.ToolTip = null;
+                updateModButton.Enabled = false;
+                updateModButton.ToolTip = null;
+                profileNotesTextArea.TextColor = colInactive;
+            }
+            else
+            {
+                deleteModButton.Enabled = true;
+                deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, profileName);
+                // On non-installable profiles we want to disable updating
+                updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
+                updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
+            }
+
+            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileName);
+            profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
+            saveButton.Enabled = true;
+            saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
+
+            if (modSettingsProfileDropDown.SelectedIndex < 0 || modSettingsProfileDropDown.Items.Count == 0)
+                return;
+            profileNotesTextArea.TextColor = colGreen;
+            profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[modSettingsProfileDropDown.SelectedIndex].ProfileNotes;
+
+        }
+
+        /// <summary>
+        /// This opens the game files directory for the current profile.
+        /// </summary>
+        private void ProfileDataButtonClickEvent(object sender, EventArgs e)
+        {
+            if (!IsProfileIndexValid())
+                return;
+            ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
+            log.Info("User opened the profile directory for profile " + profile.Name + ", which is " + profile.SaveLocation);
+            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+        }
+
+        /// <summary>
+        /// This opens the save directory for the current profile.
+        /// </summary>
+        private void SaveButtonClickEvent(object sender, EventArgs e)
+        {
+            if (!IsProfileIndexValid())
+                return;
+            ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
+            log.Info("User opened the save directory for profile " + profile.Name + ", which is " + profile.SaveLocation);
+            CrossPlatformOperations.OpenFolder(profile.SaveLocation);
         }
 
         /// <summary>
@@ -815,17 +871,17 @@ namespace AM2RLauncher
             DialogResult result = MessageBox.Show(this, HelperMethods.GetText(Text.DeleteModWarning, profile.Name), Text.WarningWindowTitle,
                                                   MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
 
-            if (result == DialogResult.Ok)
-            {
-                log.Info("User did not cancel. Proceeding to delete " + profile);
-                DeleteProfileAndAdjustLists(profile);
-                log.Info(profile + " has been deleted");
-                MessageBox.Show(this, HelperMethods.GetText(Text.DeleteModButtonSuccess, profile.Name), Text.SuccessWindowTitle);
-            }
-            else
+            // if user didn't press ok, cancel
+            if (result != DialogResult.Ok)
             {
                 log.Info("User has cancelled profile deletion.");
+                return;
             }
+
+            log.Info("User did not cancel. Proceeding to delete " + profile);
+            DeleteProfileAndAdjustLists(profile);
+            log.Info(profile + " has been deleted");
+            MessageBox.Show(this, HelperMethods.GetText(Text.DeleteModButtonSuccess, profile.Name), Text.SuccessWindowTitle);
         }
 
         /// <summary>
@@ -836,165 +892,98 @@ namespace AM2RLauncher
         {
             log.Info("User requested to update mod. Requesting user input for new mod .zip...");
 
-            bool abort = false;
-
             ProfileXML currentProfile = profileList[modSettingsProfileDropDown.SelectedIndex];
-
             OpenFileDialog fileFinder = GetSingleZipDialog(Text.SelectModFileDialog);
 
+            // If user didn't click OK, cancel
             if (fileFinder.ShowDialog(this) != DialogResult.Ok)
             {
                 log.Info("User cancelled the Mod selection.");
                 return;
             }
 
-            // Exit if nothing was selected
-            if (String.IsNullOrWhiteSpace(fileFinder.FileName))
-            {
-                log.Info("Nothing was selected, cancelling mod update.");
-                LoadProfilesAndAdjustLists();
-                return;
-            }
-
             log.Info("User selected \"" + fileFinder.FileName + "\"");
 
-            // If either a directory was selected or the file somehow went missing, cancel
+            // If either a directory was selected, no file was selected or the file somehow went missing, cancel
             if (!File.Exists(fileFinder.FileName))
             {
                 log.Error("Selected mod .zip file not found! Cancelling mod update.");
                 return;
             }
 
+            //TODO: move most of this into AM2RLauncher.Profile?
+
             FileInfo modFile = new FileInfo(fileFinder.FileName);
-
             string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
-            string extractedName = modFile.Name.Replace(".zip", "_new");
-            string extractedFolder = modsDir + "/" + extractedName;
+            string extractedName = Path.GetFileNameWithoutExtension(modFile.Name) + "_new";
+            string extractedModDir = modsDir + "/" + extractedName;
 
-            // Extract it and see if it contains a profile.xml. If not, this is invalid
-
-            // If for some reason old files remain, delete them
-            if (Directory.Exists(extractedFolder))
-                Directory.Delete(extractedFolder, true);
+            // If for some reason old files remain, delete them so that extraction doesnt throw
+            if (Directory.Exists(extractedModDir))
+                Directory.Delete(extractedModDir, true);
 
             // Directory doesn't exist -> extract!
-            ZipFile.ExtractToDirectory(fileFinder.FileName, extractedFolder);
+            ZipFile.ExtractToDirectory(fileFinder.FileName, extractedModDir);
 
-            // Let's check if profile.xml exists in there! If it doesn't throw an error and cleanup
-            if (!File.Exists(extractedFolder + "/profile.xml"))
+            // If mod doesn't have a profile.xml, throw an error and cleanup
+            if (!File.Exists(extractedModDir + "/profile.xml"))
             {
                 log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
                 MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
-                Directory.Delete(extractedFolder, true);
-                File.Delete(CrossPlatformOperations.CURRENTPATH + "/Mods/" + modFile.Name);
+                Directory.Delete(extractedModDir, true);
                 return;
             }
 
             // Check by *name*, if the mod was installed already
-            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedFolder + "/profile.xml"));
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedModDir + "/profile.xml"));
 
-            if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null || Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
+            // If the selected mod is not installed, tell user that they should add it and cleanup
+            if (profileList.FirstOrDefault(p => p.Name == profile.Name) == null)
             {
-                // Mod is already installed, so we can update!
-                DialogResult updateResult = MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
-                                                      MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
-
-                if (updateResult == DialogResult.Ok)
-                {
-                    // If the profile isn't installed, don't ask about archiving it
-                    if (Profile.IsProfileInstalled(currentProfile))
-                    {
-                        DialogResult archiveResult = MessageBox.Show(this, HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
-
-                        // User wants to archive profile
-                        if (archiveResult == DialogResult.Yes)
-                            ArchiveProfileAndAdjustLists(currentProfile);
-                    }
-                    // Now we delete the profile
-                    DeleteProfileAndAdjustLists(currentProfile);
-
-                    // Rename directory to take the old one's place
-                    string originalFolder = modsDir + "/" + extractedName.Replace("_new", "");
-                    Directory.Move(extractedFolder, originalFolder);
-                }
-                else // Cancel the operation!
-                {
-                    log.Error("User has cancelled mod update!");
-                    abort = true;
-                }
-            }
-            else
-            {
-                // Cancel the operation!
-                // Show message to tell user that mod could not be found, install this separately
                 log.Error("Mod is not installed! Cancelling mod update.");
                 MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModButtonWrongMod, currentProfile.Name).Replace("$SELECT", profile.Name),
                                 Text.WarningWindowTitle, MessageBoxButtons.OK);
-                abort = true;
+                HelperMethods.DeleteDirectory(extractedModDir);
+                return;
             }
-
-            if (abort)
+            
+            // If user doesn't want to update, cleanup
+            DialogResult updateResult = MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
+                                                    MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
+            if (updateResult != DialogResult.Ok)
             {
-                // File cleanup
-                HelperMethods.DeleteDirectory(extractedFolder);
-                LoadProfilesAndAdjustLists();
+                log.Error("User has cancelled mod update!");
+                HelperMethods.DeleteDirectory(extractedModDir);
                 return;
             }
 
-            log.Info("Successfully updated mod profile " + profile.Name + ".");
-            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, currentProfile.Name), Text.SuccessWindowTitle);
-            UpdateStateMachine();
+            // If the profile isn't installed, don't ask about archiving it
+            if (Profile.IsProfileInstalled(currentProfile))
+            {
+                DialogResult archiveResult = MessageBox.Show(this, HelperMethods.GetText(Text.ArchiveMod, currentProfile.Name + " " + Text.VersionLabel + currentProfile.Version), Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
 
+                // User wants to archive profile
+                if (archiveResult == DialogResult.Yes)
+                    ArchiveProfileAndAdjustLists(currentProfile);
+            }
+
+            DeleteProfileAndAdjustLists(currentProfile);
+
+            // Rename directory to take the old one's place
+            string originalFolder = modsDir + "/" + Path.GetFileNameWithoutExtension(modFile.Name);
+            Directory.Move(extractedModDir, originalFolder);
+
+            // Adjust our lists so it gets recognized
             LoadProfilesAndAdjustLists();
 
             modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentProfile.Name);
             if (modSettingsProfileDropDown.SelectedIndex == -1)
                 modSettingsProfileDropDown.SelectedIndex = 0;
+
+            log.Info("Successfully updated mod profile " + profile.Name + ".");
+            MessageBox.Show(this, HelperMethods.GetText(Text.ModSuccessfullyInstalledMessage, currentProfile.Name), Text.SuccessWindowTitle);
         }
 
-        /// <summary>
-        /// Gets called when user tries to close <see cref="MainForm"/>. This does a few things:<br/>
-        /// 1) Writes the Width, Height and the check if <see cref="MainForm"/> is currently maximized to the Config<br/>
-        /// 2) Checks if current <see cref="updateState"/> is <see cref="UpdateState.Downloading"/>. If yes, it creates a Warning to the end user.
-        /// </summary>
-        private void MainformClosing(object sender, CancelEventArgs e)
-        {
-            log.Info("Attempting to close MainForm!");
-
-            CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
-            CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
-            CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
-
-            switch (updateState)
-            {
-                case UpdateState.Downloading:
-                {
-                    var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
-                                                 MessageBoxType.Warning, MessageBoxDefaultButton.No);
-                    if (result == DialogResult.No)
-                    {
-                        e.Cancel = true;
-                    }
-                    else
-                        isGitProcessGettingCancelled = true;
-                    // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
-                    break;
-                }
-                case UpdateState.Installing:
-                    MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
-                    e.Cancel = true;
-                    break;
-            }
-
-            // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
-            trayIndicator.Visible = false;
-
-            if (e.Cancel)
-                log.Info("Cancelled MainForm closing event during UpdateState." + updateState + ".");
-            else
-                log.Info("Successfully closed MainForm. Exiting main thread.");
-        }
-
+        #endregion
     }
 }
