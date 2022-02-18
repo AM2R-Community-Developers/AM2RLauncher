@@ -23,12 +23,12 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Determines current conditions and calls <see cref="SetPlayButtonState(UpdateState)"/> accordingly.
+        /// Determines current conditions and calls <see cref="SetPlayButtonState(PlayButtonState)"/> accordingly.
         /// </summary>
         private void UpdatePlayState()
         {
             // If we're downloading or installing, dont't change anything
-            if ((updateState == UpdateState.Downloading) || (updateState == UpdateState.Installing))
+            if ((updateState == PlayButtonState.Downloading) || (updateState == PlayButtonState.Installing))
                 return;
 
             // If we're currently creating an APK, we disable the play button
@@ -42,14 +42,14 @@ namespace AM2RLauncher
             // If PatchData isn't cloned, we still need to download
             if (!Profile.IsPatchDataCloned())
             {
-                SetPlayButtonState(UpdateState.Download);
+                SetPlayButtonState(PlayButtonState.Download);
                 return;
             }
 
             // If 1.1 isn't installed, we still need to select it
             if (!Profile.Is11Installed())
             {
-                SetPlayButtonState(UpdateState.Select11);
+                SetPlayButtonState(PlayButtonState.Select11);
                 return;
             }
             
@@ -57,7 +57,7 @@ namespace AM2RLauncher
             // If current profile is installed, we're ready to play!
             if (isProfileValid && Profile.IsProfileInstalled(profileList[profileIndex.Value]))
             {
-                SetPlayButtonState(UpdateState.Play);
+                SetPlayButtonState(PlayButtonState.Play);
                 return;
             }
             // Otherwise, if profile is NOT installable, we delete the profile because we can't install it and therefore holds no value!
@@ -68,7 +68,7 @@ namespace AM2RLauncher
             }
 
             // Otherwise, we still need to install.
-            SetPlayButtonState(UpdateState.Install);
+            SetPlayButtonState(PlayButtonState.Install);
         }
 
         /// <summary>
@@ -95,14 +95,14 @@ namespace AM2RLauncher
             // Switch status based on main button's state
             switch (updateState)
             {
-                case UpdateState.Download:
-                case UpdateState.Downloading:
-                case UpdateState.Select11:
-                case UpdateState.Installing:
-                case UpdateState.Playing: return;
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: return;
 
-                case UpdateState.Install:
-                case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
             }
         }
 
@@ -116,14 +116,14 @@ namespace AM2RLauncher
                 return;
             switch (updateState)
             {
-                case UpdateState.Download:
-                case UpdateState.Downloading:
-                case UpdateState.Select11:
-                case UpdateState.Installing:
-                case UpdateState.Playing: profileDropDown.Enabled = false; break;
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: profileDropDown.Enabled = false; break;
 
-                case UpdateState.Install:
-                case UpdateState.Play: profileDropDown.Enabled = true; break;
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: profileDropDown.Enabled = true; break;
                 
             }
             if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
@@ -148,14 +148,14 @@ namespace AM2RLauncher
             bool enabled = false;
             switch (updateState)
             {
-                case UpdateState.Download:
-                case UpdateState.Downloading:
-                case UpdateState.Select11:
-                case UpdateState.Installing:
-                case UpdateState.Playing: enabled = false; break;
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: enabled = false; break;
 
-                case UpdateState.Install:
-                case UpdateState.Play: enabled = true; break;
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: enabled = true; break;
 
             }
             if (apkButtonState == ApkButtonState.Creating) enabled = false;
@@ -195,19 +195,19 @@ namespace AM2RLauncher
         /// Sets the global <see cref="updateState"/> and then changes the state of <see cref="playButton"/> accordingly. 
         /// </summary>
         /// <param name="state">The state that should be set to.</param>
-        private void SetPlayButtonState(UpdateState state)
+        private void SetPlayButtonState(PlayButtonState state)
         {
             updateState = state;
             switch (updateState)
             {
-                case UpdateState.Download: 
-                case UpdateState.Downloading: 
-                case UpdateState.Select11: 
-                case UpdateState.Install: 
-                case UpdateState.Play: playButton.Enabled = true; break;
+                case PlayButtonState.Download: 
+                case PlayButtonState.Downloading: 
+                case PlayButtonState.Select11: 
+                case PlayButtonState.Install: 
+                case PlayButtonState.Play: playButton.Enabled = true; break;
 
-                case UpdateState.Installing: 
-                case UpdateState.Playing: playButton.Enabled = false; break;
+                case PlayButtonState.Installing: 
+                case PlayButtonState.Playing: playButton.Enabled = false; break;
             }
             playButton.Text = GetPlayButtonText();
             playButton.ToolTip = GetPlayButtonTooltip();
@@ -240,13 +240,13 @@ namespace AM2RLauncher
         {
             switch (updateState)
             {
-                case UpdateState.Download: return Text.Download;
-                case UpdateState.Downloading: return Text.Abort;
-                case UpdateState.Select11: return Text.Select11;
-                case UpdateState.Install: return Text.Install;
-                case UpdateState.Installing: return Text.Installing;
-                case UpdateState.Play: return Text.Play;
-                case UpdateState.Playing: return Text.Playing;
+                case PlayButtonState.Download: return Text.Download;
+                case PlayButtonState.Downloading: return Text.Abort;
+                case PlayButtonState.Select11: return Text.Select11;
+                case PlayButtonState.Install: return Text.Install;
+                case PlayButtonState.Installing: return Text.Installing;
+                case PlayButtonState.Play: return Text.Play;
+                case PlayButtonState.Playing: return Text.Playing;
                 default: return null;
             }
         }
@@ -260,13 +260,13 @@ namespace AM2RLauncher
             string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
-                case UpdateState.Download: return Text.PlayButtonDownloadToolTip;
-                case UpdateState.Downloading: return Text.PlayButtonDownloadToolTip;
-                case UpdateState.Select11: return Text.PlayButtonSelect11ToolTip;
-                case UpdateState.Install: return playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName);
-                case UpdateState.Installing: return Text.PlayButtonInstallingToolTip;
-                case UpdateState.Play: return HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName);
-                case UpdateState.Playing: return Text.PlayButtonPlayingToolTip;
+                case PlayButtonState.Download: return Text.PlayButtonDownloadToolTip;
+                case PlayButtonState.Downloading: return Text.PlayButtonDownloadToolTip;
+                case PlayButtonState.Select11: return Text.PlayButtonSelect11ToolTip;
+                case PlayButtonState.Install: return playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName);
+                case PlayButtonState.Installing: return Text.PlayButtonInstallingToolTip;
+                case PlayButtonState.Play: return HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName);
+                case PlayButtonState.Playing: return Text.PlayButtonPlayingToolTip;
                 default: return null;
             }
         }
@@ -374,7 +374,7 @@ namespace AM2RLauncher
             customMirrorTextBox.Enabled = enabled;
             mirrorDropDown.Enabled = !enabled;
             // Not sure why the dropdown menu needs this hack, but the textBox does not.
-            //TODO: eto issue?
+            //TODO: eto feature request
             if (OS.IsWindows)
                 mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
             mirrorLabel.TextColor = !enabled ? colGreen : colInactive;

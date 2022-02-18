@@ -38,7 +38,7 @@ namespace AM2RLauncher
             if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
                 return;
             
-            SetPlayButtonState(UpdateState.Downloading);
+            SetPlayButtonState(PlayButtonState.Downloading);
 
             progressBar.Visible = true;
             progressLabel.Visible = true;
@@ -113,7 +113,7 @@ namespace AM2RLauncher
                 }
             }
 
-            SetPlayButtonState(UpdateState.Install);
+            SetPlayButtonState(PlayButtonState.Install);
             UpdateStateMachine();
         }
 
@@ -160,7 +160,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Gets called when user tries to close <see cref="MainForm"/>. This does a few things:<br/>
         /// 1) Writes the Width, Height, the check if <see cref="MainForm"/> is currently maximized and the ProfileIndex to the Config<br/>
-        /// 2) Checks if current <see cref="updateState"/> is <see cref="UpdateState.Downloading"/>. If yes, it creates a Warning to the end user.
+        /// 2) Checks if current <see cref="updateState"/> is <see cref="PlayButtonState.Downloading"/>. If yes, it creates a Warning to the end user.
         /// </summary>
         private void MainformClosing(object sender, CancelEventArgs e)
         {
@@ -174,7 +174,7 @@ namespace AM2RLauncher
             switch (updateState)
             {
                 // If we're currently still downloading, ask first if user really wants to close and cancel the event if necessary
-                case UpdateState.Downloading:
+                case PlayButtonState.Downloading:
                 {
                     var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
                                                     MessageBoxType.Warning, MessageBoxDefaultButton.No);
@@ -187,7 +187,7 @@ namespace AM2RLauncher
                     break;
                 }
                 // We can't close during installing, so we cancel the event.
-                case UpdateState.Installing:
+                case PlayButtonState.Installing:
                 {
                     MessageBox.Show(this, Text.CloseOnInstallingText, Text.WarningWindowTitle, MessageBoxButtons.OK, MessageBoxType.Warning);
                     e.Cancel = true;
@@ -232,13 +232,13 @@ namespace AM2RLauncher
             switch (updateState)
             {
                 #region Download
-                case UpdateState.Download:
+                case PlayButtonState.Download:
 
                     log.Info("Attempting to clone repository " + currentMirror + "...");
                     bool successful = true;
 
                     // Update playButton states
-                    SetPlayButtonState(UpdateState.Downloading);
+                    SetPlayButtonState(PlayButtonState.Downloading);
 
                     // Enable progressBar
                     progressBar.Visible = true;
@@ -306,7 +306,7 @@ namespace AM2RLauncher
                     progressBar.Value = 0;
 
                     // Just need to switch this to anything that isn't an "active" state so SetUpdateState() actually does something
-                    SetPlayButtonState(UpdateState.Install);
+                    SetPlayButtonState(PlayButtonState.Install);
 
                     // This needs to be run BEFORE the state check so that the Mod Settings tab doesn't weird out
                     LoadProfilesAndAdjustLists();
@@ -319,7 +319,7 @@ namespace AM2RLauncher
 
                 #region Downloading
 
-                case UpdateState.Downloading:
+                case PlayButtonState.Downloading:
                     var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
                     if (result != DialogResult.Yes)
                         return;
@@ -336,7 +336,7 @@ namespace AM2RLauncher
                 #endregion
 
                 #region Select11
-                case UpdateState.Select11:
+                case PlayButtonState.Select11:
 
                     log.Info("Requesting user input for AM2R_11.zip...");
 
@@ -381,10 +381,10 @@ namespace AM2RLauncher
                 #endregion
 
                 #region Install
-                case UpdateState.Install:
+                case PlayButtonState.Install:
                     progressBar.Visible = true;
                     progressBar.Value = 0;
-                    SetPlayButtonState(UpdateState.Installing);
+                    SetPlayButtonState(PlayButtonState.Installing);
 
                     // Make sure the main interface state machines properly
                     UpdateApkState();
@@ -398,7 +398,7 @@ namespace AM2RLauncher
                         {
                             MessageBox.Show(this, Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                             
-                            SetPlayButtonState(UpdateState.Install);
+                            SetPlayButtonState(PlayButtonState.Install);
                             UpdateStateMachine();
                             log.Error("Xdelta not found. Aborting installing a profile...");
                             return;
@@ -419,20 +419,20 @@ namespace AM2RLauncher
                     progressBar.Value = 0;
 
                     // Just need to switch this to anything that isn't an "active" state so SetUpdateState() actually does something
-                    SetPlayButtonState(UpdateState.Play);
+                    SetPlayButtonState(PlayButtonState.Play);
                     UpdateStateMachine();
                     break;
                 #endregion
 
                 #region Play
-                case UpdateState.Play:
+                case PlayButtonState.Play:
 
                     if (!IsProfileIndexValid())
                         return;
 
                     ProfileXML profile = profileList[profileIndex.Value];
                     Visible = false;
-                    SetPlayButtonState(UpdateState.Playing);
+                    SetPlayButtonState(PlayButtonState.Playing);
 
                     // Make sure the main interface state machines properly
                     UpdateApkState();
@@ -455,7 +455,7 @@ namespace AM2RLauncher
                     Visible = true;
                     WindowState = windowStateBeforeLaunching;
 
-                    SetPlayButtonState(UpdateState.Play);
+                    SetPlayButtonState(PlayButtonState.Play);
                     UpdateStateMachine();
                     break;
 
@@ -602,7 +602,7 @@ namespace AM2RLauncher
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="mirrorDropDown"/>.
-        /// It then writes that to the config, and if <see cref="updateState"/> is not <see cref="UpdateState.Downloading"/>
+        /// It then writes that to the config, and if <see cref="updateState"/> is not <see cref="PlayButtonState.Downloading"/>
         /// it also overwrites the upstream URL in .git/config.</summary>
         private void MirrorDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
@@ -613,7 +613,7 @@ namespace AM2RLauncher
             CrossPlatformOperations.WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
 
             // Don't overwrite the git config while we download!!!
-            if (updateState == UpdateState.Downloading) return;
+            if (updateState == PlayButtonState.Downloading) return;
 
             log.Info("Overwriting mirror in gitconfig.");
 
