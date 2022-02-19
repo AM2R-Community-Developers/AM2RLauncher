@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AM2RLauncher.Core;
 using log4net.Repository.Hierarchy;
 using Application = Eto.Forms.Application;
 using FileInfo = System.IO.FileInfo;
@@ -26,7 +27,7 @@ internal static class MainClass
     [STAThread]
     public static void Main()
     {
-        string launcherDataPath = GenerateCurrentPath();
+        string launcherDataPath = CrossPlatformOperations.CURRENTPATH;
 
         // Make sure first, ~/.local/share/AM2RLauncher exists
         if (!Directory.Exists(launcherDataPath))
@@ -83,45 +84,5 @@ internal static class MainClass
         {
             MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
         });
-    }
-
-    // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
-    private static string GenerateCurrentPath()
-    {
-        string nixHome = Environment.GetEnvironmentVariable("HOME");
-        // First, we check if the user has a custom AM2RLAUNCHERDATA env var
-        string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
-        if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
-        {
-            try
-            {
-                // This will create the directories recursively if they don't exist
-                Directory.CreateDirectory(am2rLauncherDataEnvVar);
-
-                // Our env var is now set and directories exist
-                return am2rLauncherDataEnvVar;
-            }
-            catch { }
-        }
-
-        // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
-        string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-        if (String.IsNullOrWhiteSpace(xdgDataHome))
-            xdgDataHome = nixHome + "/.local/share";
-
-        // Add AM2RLauncher to the end of the dataPath
-        xdgDataHome += "/AM2RLauncher";
-
-        try
-        {
-            // This will create the directories recursively if they don't exist
-            Directory.CreateDirectory(xdgDataHome);
-
-            // Our env var is now set and directories exist
-            return xdgDataHome;
-        }
-        catch { }
-
-        return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
     }
 }

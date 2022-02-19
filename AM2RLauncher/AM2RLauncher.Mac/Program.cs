@@ -4,6 +4,7 @@ using log4net.Config;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using AM2RLauncher.Core;
 using log4net.Repository.Hierarchy;
 
 namespace AM2RLauncher.Mac;
@@ -24,7 +25,7 @@ internal static class MainClass
     [STAThread]
     public static void Main()
     {
-        string launcherDataPath = GenerateCurrentPath();
+        string launcherDataPath = CrossPlatformOperations.CURRENTPATH;
 
         // Make sure first, ~/.local/share/AM2RLauncher exists
         if (!Directory.Exists(launcherDataPath))
@@ -67,36 +68,5 @@ internal static class MainClass
         {
             MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "Mac", MessageBoxType.Error);
         });
-    }
-
-    // This is a duplicate of CrossPlatformOperations.GenerateCurrentPath, because trying to invoke that would cause a crash due to currentPlatform not being initialized.
-    [return: NotNull]
-    private static string GenerateCurrentPath()
-    {
-        string am2rLauncherDataEnvVar = Environment.GetEnvironmentVariable("AM2RLAUNCHERDATA");
-        if (!String.IsNullOrWhiteSpace(am2rLauncherDataEnvVar))
-        {
-            try
-            {
-                // This will create the directories recursively if they don't exist
-                Directory.CreateDirectory(am2rLauncherDataEnvVar);
-
-                // Our env var is now set and directories exist
-                return am2rLauncherDataEnvVar;
-            }
-            catch { }
-        }
-
-        string nixHome = Environment.GetEnvironmentVariable("HOME");
-        //Mac has the Path at HOME/Library/AM2RLauncher
-        string macPath = nixHome + "/Library/AM2RLauncher";
-        try
-        {
-            Directory.CreateDirectory(macPath);
-            return macPath;
-        }
-        catch { }
-
-        return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
     }
 }
