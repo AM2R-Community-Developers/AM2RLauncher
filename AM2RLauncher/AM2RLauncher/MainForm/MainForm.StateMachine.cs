@@ -37,7 +37,7 @@ namespace AM2RLauncher
                 playButton.Enabled = false;
                 return;
             }
-            
+
             playButton.Enabled = true;
             // If PatchData isn't cloned, we still need to download
             if (!Profile.IsPatchDataCloned())
@@ -52,7 +52,7 @@ namespace AM2RLauncher
                 SetPlayButtonState(PlayButtonState.Select11);
                 return;
             }
-            
+
             var isProfileValid = IsProfileIndexValid();
             // If current profile is installed, we're ready to play!
             if (isProfileValid && Profile.IsProfileInstalled(profileList[profileIndex.Value]))
@@ -124,7 +124,7 @@ namespace AM2RLauncher
 
                 case PlayButtonState.Install:
                 case PlayButtonState.Play: profileDropDown.Enabled = true; break;
-                
+
             }
             if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
 
@@ -144,7 +144,7 @@ namespace AM2RLauncher
         {
             // Safety check
             if (modSettingsProfileDropDown == null || modSettingsProfileDropDown.Items.Count <= 0) return;
-            
+
             bool enabled = false;
             switch (updateState)
             {
@@ -192,7 +192,7 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Sets the global <see cref="updateState"/> and then changes the state of <see cref="playButton"/> accordingly. 
+        /// Sets the global <see cref="updateState"/> and then changes the state of <see cref="playButton"/> accordingly.
         /// </summary>
         /// <param name="state">The state that should be set to.</param>
         private void SetPlayButtonState(PlayButtonState state)
@@ -200,13 +200,13 @@ namespace AM2RLauncher
             updateState = state;
             switch (updateState)
             {
-                case PlayButtonState.Download: 
-                case PlayButtonState.Downloading: 
-                case PlayButtonState.Select11: 
-                case PlayButtonState.Install: 
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Install:
                 case PlayButtonState.Play: playButton.Enabled = true; break;
 
-                case PlayButtonState.Installing: 
+                case PlayButtonState.Installing:
                 case PlayButtonState.Playing: playButton.Enabled = false; break;
             }
             playButton.Text = GetPlayButtonText();
@@ -218,7 +218,7 @@ namespace AM2RLauncher
         }
 
         /// <summary>
-        /// Sets the global <see cref="apkButtonState"/> and then changes the state of <see cref="apkButton"/> accordingly. 
+        /// Sets the global <see cref="apkButtonState"/> and then changes the state of <see cref="apkButton"/> accordingly.
         /// </summary>
         /// <param name="state">The state that should be set to.</param>
         private void SetApkButtonState(ApkButtonState state)
@@ -314,7 +314,7 @@ namespace AM2RLauncher
             }
 
             // Read the value from the config
-            string profIndexString = CrossPlatformOperations.ReadFromConfig("ProfileIndex");
+            string profIndexString = ReadFromConfig("ProfileIndex");
 
             // Check if either no profile was found or the setting says that the last current profile didn't exist
             if (profileDropDown.Items.Count == 0)

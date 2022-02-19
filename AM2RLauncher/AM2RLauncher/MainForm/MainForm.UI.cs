@@ -118,7 +118,7 @@ namespace AM2RLauncher
             log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
 
             // Set the language to what User wanted or choose local language
-            string userLanguage = CrossPlatformOperations.ReadFromConfig("Language").ToLower();
+            string userLanguage = ReadFromConfig("Language").ToLower();
             if (!userLanguage.Equals("default"))
                 Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
@@ -179,14 +179,14 @@ namespace AM2RLauncher
             Icon = new Icon(1f, am2rIcon);
             Title = "AM2RLauncher " + VERSION + ": " + splash;
             MinimumSize = new Size(500, 400);
-            // TODO: for some reason, this sometimes doesn't work on Linux. Was reported at eto, stays here until its fixed
-            ClientSize = new Size(Int32.Parse(CrossPlatformOperations.ReadFromConfig("Width")), Int32.Parse(CrossPlatformOperations.ReadFromConfig("Height")));
+            // TODO: for some reason, this doesn't work on Linux. Was reported at eto, stays here until its fixed
+            ClientSize = new Size(Int32.Parse(ReadFromConfig("Width")), Int32.Parse(ReadFromConfig("Height")));
             if (ClientSize.Width < 500)
                 ClientSize = new Size(500, ClientSize.Height);
             if (ClientSize.Height < 400)
                 ClientSize = new Size(ClientSize.Width, 400);
             log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
-            if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
+            if (Boolean.Parse(ReadFromConfig("IsMaximized"))) Maximize();
 
             Drawable drawable = new Drawable { BackgroundColor = colBGNoAlpha };
 
@@ -398,7 +398,7 @@ namespace AM2RLauncher
             if (OS.IsUnix && !isInternetThere)
                 changelogWebView = new WebView();
 
-            //TODO: these clip on gtk, test on other platforms. maybe eto bug.
+            //TODO: these clip on gtk, Eto issue
             Label changelogNoConnectionLabel = new Label
             {
                 Text = Text.NoInternetConnection,
@@ -516,7 +516,7 @@ namespace AM2RLauncher
 
             languageDropDown.Items.AddRange(languageList);
 
-            var tmpLanguage = CrossPlatformOperations.ReadFromConfig("Language");
+            var tmpLanguage = ReadFromConfig("Language");
             languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
 
             if (languageDropDown.SelectedIndex == -1)
@@ -528,7 +528,7 @@ namespace AM2RLauncher
             // autoUpdateAM2R checkbox
             autoUpdateAM2RCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
+                Checked = Boolean.Parse(ReadFromConfig("AutoUpdateAM2R")),
                 Text = Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
@@ -537,7 +537,7 @@ namespace AM2RLauncher
             // autoUpdateLauncher checkbox
             autoUpdateLauncherCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
+                Checked = Boolean.Parse(ReadFromConfig("AutoUpdateLauncher")),
                 Text = Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
@@ -545,7 +545,7 @@ namespace AM2RLauncher
             // HQ music, PC
             hqMusicPCCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
+                Checked = Boolean.Parse(ReadFromConfig("MusicHQPC")),
                 Text = Text.HighQualityPC,
                 TextColor = colGreen
             };
@@ -553,7 +553,7 @@ namespace AM2RLauncher
             // HQ music, Android
             hqMusicAndroidCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
+                Checked = Boolean.Parse(ReadFromConfig("MusicHQAndroid")),
                 Text = Text.HighQualityAndroid,
                 TextColor = colGreen
             };
@@ -561,7 +561,7 @@ namespace AM2RLauncher
             // Create game debug logs
             profileDebugLogCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
+                Checked = Boolean.Parse(ReadFromConfig("ProfileDebugLog")),
                 Text = Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
@@ -583,7 +583,7 @@ namespace AM2RLauncher
             {
                 customEnvVarTextBox = new TextBox
                 {
-                    Text = CrossPlatformOperations.ReadFromConfig("CustomEnvVar"),
+                    Text = ReadFromConfig("CustomEnvVar"),
                     BackgroundColor = colBGNoAlpha,
                     TextColor = colGreen
                 };
@@ -605,7 +605,7 @@ namespace AM2RLauncher
                 mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex"))
+            mirrorIndex = (Int32.Parse(ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(ReadFromConfig("MirrorIndex"))
                                                                                                                             : 0;
             mirrorDropDown.SelectedIndex = mirrorIndex;
 
@@ -614,14 +614,14 @@ namespace AM2RLauncher
             // Custom mirror
             customMirrorCheck = new CheckBox
             {
-                Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
+                Checked = Boolean.Parse(ReadFromConfig("CustomMirrorEnabled")),
                 Text = Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
 
             customMirrorTextBox = new TextBox
             {
-                Text = CrossPlatformOperations.ReadFromConfig("CustomMirrorText"),
+                Text = ReadFromConfig("CustomMirrorText"),
                 BackgroundColor = colBGNoAlpha,
                 TextColor = colGreen
             };
@@ -847,7 +847,7 @@ namespace AM2RLauncher
         private readonly Color colBGNoAlpha = Color.FromArgb(10, 10, 10);
         /// <summary>The black background color.</summary>
         // XORG can't display alpha anyway, and Wayland breaks with it.
-        // TODO: that sounds like an Eto bug. investigate, try to open eto issue.
+        // TODO: that sounds like an Eto issue. investigate, try to open eto issue.
         private readonly Color colBG = OS.IsLinux ? Color.FromArgb(10, 10, 10) : Color.FromArgb(10, 10, 10, 80);
         /// <summary>The lighter green color on hover.</summary>
         private readonly Color colBGHover = Color.FromArgb(17, 28, 13);

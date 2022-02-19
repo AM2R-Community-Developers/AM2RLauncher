@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace AM2RLauncher.Core.XML;
-
-//TODO: AM2RLauncher specific, should probably get moved.
+namespace AM2RLauncher.XML;
 
 /// <summary>
 /// Class that handles how the Launcher settings are saved as XML. Only affects Linux

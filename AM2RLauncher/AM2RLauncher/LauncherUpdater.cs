@@ -1,4 +1,5 @@
 ﻿using AM2RLauncher.Core;
+using AM2RLauncher;
 using Eto.Forms;
 using log4net;
 using System;
@@ -33,7 +34,7 @@ namespace AM2RLauncher
         private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
 
         /// <summary>
-        /// Performs the entire AM2RLauncher update procedure. 
+        /// Performs the entire AM2RLauncher update procedure.
         /// </summary>
         public static void Main()
         {
@@ -79,7 +80,7 @@ namespace AM2RLauncher
             }
 
             // Check settings if autoUpdateLauncher is set to true
-            bool autoUpdate = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher"));
+            bool autoUpdate = Boolean.Parse(MainForm.ReadFromConfig("AutoUpdateLauncher"));
 
             if (autoUpdate)
             {
@@ -118,7 +119,7 @@ namespace AM2RLauncher
                     int onlineNum = Int32.Parse(onlineVersionArray[i]);
                     int localNum = Int32.Parse(localVersionArray[i]);
                     if (onlineNum > localNum)
-                    { 
+                    {
                         isCurrentVersionOutdated = true;
                         break;
                     }
@@ -140,7 +141,7 @@ namespace AM2RLauncher
                                     "Please recompile AM2RLauncher again or disable auto-updating");
                     return;
                 }
-                
+
                 log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
                 string tmpUpdatePath = CrossPlatformOperations.CURRENTPATH + "/tmpupdate/";
@@ -211,7 +212,7 @@ namespace AM2RLauncher
 
                 Directory.Delete(tmpUpdatePath, true);
 
-                CrossPlatformOperations.CopyOldConfigToNewConfig();
+                MainForm.CopyOldConfigToNewConfig();
 
                 log.Info("Files extracted. Preparing to restart executable...");
                 if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");

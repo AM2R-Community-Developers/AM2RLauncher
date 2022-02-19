@@ -5,7 +5,6 @@ using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace AM2RLauncher.Core;
 
@@ -39,14 +38,14 @@ public static class CrossPlatformOperations
     /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher <br/>
     /// Mac: Will point to ~/Library/Preferences/AM2RLauncher
     /// </summary>
-    private static readonly string NIXLAUNCHERCONFIGPATH = OS.IsLinux ? (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? NIXHOME + "/.config"
+    public static readonly string NIXLAUNCHERCONFIGPATH = OS.IsLinux ? (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? NIXHOME + "/.config"
             : LINUXXDGCONFIG) + "/AM2RLauncher"
         : NIXHOME + "/Library/Preferences/AM2RLauncher";
 
     /// <summary>
     /// Config file path for *nix based systems. Will be <see cref="NIXLAUNCHERCONFIGPATH"/> + "/config.xml".
     /// </summary>
-    private static readonly string NIXLAUNCHERCONFIGFILEPATH = NIXLAUNCHERCONFIGPATH + "/config.xml";
+    public static readonly string NIXLAUNCHERCONFIGFILEPATH = NIXLAUNCHERCONFIGPATH + "/config.xml";
 
     /// <summary>
     /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
@@ -90,125 +89,7 @@ public static class CrossPlatformOperations
         return new List<string>();
     }
 
-    /// <summary>
-    /// Reads the Launcher config file on the current Platform and returns the value for <paramref name="property"/>.
-    /// </summary>
-    /// <param name="property">The property to get the value from.</param>
-    /// <returns>The value from <paramref name="property"/> as a string</returns>
-    public static string ReadFromConfig(string property)
-    {
-        log.Info($"Reading {property} from config.");
-        if (OS.IsWindows)
-        {
-            // We use the configuration manager in order to read `property` from the app.config and then return it
-            ConnectionStringSettings appConfig = ConfigurationManager.ConnectionStrings[property];
-            if (appConfig == null) throw new ArgumentException("The property " + property + " could not be found.");
-            return appConfig.ConnectionString;
-        }
-        if (OS.IsUnix)
-        {
-            string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
-            string launcherConfigFilePath = launcherConfigPath + "/config.xml";
-            XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
-            // If folder doesn't exist, create it and the config file
-            if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
-            {
-                Directory.CreateDirectory(launcherConfigPath);
-                File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-            }
-
-            // Deserialize the config xml into launcherConfig
-            launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
-
-            // This uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
-            return launcherConfig[property]?.ToString();
-        }
-
-        log.Error(OS.Name + " has no config to read from!");
-        return null;
-    }
-
-    /// <summary>
-    /// Writes <paramref name="value"/> to <paramref name="property"/> in the Launcher Config file.
-    /// </summary>
-    /// <param name="property">The property whose value you want to change.</param>
-    /// <param name="value">The value that will be written.</param>
-    public static void WriteToConfig(string property, object value)
-    {
-        log.Info($"Writing {value} of type {value.GetType()} to {property} to config.");
-        if (OS.IsWindows)
-        {
-            // We use the configuration manager in order to read from the app.config, change the value and save it
-            Configuration appConfig = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            if (appConfig == null)
-                throw new NullReferenceException("Could not find the Config file! Please make sure it exists!");
-            ConnectionStringsSection connectionStringsSection = (ConnectionStringsSection)appConfig.GetSection("connectionStrings");
-            if (connectionStringsSection?.ConnectionStrings[property]?.ConnectionString == null)
-                throw new ArgumentException("The property " + property + " could not be found.");
-            connectionStringsSection.ConnectionStrings[property].ConnectionString = value.ToString();
-            appConfig.Save();
-            ConfigurationManager.RefreshSection("connectionStrings");
-        }
-        else if (OS.IsUnix)
-        {
-            string launcherConfigPath = NIXLAUNCHERCONFIGPATH;
-            string launcherConfigFilePath = NIXLAUNCHERCONFIGFILEPATH;
-            XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
-
-            // If folder doesn't exist, create it and the config file
-            if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
-            {
-                Directory.CreateDirectory(launcherConfigPath);
-                File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-            }
-            // Deserialize the config xml into launcherConfig
-            launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
-
-            // Uses indexer. Look at LauncherConfigXML for more info
-            launcherConfig[property] = value;
-
-            // Serialize back into the file
-            File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-        }
-        else
-            log.Error(OS.Name + " has no config to write to!");
-    }
-
-    /// <summary>
-    /// When a Launcher update occurs that introduces new config properties, this method ensures that the old user config is copied over as much as possible.
-    /// </summary>
-    public static void CopyOldConfigToNewConfig()
-    {
-        if (OS.IsWindows)
-        {
-            string oldConfigPath = LAUNCHERNAME + ".oldCfg";
-            string newConfigPath = LAUNCHERNAME + ".config";
-            string oldConfigText = File.ReadAllText(oldConfigPath);
-            string newConfigText = File.ReadAllText(newConfigPath);
-
-            Regex settingRegex = new Regex("<add name=\".*\" />");
-
-            MatchCollection oldMatch = settingRegex.Matches(oldConfigText);
-            MatchCollection newMatch = settingRegex.Matches(newConfigText);
-
-            for (int i = 0; i < oldMatch.Count; i++)
-                newConfigText = newConfigText.Replace(newMatch[i].Value, oldMatch[i].Value);
-
-            File.WriteAllText(newConfigPath, newConfigText);
-
-        }
-        else if (OS.IsUnix)
-        {
-            string launcherConfigFilePath = NIXLAUNCHERCONFIGFILEPATH;
-
-            // For some reason deserializing and saving back again works, not exactly sure why, but I'll take it
-            XML.LauncherConfigXML launcherConfig = XML.Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
-            File.WriteAllText(launcherConfigFilePath, XML.Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-        }
-        else
-            log.Error(OS.Name + " has no config to transfer over!");
-    }
 
     /// <summary>
     /// This open a website cross-platform.

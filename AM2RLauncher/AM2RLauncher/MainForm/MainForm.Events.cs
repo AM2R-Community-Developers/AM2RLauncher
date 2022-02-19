@@ -82,10 +82,10 @@ namespace AM2RLauncher
         {
             log.Info("Attempting to close MainForm!");
 
-            CrossPlatformOperations.WriteToConfig("Width", ClientSize.Width);
-            CrossPlatformOperations.WriteToConfig("Height", ClientSize.Height);
-            CrossPlatformOperations.WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
-            CrossPlatformOperations.WriteToConfig("ProfileIndex", profileIndex.ToString());
+            WriteToConfig("Width", ClientSize.Width);
+            WriteToConfig("Height", ClientSize.Height);
+            WriteToConfig("IsMaximized", this.WindowState == WindowState.Maximized);
+            WriteToConfig("ProfileIndex", profileIndex.ToString());
 
             switch (updateState)
             {
@@ -112,7 +112,7 @@ namespace AM2RLauncher
             }
 
             // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
-            //TODO: this sounds like an eto bug. check if this can get reproduced.
+            //TODO: this sounds like an eto issue. check if this can get reproduced.
             trayIndicator.Visible = false;
 
             if (e.Cancel)
@@ -451,7 +451,7 @@ namespace AM2RLauncher
 
                 #endregion
 
-                default: throw new NotImplementedException("Encountered invalid update state: " + updateState + "!");
+                default: log.Error("Encountered invalid update state: " + updateState + "!"); break;
             }
         }
 
@@ -550,35 +550,35 @@ namespace AM2RLauncher
         private void LanguageDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
             log.Info("languageDropDown.SelectedIndex has been changed to " + languageDropDown.SelectedIndex + ".");
-            CrossPlatformOperations.WriteToConfig("Language", languageDropDown.SelectedIndex == 0 ? "Default" : languageDropDown.Items[languageDropDown.SelectedIndex].Text);
+            WriteToConfig("Language", languageDropDown.SelectedIndex == 0 ? "Default" : languageDropDown.Items[languageDropDown.SelectedIndex].Text);
         }
 
         /// <summary>Gets called when <see cref="autoUpdateAM2RCheck"/> gets clicked and writes its new value to the config.</summary>
         private void AutoUpdateAM2RCheckChanged(object sender, EventArgs e)
         {
             log.Info("Auto Update AM2R has been set to " + autoUpdateAM2RCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("AutoUpdateAM2R", (bool)autoUpdateAM2RCheck.Checked);
+            WriteToConfig("AutoUpdateAM2R", (bool)autoUpdateAM2RCheck.Checked);
         }
 
         /// <summary>Gets called when <see cref="autoUpdateLauncherCheck"/> gets clicked and writes its new value to the config.</summary>
         private void AutoUpdateLauncherCheckChanged(object sender, EventArgs e)
         {
             log.Info("Auto Update Launcher has been set to " + autoUpdateAM2RCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("AutoUpdateLauncher", (bool)autoUpdateAM2RCheck.Checked);
+            WriteToConfig("AutoUpdateLauncher", (bool)autoUpdateAM2RCheck.Checked);
         }
 
         /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>
         private void HqMusicPCCheckChanged(object sender, EventArgs e)
         {
             log.Info("PC HQ Music option has been changed to " + hqMusicPCCheck.Checked);
-            CrossPlatformOperations.WriteToConfig("MusicHQPC", hqMusicPCCheck.Checked);
+            WriteToConfig("MusicHQPC", hqMusicPCCheck.Checked);
         }
 
         /// <summary>Gets called when <see cref="hqMusicAndroidCheck"/> gets clicked and writes its new value to the config.</summary>
         private void HqMusicAndroidCheckChanged(object sender, EventArgs e)
         {
             log.Info("Android HQ Music option has been changed to " + hqMusicAndroidCheck.Checked);
-            CrossPlatformOperations.WriteToConfig("MusicHQAndroid", hqMusicAndroidCheck.Checked);
+            WriteToConfig("MusicHQAndroid", hqMusicAndroidCheck.Checked);
         }
 
         /// <summary>
@@ -587,7 +587,7 @@ namespace AM2RLauncher
         private void ProfileDebugLogCheckedChanged(object sender, EventArgs e)
         {
             log.Info("Create Game Debug Logs option has been set to " + profileDebugLogCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("ProfileDebugLog", profileDebugLogCheck.Checked);
+            WriteToConfig("ProfileDebugLog", profileDebugLogCheck.Checked);
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="mirrorDropDown"/>.
@@ -599,7 +599,7 @@ namespace AM2RLauncher
 
             log.Info("Current mirror has been set to " + currentMirror + ".");
 
-            CrossPlatformOperations.WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
+            WriteToConfig("MirrorIndex", mirrorDropDown.SelectedIndex);
 
             // Don't overwrite the git config while we download!!!
             if (updateState == PlayButtonState.Downloading) return;
@@ -622,7 +622,7 @@ namespace AM2RLauncher
         private void CustomMirrorCheckChanged(object sender, EventArgs e)
         {
             log.Info("Use Custom Mirror option has been set to " + customMirrorCheck.Checked + ".");
-            CrossPlatformOperations.WriteToConfig("CustomMirrorEnabled", (bool)customMirrorCheck.Checked);
+            WriteToConfig("CustomMirrorEnabled", (bool)customMirrorCheck.Checked);
 
             EnableMirrorControlsAccordingly();
 
@@ -655,7 +655,7 @@ namespace AM2RLauncher
             }
 
             currentMirror = mirrorText;
-            CrossPlatformOperations.WriteToConfig("CustomMirrorText", currentMirror);
+            WriteToConfig("CustomMirrorText", currentMirror);
 
             log.Info("Overwriting mirror in gitconfig.");
 
@@ -676,7 +676,7 @@ namespace AM2RLauncher
         private void CustomEnvVarTextBoxLostFocus(object sender, EventArgs e)
         {
             log.Info("Custom Environment variables have been set to \"" + customEnvVarTextBox.Text + "\".");
-            CrossPlatformOperations.WriteToConfig("CustomEnvVar", customEnvVarTextBox.Text);
+            WriteToConfig("CustomEnvVar", customEnvVarTextBox.Text);
         }
 
         #endregion
