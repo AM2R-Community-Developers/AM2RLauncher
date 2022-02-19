@@ -17,7 +17,7 @@ public static class CrossPlatformOperations
     /// <summary>
     /// The logger for <see cref="Core"/>, used to write any caught exceptions.
     /// </summary>
-    private static readonly ILog log = Core.Log;
+    private static readonly ILog log = LogManager.GetLogger(typeof(CrossPlatformOperations));
 
     /// <summary>
     /// Name of the Launcher executable.
@@ -410,7 +410,7 @@ public static class CrossPlatformOperations
 
         if (originalOutput == output || !File.Exists(output))
             return;
-        
+
         File.Delete(originalOutput);
         File.Move(output, originalOutput);
     }
@@ -458,7 +458,8 @@ public static class CrossPlatformOperations
     ///     <item><b>$AM2RLAUNCHERDATA</b> environment variable is read and folders are recursively generated.</item>
     ///     <item>The current OS is checked. For Windows, the path where the executable is located will be returned.<br/>
     ///     For Linux, <b>$XDG_DATA_HOME/AM2RLauncher</b> will be returned.
-    ///     Should <b>$XDG_DATA_HOME</b> be empty, it will default to <b>$HOME/.local/share</b>.</item>
+    ///     Should <b>$XDG_DATA_HOME</b> be empty, it will default to <b>$HOME/.local/share</b>.<br/>
+    ///     For Mac, <b>HOME/Library/AM2RLauncher"</b> will be returned.</item>
     ///     <item>The path where the executable is located will be returned.</item>
     /// </list>
     /// Should any errors occur, it falls down to the next step.

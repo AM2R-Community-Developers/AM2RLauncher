@@ -188,7 +188,7 @@ namespace AM2RLauncher
             log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
             if (Boolean.Parse(CrossPlatformOperations.ReadFromConfig("IsMaximized"))) Maximize();
 
-            drawable = new Drawable { BackgroundColor = colBGNoAlpha };
+            Drawable drawable = new Drawable { BackgroundColor = colBGNoAlpha };
 
             // Drawable paint event
             drawable.Paint += DrawablePaintEvent;
@@ -275,7 +275,7 @@ namespace AM2RLauncher
 
             // Profiles dropdown
 
-            // Yes, we know this looks horrific on GTK. Sorry. 
+            // Yes, we know this looks horrific on GTK. Sorry.
             // We're not exactly in a position to rewrite the entire DropDown object as a Drawable child, but if you want to, you're more than welcome!
             // Mac gets a default BackgroundColor because it looks waaaaaaay better.
             profileDropDown = new DropDown
@@ -354,11 +354,11 @@ namespace AM2RLauncher
 
 
             // Version number label
-            Label versionLabel = new Label 
+            Label versionLabel = new Label
             {
                 Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""),
                 Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen,
-                Font = new Font(SystemFont.Default, 12) 
+                Font = new Font(SystemFont.Default, 12)
             };
 
             // Tie everything together
@@ -605,7 +605,7 @@ namespace AM2RLauncher
                 mirrorDropDown = new DropDown();
 
             mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) 
+            mirrorIndex = (Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(CrossPlatformOperations.ReadFromConfig("MirrorIndex"))
                                                                                                                             : 0;
             mirrorDropDown.SelectedIndex = mirrorIndex;
 
@@ -784,7 +784,7 @@ namespace AM2RLauncher
             log.Info("All UI objects have been initialized, UI has been set up.");
             log.Info("Beginning event linkage...");
 
-            Closing += MainformClosing;
+            Closing += MainFormClosing;
             showButton.Click += ShowButtonClick;
             profileDropDown.SelectedIndexChanged += ProfileDropDownSelectedIndexChanged;
             languageDropDown.SelectedIndexChanged += LanguageDropDownSelectedIndexChanged;
@@ -857,10 +857,6 @@ namespace AM2RLauncher
         private List<string> mirrorList;
         /// <summary><see cref="List{ListItem}"/> of <see cref="ListItem"/> so that Eto's annoying IListItem interface is appeased. Used for mirror name display in DropDowns.</summary>
         private List<ListItem> mirrorDescriptionList;
-
-        // UI Elements
-        /// <summary>The main control of the main page, used to draw the <see cref="formBG"/> and hold the main interface.</summary>
-        private Drawable drawable;
 
         /// <summary>A <see cref="ColorButton"/> that acts as the main Button</summary>
         private ColorButton playButton;

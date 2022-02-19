@@ -84,5 +84,31 @@ namespace AM2RLauncher
             fileDialog.Filters.Add(new FileFilter(Text.ZipArchiveText, ".zip"));
             return fileDialog;
         }
+
+        private void DisableProgressBar()
+        {
+            progressBar.Visible = false;
+            progressBar.Value = 0;
+        }
+
+        private void EnableProgressBar()
+        {
+            progressBar.Visible = true;
+            progressBar.Value = 0;
+        }
+
+        private void DisableProgressBarAndProgressLabel()
+        {
+            DisableProgressBar();
+            progressLabel.Visible = false;
+            progressLabel.Text = "";
+        }
+
+        private void EnableProgressBarAndLabel()
+        {
+            EnableProgressBar();
+            progressLabel.Visible = true;
+            progressLabel.Text = "";
+        }
     }
 }

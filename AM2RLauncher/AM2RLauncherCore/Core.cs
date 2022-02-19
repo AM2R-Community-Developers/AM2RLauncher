@@ -17,12 +17,7 @@ public static class Core
     public static readonly ILog Log = LogManager.GetLogger(typeof(Core));
 
     /// <summary>The Version that identifies this current release.</summary>
-    public const string VERSION = "2.2.0";
-
-    /// <summary>
-    /// Checks if this is run via WINE.
-    /// </summary>
-    public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
+    public const string Version = "2.2.0";
 
     /// <summary>
     /// Indicates whether or not we have established an internet connection.
@@ -30,14 +25,39 @@ public static class Core
     public static readonly bool IsInternetThere = HelperMethods.IsConnectedToInternet();
 
     /// <summary>
+    /// Path where the Launcher's PatchData folder is located.
+    /// </summary>
+    public static readonly string PatchDataPath = CrossPlatformOperations.CURRENTPATH + "/PatchData";
+
+    /// <summary>
+    /// Path where the AM2R_11.zip is located.
+    /// </summary>
+    public static readonly string AM2R11File = CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip";
+
+    /// <summary>
+    /// Path where the Launcher's Profiles folder is located.
+    /// </summary>
+    public static readonly string ProfilesPath = CrossPlatformOperations.CURRENTPATH + "/Profiles";
+
+    /// <summary>
+    /// Path where the Launcher's Mods folder is located.
+    /// </summary>
+    public static readonly string ModsPath = CrossPlatformOperations.CURRENTPATH + "/Mods";
+
+    /// <summary>
+    /// Checks if this is run via WINE.
+    /// </summary>
+    public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
+
+    /// <summary>
     /// Checks if this is ran from WINE
     /// </summary>
     /// <returns><see langword="true"/> if run from WINE, <see langword="false"/> if not.</returns>
     private static bool CheckIfRunFromWINE()
     {
-        if (OS.IsWindows && Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null)
+        if (OS.IsWindows && (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null))
             return true;
-            
+
         return false;
     }
 

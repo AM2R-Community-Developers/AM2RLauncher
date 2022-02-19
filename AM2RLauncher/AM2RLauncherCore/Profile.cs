@@ -59,7 +59,7 @@ public static class Profile
         // If we have a cache, return that instead
         if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
 
-        string am2r11file = CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip";
+        string am2r11file = Core.AM2R11File;
         // Return safely if file doesn't exist
         if (!File.Exists(am2r11file)) return false;
         lastAM2R11ZipMD5 = HelperMethods.CalculateMD5(am2r11file);
@@ -82,15 +82,14 @@ public static class Profile
     private static void InvalidateAM2R11InstallCache()
     {
         // If the file exists, and its hash matches with ours, don't invalidate
-        if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
-            HelperMethods.CalculateMD5(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") == lastAM2R11ZipMD5)
+        if ((HelperMethods.CalculateMD5(Core.AM2R11File) == lastAM2R11ZipMD5))
             return;
 
         isAM2R11InstalledCache = null;
     }
 
     /// <summary>
-    /// Checks if a Zip file is a valid AM2R_1.1 zip. 
+    /// Checks if a Zip file is a valid AM2R_1.1 zip.
     /// </summary>
     /// <param name="zipPath">Full Path to the Zip file to check.</param>
     /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result</returns>
@@ -152,35 +151,34 @@ public static class Profile
     /// </summary>
     public static void PullPatchData(Func<TransferProgress, bool> transferProgressHandlerMethod)
     {
-        using (var repo = new Repository(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
+        using Repository repo = new Repository(Core.PatchDataPath);
+
+        // Throw if we neither have a master nor main branch
+        Branch originMaster = repo.Branches.FirstOrDefault(b => b.FriendlyName.Contains("origin/master") || b.FriendlyName.Contains("origin/main"));
+        if (originMaster == null)
+            throw new UserCancelledException("Neither branch 'master' nor branch 'main' could be found! Corrupted or invalid git repo?");
+
+        // Permanently undo commits not pushed to remote
+        repo.Reset(ResetMode.Hard, originMaster.Tip);
+
+        // Credential information to fetch
+        PullOptions options = new PullOptions
         {
-            // Permanently undo commits not pushed to remote
-            Branch originMaster = repo.Branches.ToList().FirstOrDefault(b => b.FriendlyName.Contains("origin/master") || b.FriendlyName.Contains("origin/main"));
+            FetchOptions = new FetchOptions { OnTransferProgress = tp => transferProgressHandlerMethod(tp)}
+        };
 
-            if (originMaster == null)
-                throw new UserCancelledException("Neither branch 'master' nor branch 'main' could be found! Corrupted or invalid git repo ? Deleting PatchData...");
+        // Create dummy user information to create a merge commit
+        Signature signature = new Signature("null", "null", DateTimeOffset.Now);
 
-            repo.Reset(ResetMode.Hard, originMaster.Tip);
-
-            // Credential information to fetch
-
-            PullOptions options = new PullOptions();
-            options.FetchOptions = new FetchOptions();
-            options.FetchOptions.OnTransferProgress += tp => transferProgressHandlerMethod(tp);
-
-            // User information to create a merge commit
-            var signature = new Signature("null", "null", DateTimeOffset.Now);
-
-            // Pull
-            try
-            {
-                Commands.Pull(repo, signature, options);
-            }
-            catch
-            {
-                log.Error("Repository pull attempt failed!");
-                return;
-            }
+        // Pull
+        try
+        {
+            Commands.Pull(repo, signature, options);
+        }
+        catch
+        {
+            log.Error("Repository pull attempt failed!");
+            return;
         }
         log.Info("Repository pulled successfully.");
     }
@@ -196,19 +194,19 @@ public static class Profile
         List<ProfileXML> profileList = new List<ProfileXML>();
 
         // Check for and add the Community Updates profile
-        if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
+        if (File.Exists(Core.PatchDataPath + "/profile.xml"))
         {
-            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"));
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(Core.PatchDataPath + "/profile.xml"));
             profile.DataPath = "/PatchData/data";
             profileList.Add(profile);
         }
 
         // Safety check to generate the Mods folder if it does not exist
-        if (!Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Mods"))
-            Directory.CreateDirectory(CrossPlatformOperations.CURRENTPATH + "/Mods");
+        if (!Directory.Exists(Core.ModsPath))
+            Directory.CreateDirectory(Core.ModsPath);
 
         // Get Mods folder info
-        DirectoryInfo modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods");
+        DirectoryInfo modsDir = new DirectoryInfo(Core.ModsPath);
 
         // Add all extracted profiles in Mods to the profileList.
         foreach (DirectoryInfo dir in modsDir.GetDirectories())
@@ -254,19 +252,19 @@ public static class Profile
 
         log.Info("Archiving " + profile.Name);
 
-        string profileArchivePath = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+        string profileArchivePath = Core.ProfilesPath + "/" + profile.Name;
 
         // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
         if (!Directory.Exists(profileArchivePath))
         {
             // Rename current profile if we have it installed
-            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName))
-                Directory.Move(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName, profileArchivePath);
+            if (Directory.Exists(Core.ProfilesPath + "/" + originalName))
+                Directory.Move(Core.ProfilesPath + "/" + originalName, profileArchivePath);
 
             // Set as non-installable so that it's just treated as a launching reference
             profile.Installable = false;
 
-            string modArchivePath = CrossPlatformOperations.CURRENTPATH + "/Mods/" + profile.Name;
+            string modArchivePath = Core.ModsPath + "/" + profile.Name;
 
             // Do NOT overwrite if a path with this name already exists! It is likely an existing user archive.
             if (!Directory.Exists(modArchivePath))
@@ -284,7 +282,7 @@ public static class Profile
         // If our desired rename already exists, it's probably a user archive... so we just delete the original folder and move on with installation of the new version.
         else
         {
-            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + originalName);
+            HelperMethods.DeleteDirectory(Core.ProfilesPath + "/" + originalName);
             log.Info("Cancelling archival! User-defined archive in Profiles already exists.");
         }
     }
@@ -310,8 +308,8 @@ public static class Profile
         }
 
         // Delete folder in Profiles
-        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+        if (Directory.Exists(Core.ProfilesPath + "/" + profile.Name))
+            HelperMethods.DeleteDirectory(Core.ProfilesPath + "/" + profile.Name);
 
         log.Info("Successfully deleted profile " + profile.Name + ".");
     }
@@ -326,13 +324,13 @@ public static class Profile
     {
         log.Info("Installing profile " + profile.Name + "...");
 
-        string profilesHomePath = CrossPlatformOperations.CURRENTPATH + "/Profiles";
+        string profilesHomePath = Core.ProfilesPath;
         string profilePath = profilesHomePath + "/" + profile.Name;
 
         // Failsafe for Profiles directory
         if (!Directory.Exists(profilesHomePath))
             Directory.CreateDirectory(profilesHomePath);
-        
+
         // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
         if (Directory.Exists(profilePath))
             Directory.Delete(profilePath, true);
@@ -363,7 +361,7 @@ public static class Profile
         }
 
         // Extract 1.1
-        ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", profilePath);
+        ZipFile.ExtractToDirectory(Core.AM2R11File, profilePath);
 
         // Extracted 1.1
         progress.Report(33);
@@ -383,7 +381,7 @@ public static class Profile
         {
             datawin = "game.unx";
             // Use the exe name based on the desktop file in the AppImage, rather than hard coding it.
-            string desktopContents = File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir/AM2R.desktop");
+            string desktopContents = File.ReadAllText(Core.PatchDataPath + "/data/AM2R.AppDir/AM2R.desktop");
             exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
             log.Info("According to AppImage desktop file, using \"" + exe + "\" as game name.");
         }
@@ -448,7 +446,7 @@ public static class Profile
 
         // HQ music
         if (!profile.UsesCustomMusic && useHqMusic)
-            HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", profilePath);
+            HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/HDR_HQ_in-game_music", profilePath);
 
 
         // Linux post-process
@@ -463,7 +461,7 @@ public static class Profile
                     File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
 
             // Copy AppImage template to here
-            HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
+            HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
 
             // Safety checks, in case the folders don't exist
             Directory.CreateDirectory(profilePath + "/AM2R.AppDir/usr/bin/");
@@ -482,7 +480,7 @@ public static class Profile
             Directory.SetCurrentDirectory(profilePath);
             Console.SetError(new StreamWriter(Stream.Null));
             Environment.SetEnvironmentVariable("ARCH", "x86_64");
-            Process.Start(CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/appimagetool-x86_64.AppImage", "-n AM2R.AppDir")?.WaitForExit();
+            Process.Start(Core.PatchDataPath + "/utilities/appimagetool-x86_64.AppImage", "-n AM2R.AppDir")?.WaitForExit();
             Directory.SetCurrentDirectory(workingDir);
             Console.SetError(cliError);
 
@@ -504,9 +502,9 @@ public static class Profile
             if (Directory.Exists(profilePath + "/lang/fonts"))
                 Directory.Delete(profilePath + "/lang/fonts", true);
             // Move Frameworks, Info.plist and PkgInfo over
-            HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
+            HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
             File.Copy(dataPath + "/Info.plist", profilePath.Replace("Resources", "") + "/Info.plist", true);
-            File.Copy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/PkgInfo", profilePath.Replace("Resources", "") + "/PkgInfo", true);
+            File.Copy(Core.PatchDataPath + "/data/PkgInfo", profilePath.Replace("Resources", "") + "/PkgInfo", true);
             //Put profilePath back to what it was before
             profilePath = profilesHomePath + "/" + profile.Name;
         }
@@ -529,9 +527,9 @@ public static class Profile
     /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
     public static bool IsProfileInstalled(ProfileXML profile)
     {
-        if (OS.IsWindows) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.exe");
-        if (OS.IsLinux) return File.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.AppImage");
-        if (OS.IsMac) return Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name + "/AM2R.app");
+        if (OS.IsWindows) return File.Exists(Core.ProfilesPath + "/" + profile.Name + "/AM2R.exe");
+        if (OS.IsLinux) return File.Exists(Core.ProfilesPath + "/" + profile.Name + "/AM2R.AppImage");
+        if (OS.IsMac) return Directory.Exists(Core.ProfilesPath + "/" + profile.Name + "/AM2R.app");
 
         log.Error(OS.Name + " can't have profiles installed!");
         return false;
@@ -555,8 +553,8 @@ public static class Profile
         log.Info("Creating Android APK for profile " + profile.Name + ".");
 
         // Create working dir after some cleanup
-        string apktoolPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/apktool.jar",
-               uberPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/utilities/android/uber-apk-signer.jar",
+        string apktoolPath = Core.PatchDataPath + "/utilities/android/apktool.jar",
+               uberPath = Core.PatchDataPath + "/utilities/android/uber-apk-signer.jar",
                tempDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/temp").FullName,
                dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
         if (Directory.Exists(tempDir))
@@ -573,11 +571,11 @@ public static class Profile
 
         // Add datafiles: 1.1, new datafiles, hq music, am2r.ini
         string workingDir = tempDir + "/AM2RWrapper/assets";
-        ZipFile.ExtractToDirectory(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip", workingDir);
+        ZipFile.ExtractToDirectory(Core.AM2R11File, workingDir);
         HelperMethods.DirectoryCopy(dataPath + "/files_to_copy", workingDir);
 
         if (useHqMusic)
-            HelperMethods.DirectoryCopy(CrossPlatformOperations.CURRENTPATH + "/PatchData/data/HDR_HQ_in-game_music", workingDir);
+            HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/HDR_HQ_in-game_music", workingDir);
         // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
         foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
             File.Copy(file.FullName, workingDir + "/" + file.Name);
@@ -657,7 +655,7 @@ public static class Profile
 
                 StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
-                stream.WriteLine("AM2RLauncher " + Core.VERSION + " log generated at " + date);
+                stream.WriteLine("AM2RLauncher " + Core.Version + " log generated at " + date);
 
                 if (Core.IsThisRunningFromWine)
                     stream.WriteLine("Using WINE!");
@@ -671,7 +669,7 @@ public static class Profile
 
             ProcessStartInfo proc = new ProcessStartInfo();
 
-            proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+            proc.WorkingDirectory = Core.ProfilesPath + "/" + profile.Name;
             proc.FileName = proc.WorkingDirectory + "/AM2R.exe";
             proc.Arguments = arguments;
 
@@ -726,7 +724,7 @@ public static class Profile
             string terminalOutput = null;
 
             startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+            startInfo.WorkingDirectory = Core.ProfilesPath + "/" + profile.Name;
             startInfo.FileName = startInfo.WorkingDirectory + "/AM2R.AppImage";
 
             log.Info("CWD of Profile is " + startInfo.WorkingDirectory);
@@ -773,7 +771,7 @@ public static class Profile
                 StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
                 // Write general info
-                stream.WriteLine("AM2RLauncher " + Core.VERSION + " log generated at " + date);
+                stream.WriteLine("AM2RLauncher " + Core.Version + " log generated at " + date);
 
                 // Write what was in the terminal
                 stream.WriteLine(terminalOutput);
@@ -802,7 +800,7 @@ public static class Profile
 
                 StreamWriter stream = File.AppendText(logDir.FullName + "/" + profile.Name + ".txt");
 
-                stream.WriteLine("AM2RLauncher " + Core.VERSION + " log generated at " + date);
+                stream.WriteLine("AM2RLauncher " + Core.Version + " log generated at " + date);
 
                 stream.Flush();
 
@@ -813,7 +811,7 @@ public static class Profile
 
             ProcessStartInfo proc = new ProcessStartInfo();
 
-            proc.WorkingDirectory = CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name;
+            proc.WorkingDirectory = Core.ProfilesPath + "/" + profile.Name;
             proc.FileName = "open";
             proc.Arguments = arguments;
 
@@ -835,6 +833,6 @@ public static class Profile
     public static bool IsPatchDataCloned()
     {
         // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
-        return File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml") && Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+        return File.Exists(Core.PatchDataPath + "/profile.xml") && Repository.IsValid(Core.PatchDataPath);
     }
 }

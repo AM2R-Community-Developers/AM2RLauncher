@@ -18,7 +18,7 @@ namespace AM2RLauncher
         // Auto updating is fun!
 
         /// <summary>The Version that identifies this current release.</summary>
-        public const string VERSION = Core.Core.VERSION;
+        public const string VERSION = Core.Core.Version;
 
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         private static readonly string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";

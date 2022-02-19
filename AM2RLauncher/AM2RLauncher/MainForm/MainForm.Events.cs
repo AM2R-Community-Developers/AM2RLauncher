@@ -29,94 +29,6 @@ namespace AM2RLauncher
         /// </summary>
         private static bool isGitProcessGettingCancelled = false;
 
-        /// <summary>
-        /// After the <see cref="playButton"/> has bee loaded, git pull if a repo has been cloned already.
-        /// </summary>
-        private async void PlayButtonLoadComplete(object sender, EventArgs e)
-        {
-            LoadProfilesAndAdjustLists();
-            if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
-                return;
-            
-            SetPlayButtonState(PlayButtonState.Downloading);
-
-            progressBar.Visible = true;
-            progressLabel.Visible = true;
-            progressBar.Value = 0;
-
-            // Try to pull first.
-            try
-            {
-                log.Info("Attempting to pull repository " + currentMirror + "...");
-                await Task.Run(() => Profile.PullPatchData(TransferProgressHandlerMethod));
-
-                // Thank you druid, for this case that should never happen
-                if (!File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml"))
-                {
-                    log.Error("Druid PatchData corruption occurred!");
-                    await Application.Instance.InvokeAsync(() =>
-                    {
-                        MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
-                    });
-                    HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
-                    return;
-                }
-            }
-            catch (UserCancelledException ex) 
-            {
-                log.Info(ex.Message);
-                MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
-                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
-            }
-            catch (LibGit2SharpException ex)   // This is for any exceptions from libgit
-            {
-                // Libgit2sharp error messages are always in english!
-                if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
-                    ex.Message.ToLower().Contains("failed to resolve address"))
-                {
-                    if (!(bool)autoUpdateAM2RCheck.Checked)
-                    {
-                        log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
-                        MessageBox.Show(this, Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
-                    }
-                }
-                else
-                {
-                    log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                    MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-                }
-            }
-            catch (Exception ex) // This is if somehow any other exception might get thrown as well.
-            {
-                log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
-                MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-            }
-            finally
-            {
-                progressBar.Visible = false;
-                progressLabel.Visible = false;
-                LoadProfilesAndAdjustLists();
-            }
-
-            // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
-            // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
-            if (profileList.Count > 0 && Profile.IsProfileInstalled(profileList[0]))
-            {
-                ProfileXML currentXML = Serializer.Deserialize<ProfileXML>(File.ReadAllText(CrossPlatformOperations.CURRENTPATH + "/Profiles/Community Updates (Latest)/profile.xml"));
-
-                if (currentXML.Version != profileList[0].Version)
-                {
-                    log.Info("New game version (" + profileList[0].Version + ") detected! Beginning archival of version " + currentXML.Version + "...");
-                    Profile.ArchiveProfile(currentXML);
-                    profileDropDown.SelectedIndex = 0;
-                    LoadProfilesAndAdjustLists();
-                }
-            }
-
-            SetPlayButtonState(PlayButtonState.Install);
-            UpdateStateMachine();
-        }
-
         #region Misc events
 
         /// <summary>
@@ -142,6 +54,10 @@ namespace AM2RLauncher
         /// </summary>
         private void DrawablePaintEvent(object sender, PaintEventArgs e)
         {
+            // Exit if sender is not a Drawable
+            Drawable drawable = sender as Drawable;
+            if (drawable == null) return;
+
             // Get drawing variables
             float height = drawable.Height;
             float width = drawable.Width;
@@ -162,7 +78,7 @@ namespace AM2RLauncher
         /// 1) Writes the Width, Height, the check if <see cref="MainForm"/> is currently maximized and the ProfileIndex to the Config<br/>
         /// 2) Checks if current <see cref="updateState"/> is <see cref="PlayButtonState.Downloading"/>. If yes, it creates a Warning to the end user.
         /// </summary>
-        private void MainformClosing(object sender, CancelEventArgs e)
+        private void MainFormClosing(object sender, CancelEventArgs e)
         {
             log.Info("Attempting to close MainForm!");
 
@@ -219,6 +135,89 @@ namespace AM2RLauncher
         #region MAIN TAB
 
         /// <summary>
+        /// After the <see cref="playButton"/> has been loaded, git pull if a repo has been cloned already.
+        /// </summary>
+        private async void PlayButtonLoadComplete(object sender, EventArgs e)
+        {
+            //Only pull if Patchdata is cloned and user wants it updated
+            LoadProfilesAndAdjustLists();
+            if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
+                return;
+
+            SetPlayButtonState(PlayButtonState.Downloading);
+            EnableProgressBarAndLabel();
+
+            // Try to pull
+            try
+            {
+                log.Info("Attempting to pull repository " + currentMirror + "...");
+                await Task.Run(() => Profile.PullPatchData(TransferProgressHandlerMethod));
+            }
+            catch (UserCancelledException ex)
+            {
+                // TODO: why do we delete patchdata if user cancels pulling?
+                log.Info(ex.Message);
+                MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
+                HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
+            }
+            // This is for any exceptions from libgit
+            catch (LibGit2SharpException ex)
+            {
+                string errMessage = ex.Message.ToLower();
+                // Libgit2sharp error messages are always in english!
+                // If internet connection suddenly dropped or site not reachable
+                if (errMessage.Contains("failed to send request") || errMessage.Contains("connection with the server was terminated") ||
+                    errMessage.Contains("failed to resolve address"))
+                {
+                    log.Error("Internet connection failed while attempting to pull repository" + currentMirror + "!");
+                    MessageBox.Show(this, Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
+                }
+                // Error message on protected folders. See this for more info: https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/controlled-folders
+                else if (errMessage.Contains("access is denied"))
+                {
+                    // Needs localizable text, logging and message box
+                    // Also, check if this is the right place for it.
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
+                    MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+                }
+            }
+            // This is if somehow any other exception might get thrown as well.
+            catch (Exception ex)
+            {
+                log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
+                MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
+            }
+            // At the end of everything, reset progressBar controls
+            finally
+            {
+                DisableProgressBarAndProgressLabel();
+                LoadProfilesAndAdjustLists();
+            }
+
+            // Handling for updates - if current version does not match PatchData version, rename folder so that we attempt to install!
+            // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
+            if ((profileList.Count > 0) && Profile.IsProfileInstalled(profileList[0]))
+            {
+                ProfileXML installedUpdatesProfile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(Core.Core.ProfilesPath + "/Community Updates (Latest)/profile.xml"));
+
+                if (installedUpdatesProfile.Version != profileList[0].Version)
+                {
+                    log.Info("New game version (" + profileList[0].Version + ") detected! Beginning archival of version " + installedUpdatesProfile.Version + "...");
+                    Profile.ArchiveProfile(installedUpdatesProfile);
+                    profileDropDown.SelectedIndex = 0;
+                    LoadProfilesAndAdjustLists();
+                }
+            }
+
+            SetPlayButtonState(PlayButtonState.Install);
+            UpdateStateMachine();
+        }
+
+        /// <summary>
         /// Does a bunch of stuff, depending on the current state of <see cref="updateState"/>.
         /// </summary>
         private async void PlayButtonClickEvent(object sender, EventArgs e)
@@ -237,37 +236,34 @@ namespace AM2RLauncher
                     log.Info("Attempting to clone repository " + currentMirror + "...");
                     bool successful = true;
 
-                    // Update playButton states
+                    // Update playButton states and progress controls
                     SetPlayButtonState(PlayButtonState.Downloading);
-
-                    // Enable progressBar
-                    progressBar.Visible = true;
-                    progressLabel.Visible = true;
-                    progressBar.Value = 0;
+                    EnableProgressBarAndLabel();
 
                     // Set up progressBar update method
-                    var c = new CloneOptions
-                    {
-                        OnTransferProgress = TransferProgressHandlerMethod
-                    };
+                    CloneOptions cloneOptions = new CloneOptions { OnTransferProgress = TransferProgressHandlerMethod };
 
-                    // Everything after this is on a different thread, so the rest of the launcher isn't locked up.
+                    // Try to clone
                     try
                     {
-                        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
+                        // Cleanup invalid PatchData directory if it exists
+                        if (Directory.Exists(Core.Core.PatchDataPath))
                         {
                             log.Info("PatchData directory already exists, cleaning up...");
-                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
                         }
 
-                        await Task.Run(() => Repository.Clone(currentMirror, CrossPlatformOperations.CURRENTPATH + "/PatchData", c));
+                        // Separate thread so launcher doesn't get locked
+                        await Task.Run(() => Repository.Clone(currentMirror, Core.Core.PatchDataPath, cloneOptions));
                     }
+                    // We deliberately cancelled this, so no error handling
                     catch (UserCancelledException)
                     {
-                        // We deliberately cancelled this!
                         successful = false;
                     }
-                    catch (LibGit2SharpException ex)    // This is for any exceptions from libgit
+                    //TODO: this is currently copy-pasted with the PullPatchData method. put this into a separate method.
+                    // For any exceptions from libgit
+                    catch (LibGit2SharpException ex)
                     {
                         // Libgit2sharp error messages are always in english!
                         if (ex.Message.ToLower().Contains("failed to send request") || ex.Message.ToLower().Contains("connection with the server was terminated") ||
@@ -280,18 +276,19 @@ namespace AM2RLauncher
                         {
                             log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                             MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-                            if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData"))
-                                HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            if (Directory.Exists(Core.Core.PatchDataPath))
+                                HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
                         }
                         successful = false;
                     }
-                    catch (Exception ex)             // This is if somehow any other exception might get thrown as well.
+                    // This is if somehow any other exception might get thrown as well.
+                    catch (Exception ex)
                     {
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
 
                         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
-                            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/PatchData");
+                            HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
                         successful = false;
                     }
 
@@ -300,10 +297,7 @@ namespace AM2RLauncher
                     currentGitObject = 0;
 
                     // Reset progressBar after clone is finished
-                    progressLabel.Visible = false;
-                    progressLabel.Text = "";
-                    progressBar.Visible = false;
-                    progressBar.Value = 0;
+                   DisableProgressBarAndProgressLabel();
 
                     // Just need to switch this to anything that isn't an "active" state so SetUpdateState() actually does something
                     SetPlayButtonState(PlayButtonState.Install);
@@ -320,13 +314,14 @@ namespace AM2RLauncher
                 #region Downloading
 
                 case PlayButtonState.Downloading:
-                    var result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo, MessageBoxType.Warning, MessageBoxDefaultButton.No);
+                    DialogResult result = MessageBox.Show(this, Text.CloseOnCloningText, Text.WarningWindowTitle, MessageBoxButtons.YesNo,
+                                                 MessageBoxType.Warning, MessageBoxDefaultButton.No);
                     if (result != DialogResult.Yes)
                         return;
-                    
+
                     log.Info("User cancelled download!");
                     isGitProcessGettingCancelled = true;
-                    
+
                     // We don't need to delete any folders here, the cancelled gitClone will do that automatically for us :)
                     // But we should probably wait a bit before proceeding, since cleanup can take a while
                     Thread.Sleep(1000);
@@ -341,7 +336,6 @@ namespace AM2RLauncher
                     log.Info("Requesting user input for AM2R_11.zip...");
 
                     OpenFileDialog fileFinder = GetSingleZipDialog(Text.Select11FileDialog);
-
                     if (fileFinder.ShowDialog(this) != DialogResult.Ok)
                     {
                         log.Info("User cancelled the selection.");
@@ -349,7 +343,7 @@ namespace AM2RLauncher
                     }
 
                     // Default filename is whitespace
-                    if (String.IsNullOrWhiteSpace(fileFinder.FileName)) 
+                    if (String.IsNullOrWhiteSpace(fileFinder.FileName))
                     {
                         log.Error("User did not supply valid input. Cancelling import.");
                         return;
@@ -359,7 +353,7 @@ namespace AM2RLauncher
                     if (!File.Exists(fileFinder.FileName))
                     {
                         log.Error("Selected AM2R_11.zip file not found! Cancelling import.");
-                        break;
+                        return;
                     }
 
                     IsZipAM2R11ReturnCodes errorCode = Profile.CheckIfZipIsAM2R11(fileFinder.FileName);
@@ -371,19 +365,17 @@ namespace AM2RLauncher
                     }
 
                     // We check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
-                    if (fileFinder.FileName != CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip")
-                        File.Copy(fileFinder.FileName, CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip");
+                    if (fileFinder.FileName != Core.Core.AM2R11File)
+                        File.Copy(fileFinder.FileName, Core.Core.AM2R11File);
 
                     log.Info("AM2R_11.zip successfully imported.");
-                    
                     UpdateStateMachine();
                     break;
                 #endregion
 
                 #region Install
                 case PlayButtonState.Install:
-                    progressBar.Visible = true;
-                    progressBar.Value = 0;
+                    EnableProgressBar();
                     SetPlayButtonState(PlayButtonState.Installing);
 
                     // Make sure the main interface state machines properly
@@ -397,13 +389,12 @@ namespace AM2RLauncher
                         if (OS.IsUnix && !CrossPlatformOperations.CheckIfXdeltaIsInstalled())
                         {
                             MessageBox.Show(this, Text.XdeltaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
-                            
                             SetPlayButtonState(PlayButtonState.Install);
                             UpdateStateMachine();
                             log.Error("Xdelta not found. Aborting installing a profile...");
                             return;
                         }
-                        var progressIndicator = new Progress<int>(UpdateProgressBar);
+                        Progress<int> progressIndicator = new Progress<int>(UpdateProgressBar);
                         bool useHqMusic = hqMusicPCCheck.Checked.Value;
                         await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHqMusic, progressIndicator));
                         // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
@@ -415,8 +406,7 @@ namespace AM2RLauncher
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
                     }
-                    progressBar.Visible = false;
-                    progressBar.Value = 0;
+                    DisableProgressBar();
 
                     // Just need to switch this to anything that isn't an "active" state so SetUpdateState() actually does something
                     SetPlayButtonState(PlayButtonState.Play);
@@ -476,7 +466,7 @@ namespace AM2RLauncher
             // Check for java, exit safely with a warning if not found!
             if (!CrossPlatformOperations.IsJavaInstalled())
             {
-                MessageBox.Show(this, Text.JavaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);   
+                MessageBox.Show(this, Text.JavaNotFound, Text.WarningWindowTitle, MessageBoxButtons.OK);
                 SetApkButtonState(ApkButtonState.Create);
                 UpdateStateMachine();
                 log.Error("Java not found! Aborting Android APK creation.");
@@ -496,25 +486,25 @@ namespace AM2RLauncher
             UpdateStateMachine();
 
             if (apkButtonState != ApkButtonState.Create) return;
-            
+
             SetApkButtonState(ApkButtonState.Creating);
             UpdateStateMachine();
 
-            progressBar.Visible = true;
+            EnableProgressBar();
             bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
 
-            var progressIndicator = new Progress<int>(UpdateProgressBar);
+            Progress<int> progressIndicator = new Progress<int>(UpdateProgressBar);
             await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
 
             SetApkButtonState(ApkButtonState.Create);
-            progressBar.Visible = false;
+            DisableProgressBar();
             UpdateStateMachine();
         }
 
         /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
         private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (profileDropDown.SelectedIndex == -1 && profileDropDown.Items.Count == 0) return;
+            if ((profileDropDown.SelectedIndex == -1) && (profileDropDown.Items.Count == 0)) return;
 
             profileIndex = profileDropDown.SelectedIndex;
             log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
@@ -522,8 +512,8 @@ namespace AM2RLauncher
             profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
             profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
 
-            if (profileDropDown.SelectedIndex != 0 && (profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R" ||
-                                                       profileList[profileDropDown.SelectedIndex].SaveLocation == "default"))
+            if ((profileDropDown.SelectedIndex != 0) && ((profileList[profileDropDown.SelectedIndex].SaveLocation == "%localappdata%/AM2R") ||
+                                                         (profileList[profileDropDown.SelectedIndex].SaveLocation == "default")))
                 saveWarningLabel.Visible = true;
             else
                 saveWarningLabel.Visible = false;
@@ -617,8 +607,9 @@ namespace AM2RLauncher
             log.Info("Overwriting mirror in gitconfig.");
 
             // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
-            string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
+            string gitConfigPath = Core.Core.PatchDataPath + "/.git/config";
             if (!File.Exists(gitConfigPath)) return;
+
             string gitConfig = File.ReadAllText(gitConfigPath);
             Regex gitURLRegex = new Regex("https://.*\\.git");
             Match match = gitURLRegex.Match(gitConfig);
@@ -669,7 +660,7 @@ namespace AM2RLauncher
             log.Info("Overwriting mirror in gitconfig.");
 
             // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
-            string gitConfigPath = CrossPlatformOperations.CURRENTPATH + "/PatchData/.git/config";
+            string gitConfigPath = Core.Core.PatchDataPath + "/.git/config";
             if (!File.Exists(gitConfigPath)) return;
             string gitConfig = File.ReadAllText(gitConfigPath);
             Match match = gitURLRegex.Match(gitConfig);
@@ -720,9 +711,8 @@ namespace AM2RLauncher
             //TODO: move most of this into AM2RLauncher.Profile?
 
             FileInfo modFile = new FileInfo(fileFinder.FileName);
-            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
             string modFileName = Path.GetFileNameWithoutExtension(modFile.Name);
-            string extractedModDir = modsDir + "/" + modFileName;
+            string extractedModDir = Core.Core.ModsPath + "/" + modFileName;
 
             // Check first, if the directory is already there, if yes, throw error
             if (Directory.Exists(extractedModDir))
@@ -805,7 +795,7 @@ namespace AM2RLauncher
                 updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
             }
 
-            profileButton.Enabled = Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profileName);
+            profileButton.Enabled = Directory.Exists(Core.Core.ProfilesPath + "/" + profileName);
             profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
             saveButton.Enabled = true;
             saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
@@ -826,7 +816,7 @@ namespace AM2RLauncher
                 return;
             ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
             log.Info("User opened the profile directory for profile " + profile.Name + ", which is " + profile.SaveLocation);
-            CrossPlatformOperations.OpenFolder(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
+            CrossPlatformOperations.OpenFolder(Core.Core.ProfilesPath + "/" + profile.Name);
         }
 
         /// <summary>
@@ -895,9 +885,8 @@ namespace AM2RLauncher
             //TODO: move most of this into AM2RLauncher.Profile?
 
             FileInfo modFile = new FileInfo(fileFinder.FileName);
-            string modsDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/Mods").FullName;
             string extractedName = Path.GetFileNameWithoutExtension(modFile.Name) + "_new";
-            string extractedModDir = modsDir + "/" + extractedName;
+            string extractedModDir = Core.Core.ModsPath + "/" + extractedName;
 
             // If for some reason old files remain, delete them so that extraction doesn't throw
             if (Directory.Exists(extractedModDir))
@@ -927,7 +916,7 @@ namespace AM2RLauncher
                 HelperMethods.DeleteDirectory(extractedModDir);
                 return;
             }
-            
+
             // If user doesn't want to update, cleanup
             DialogResult updateResult = MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModWarning, currentProfile.Name), Text.WarningWindowTitle,
                                                     MessageBoxButtons.OKCancel, MessageBoxType.Warning, MessageBoxDefaultButton.Cancel);
@@ -951,7 +940,7 @@ namespace AM2RLauncher
             DeleteProfileAndAdjustLists(currentProfile);
 
             // Rename directory to take the old one's place
-            string originalFolder = modsDir + "/" + Path.GetFileNameWithoutExtension(modFile.Name);
+            string originalFolder = Core.Core.ModsPath + "/" + Path.GetFileNameWithoutExtension(modFile.Name);
             Directory.Move(extractedModDir, originalFolder);
 
             // Adjust our lists so it gets recognized
