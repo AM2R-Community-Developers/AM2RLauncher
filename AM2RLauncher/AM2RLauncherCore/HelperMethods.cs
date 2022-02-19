@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 
@@ -159,5 +160,16 @@ public static class HelperMethods
         }
         log.Info("Internet connection established!");
         return true;
+    }
+
+    /// <summary>
+    /// Gets <paramref name="languageText"/> and replaces "$NAME" with <paramref name="replacementText"/>.
+    /// </summary>
+    /// <param name="languageText">The text to get</param>
+    /// <param name="replacementText">The text to replace "$NAME" with.</param>
+    /// <returns></returns>
+    public static string GetText(string languageText, string replacementText = "")
+    {
+        return languageText.Replace("$NAME", replacementText);
     }
 }

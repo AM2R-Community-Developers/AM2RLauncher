@@ -353,7 +353,6 @@ public static class CrossPlatformOperations
         try
         {
             xdelta.Start();
-
             xdelta.WaitForExit();
         }
         catch (System.ComponentModel.Win32Exception)

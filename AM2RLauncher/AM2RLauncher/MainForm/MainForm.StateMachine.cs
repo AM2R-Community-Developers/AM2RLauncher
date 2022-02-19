@@ -2,6 +2,7 @@
 using System;
 using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
+using AM2RLauncher.Language;
 
 namespace AM2RLauncher
 {
@@ -18,61 +19,56 @@ namespace AM2RLauncher
             UpdatePlayState();
             UpdateApkState();
             UpdateProfileState();
-            UpdateProfileSettingsState();
+            UpdateModSettingsState();
         }
 
         /// <summary>
-        /// Determines current conditions and calls <see cref="SetPlayButtonState(UpdateState)"/> accordingly.
+        /// Determines current conditions and calls <see cref="SetPlayButtonState(PlayButtonState)"/> accordingly.
         /// </summary>
         private void UpdatePlayState()
         {
-            // If not downloading or installing...
-            if ((updateState == UpdateState.Downloading) || (updateState == UpdateState.Installing))
+            // If we're downloading or installing, dont't change anything
+            if ((updateState == PlayButtonState.Downloading) || (updateState == PlayButtonState.Installing))
                 return;
 
-            // If we're currently creating an APK...
-            if (apkButtonState != ApkButtonState.Creating)
-            {
-                playButton.Enabled = true;
-                // If PatchData is cloned...
-                if (Profile.IsPatchDataCloned())
-                {
-                    // If 1.1 is installed or if the current profile is invalid...
-                    if (Profile.Is11Installed())
-                    {
-                        var isProfileValid = IsProfileIndexValid();
-                        // If current profile is installed...
-                        if (isProfileValid && Profile.IsProfileInstalled(profileList[profileIndex.Value]))
-                        {
-                            // We're ready to play!
-                            SetPlayButtonState(UpdateState.Play);
-                        }
-                        // Otherwise, if profile is NOT installable...
-                        else if (isProfileValid && profileList[profileIndex.Value].Installable == false)
-                        {
-                            // We delete the profile, because we can't install it and it therefore holds no value!
-                            DeleteProfileAndAdjustLists(profileList[profileIndex.Value]);
-                        }
-                        // Otherwise, we still need to install.
-                        else
-                        {
-                            SetPlayButtonState(UpdateState.Install);
-                        }
-                    }
-                    else // We still need to select 1.1.
-                    {
-                        SetPlayButtonState(UpdateState.Select11);
-                    }
-                }
-                else // We still need to download.
-                {
-                    SetPlayButtonState(UpdateState.Download);
-                }
-            }
-            else // We disable the Play button.
+            // If we're currently creating an APK, we disable the play button
+            if (apkButtonState == ApkButtonState.Creating)
             {
                 playButton.Enabled = false;
+                return;
             }
+            
+            playButton.Enabled = true;
+            // If PatchData isn't cloned, we still need to download
+            if (!Profile.IsPatchDataCloned())
+            {
+                SetPlayButtonState(PlayButtonState.Download);
+                return;
+            }
+
+            // If 1.1 isn't installed, we still need to select it
+            if (!Profile.Is11Installed())
+            {
+                SetPlayButtonState(PlayButtonState.Select11);
+                return;
+            }
+            
+            var isProfileValid = IsProfileIndexValid();
+            // If current profile is installed, we're ready to play!
+            if (isProfileValid && Profile.IsProfileInstalled(profileList[profileIndex.Value]))
+            {
+                SetPlayButtonState(PlayButtonState.Play);
+                return;
+            }
+            // Otherwise, if profile is NOT installable, we delete the profile because we can't install it and therefore holds no value!
+            else if (isProfileValid && profileList[profileIndex.Value].Installable == false)
+            {
+                DeleteProfileAndAdjustLists(profileList[profileIndex.Value]);
+                return;
+            }
+
+            // Otherwise, we still need to install.
+            SetPlayButtonState(PlayButtonState.Install);
         }
 
         /// <summary>
@@ -83,30 +79,31 @@ namespace AM2RLauncher
             // Safety check
             if (apkButton == null)
                 return;
-            
-            // If profile supports Android and if we are NOT already creating an APK...
-            if (IsProfileIndexValid())
-            {
-                var profile = profileList[profileIndex.Value];
-                if (profile.SupportsAndroid && profile.Installable && (apkButtonState == ApkButtonState.Create))
-                {
-                    // Switch status based on main button's state
-                    switch (updateState)
-                    {
-                        case UpdateState.Download: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Downloading: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Select11: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Install: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                        case UpdateState.Installing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                        case UpdateState.Play: apkButton.Enabled = true; apkButton.ToolTip = Language.Text.ApkButtonEnabledToolTip.Replace("$NAME", profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
-                        case UpdateState.Playing: apkButton.Enabled = false; apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip; break;
-                    }
-                    return;
-                }
-            }
 
+            // Our default values
             apkButton.Enabled = false;
-            apkButton.ToolTip = Language.Text.ApkButtonDisabledToolTip;
+            apkButton.ToolTip = Text.ApkButtonDisabledToolTip;
+
+            // If profile supports Android and if we are NOT already creating an APK...
+            if (!IsProfileIndexValid())
+                return;
+
+            var profile = profileList[profileIndex.Value];
+            if (!profile.SupportsAndroid || !profile.Installable || apkButtonState != ApkButtonState.Create)
+                return;
+
+            // Switch status based on main button's state
+            switch (updateState)
+            {
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: return;
+
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+            }
         }
 
         /// <summary>
@@ -119,18 +116,17 @@ namespace AM2RLauncher
                 return;
             switch (updateState)
             {
-                case UpdateState.Download: profileDropDown.Enabled = false; break;
-                case UpdateState.Downloading: profileDropDown.Enabled = false; break;
-                case UpdateState.Select11: profileDropDown.Enabled = true; break;
-                case UpdateState.Install: profileDropDown.Enabled = true; break;
-                case UpdateState.Installing: profileDropDown.Enabled = false; break;
-                case UpdateState.Play: profileDropDown.Enabled = true; break;
-                case UpdateState.Playing: profileDropDown.Enabled = false; break;
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: profileDropDown.Enabled = false; break;
+
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: profileDropDown.Enabled = true; break;
+                
             }
-            switch (apkButtonState)
-            {
-                case ApkButtonState.Creating: profileDropDown.Enabled = false; break;
-            }
+            if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
 
             Color col = profileDropDown.Enabled ? colGreen : colInactive;
 
@@ -144,79 +140,81 @@ namespace AM2RLauncher
         /// <summary>
         /// Determines current conditions and enables or disables <see cref="profilePage"/> controls accordingly.
         /// </summary>
-        private void UpdateProfileSettingsState()
+        private void UpdateModSettingsState()
         {
             // Safety check
-            if (settingsProfileDropDown == null || settingsProfileDropDown.Items.Count <= 0) return;
+            if (modSettingsProfileDropDown == null || modSettingsProfileDropDown.Items.Count <= 0) return;
             
             bool enabled = false;
             switch (updateState)
             {
-                case UpdateState.Download:
-                case UpdateState.Downloading:
-                case UpdateState.Select11:
-                case UpdateState.Installing:
-                case UpdateState.Playing: enabled = false; break;
-                case UpdateState.Install:
-                case UpdateState.Play: enabled = true; break;
+                case PlayButtonState.Download:
+                case PlayButtonState.Downloading:
+                case PlayButtonState.Select11:
+                case PlayButtonState.Installing:
+                case PlayButtonState.Playing: enabled = false; break;
+
+                case PlayButtonState.Install:
+                case PlayButtonState.Play: enabled = true; break;
 
             }
             if (apkButtonState == ApkButtonState.Creating) enabled = false;
 
+            string selectedProfileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
+
             settingsProfileLabel.TextColor = colGreen;
-            settingsProfileDropDown.Enabled = enabled;
+            modSettingsProfileDropDown.Enabled = enabled;
             profileButton.Enabled = enabled;
-            profileButton.ToolTip = Language.Text.OpenProfileFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+            profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, selectedProfileName);
             saveButton.Enabled = enabled;
-            saveButton.ToolTip = Language.Text.OpenSaveFolderToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+            saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, selectedProfileName);
             addModButton.Enabled = enabled;
-            addModButton.ToolTip = Language.Text.AddNewModToolTip;
+            addModButton.ToolTip = Text.AddNewModToolTip;
 
             // Only enable these, when we're not on the community updates
-            if (settingsProfileDropDown.SelectedIndex > 0)
+            if (modSettingsProfileDropDown.SelectedIndex > 0)
             {
-                updateModButton.Enabled = profileList[settingsProfileDropDown.SelectedIndex].Installable;
-                updateModButton.ToolTip = Language.Text.UpdateModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
+                updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, selectedProfileName);
                 deleteModButton.Enabled = enabled;
-                deleteModButton.ToolTip = Language.Text.DeleteModButtonToolTip.Replace("$NAME", settingsProfileDropDown.Items[settingsProfileDropDown.SelectedIndex].Text);
+                deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, selectedProfileName);
             }
 
             Color col = enabled ? colGreen : colInactive;
 
             if (OS.IsWindows)
-                settingsProfileDropDown.TextColor = col;
+                modSettingsProfileDropDown.TextColor = col;
 
             settingsProfileLabel.TextColor = col;
 
             if (enabled)
-            {
-                settingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
-            }
+                modSettingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
         }
 
         /// <summary>
         /// Sets the global <see cref="updateState"/> and then changes the state of <see cref="playButton"/> accordingly. 
         /// </summary>
         /// <param name="state">The state that should be set to.</param>
-        private void SetPlayButtonState(UpdateState state)
+        private void SetPlayButtonState(PlayButtonState state)
         {
             updateState = state;
-            string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
             switch (updateState)
             {
-                case UpdateState.Download: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonDownloadToolTip; break;
-                case UpdateState.Downloading: playButton.Enabled = true; playButton.ToolTip = ""; playButton.ToolTip = Language.Text.PlayButtonDownladingToolTip; break;
-                case UpdateState.Select11: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonSelect11ToolTip; break;
-                case UpdateState.Install: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonInstallToolTip.Replace("$NAME", profileName); break;
-                case UpdateState.Installing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonInstallingToolTip; break;
-                case UpdateState.Play: playButton.Enabled = true; playButton.ToolTip = Language.Text.PlayButtonPlayToolTip.Replace("$NAME", profileName); break;
-                case UpdateState.Playing: playButton.Enabled = false; playButton.ToolTip = Language.Text.PlayButtonPlayingToolTip; break;
+                case PlayButtonState.Download: 
+                case PlayButtonState.Downloading: 
+                case PlayButtonState.Select11: 
+                case PlayButtonState.Install: 
+                case PlayButtonState.Play: playButton.Enabled = true; break;
+
+                case PlayButtonState.Installing: 
+                case PlayButtonState.Playing: playButton.Enabled = false; break;
             }
             playButton.Text = GetPlayButtonText();
+            playButton.ToolTip = GetPlayButtonTooltip();
 
             playButton.Invalidate();
 
-            UpdateProfileSettingsState();
+            UpdateModSettingsState();
         }
 
         /// <summary>
@@ -242,13 +240,33 @@ namespace AM2RLauncher
         {
             switch (updateState)
             {
-                case UpdateState.Download: return Language.Text.Download;
-                case UpdateState.Downloading: return Language.Text.Abort;
-                case UpdateState.Select11: return Language.Text.Select11;
-                case UpdateState.Install: return Language.Text.Install;
-                case UpdateState.Installing: return Language.Text.Installing;
-                case UpdateState.Play: return Language.Text.Play;
-                case UpdateState.Playing: return Language.Text.Playing;
+                case PlayButtonState.Download: return Text.Download;
+                case PlayButtonState.Downloading: return Text.Abort;
+                case PlayButtonState.Select11: return Text.Select11;
+                case PlayButtonState.Install: return Text.Install;
+                case PlayButtonState.Installing: return Text.Installing;
+                case PlayButtonState.Play: return Text.Play;
+                case PlayButtonState.Playing: return Text.Playing;
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// This returns the tooltip that <see cref="playButton"/> should have depending on the global updateState.
+        /// </summary>
+        /// <returns>The tooltip as a <see cref="String"/>, or <see langword="null"/> if the current State is invalid.</returns>
+        private string GetPlayButtonTooltip()
+        {
+            string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
+            switch (updateState)
+            {
+                case PlayButtonState.Download: return Text.PlayButtonDownloadToolTip;
+                case PlayButtonState.Downloading: return Text.PlayButtonDownloadToolTip;
+                case PlayButtonState.Select11: return Text.PlayButtonSelect11ToolTip;
+                case PlayButtonState.Install: return playButton.ToolTip = HelperMethods.GetText(Text.PlayButtonInstallToolTip, profileName);
+                case PlayButtonState.Installing: return Text.PlayButtonInstallingToolTip;
+                case PlayButtonState.Play: return HelperMethods.GetText(Text.PlayButtonPlayToolTip, profileName);
+                case PlayButtonState.Playing: return Text.PlayButtonPlayingToolTip;
                 default: return null;
             }
         }
@@ -261,8 +279,8 @@ namespace AM2RLauncher
         {
             switch (apkButtonState)
             {
-                case ApkButtonState.Create: return Language.Text.CreateAPK;
-                case ApkButtonState.Creating: return Language.Text.CreatingAPK;
+                case ApkButtonState.Create: return Text.CreateAPK;
+                case ApkButtonState.Creating: return Text.CreatingAPK;
                 default: return null;
             }
         }
@@ -286,11 +304,10 @@ namespace AM2RLauncher
                 // Archive version notes
                 if (!profile.Installable)
                 {
-                    //TODO: localizations
                     if (profile.Name.Contains("Community Updates"))
-                        profile.ProfileNotes = Language.Text.ArchiveNotesCommunityUpdates;
+                        profile.ProfileNotes = Text.ArchiveNotesCommunityUpdates;
                     else
-                        profile.ProfileNotes = Language.Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
+                        profile.ProfileNotes = Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
                 }
 
                 profileDropDown.Items.Add(profile.Name);
@@ -317,15 +334,15 @@ namespace AM2RLauncher
             }
 
             // Update stored profiles in the Profile Settings tab
-            settingsProfileDropDown.Items.Clear();
-            settingsProfileDropDown.Items.AddRange(profileDropDown.Items);
-            settingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
+            modSettingsProfileDropDown.Items.Clear();
+            modSettingsProfileDropDown.Items.AddRange(profileDropDown.Items);
+            modSettingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
             // Refresh the author and version label on the main tab
             if (profileList.Count > 0)
             {
-                profileAuthorLabel.Text = Language.Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-                profileVersionLabel.Text = Language.Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
+                profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
+                profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
             }
 
             log.Info("Reloading UI components after loading successful.");
@@ -348,6 +365,19 @@ namespace AM2RLauncher
         {
             Profile.ArchiveProfile(profile);
             LoadProfilesAndAdjustLists();
+        }
+
+        /// <summary>Enables and changes colors for <see cref="customMirrorTextBox"/> and <see cref="mirrorDropDown"/> accordingly.</summary>
+        private void EnableMirrorControlsAccordingly()
+        {
+            bool enabled = (bool)customMirrorCheck.Checked;
+            customMirrorTextBox.Enabled = enabled;
+            mirrorDropDown.Enabled = !enabled;
+            // Not sure why the dropdown menu needs this hack, but the textBox does not.
+            //TODO: eto feature request
+            if (OS.IsWindows)
+                mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
+            mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
         }
     }
 }

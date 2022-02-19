@@ -47,13 +47,14 @@ public static class Profile
 
     /// <summary>
     /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
+    /// This method will store the result in a cache and return that, unless it's invalidated by <paramref name="invalidateCache"/>.
     /// </summary>
-    /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated</param>
+    /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated.</param>
     /// <returns></returns>
     public static bool Is11Installed(bool invalidateCache = false)
     {
         // Only invalidate if we need to
-        if (invalidateCache) InvalidateAM2R11InstallCacheIfNecessary();
+        if (invalidateCache) InvalidateAM2R11InstallCache();
 
         // If we have a cache, return that instead
         if (isAM2R11InstalledCache != null) return isAM2R11InstalledCache.Value;
@@ -78,7 +79,7 @@ public static class Profile
     /// <summary>
     /// Invalidates <see cref="isAM2R11InstalledCache"/> if necessary.
     /// </summary>
-    private static void InvalidateAM2R11InstallCacheIfNecessary()
+    private static void InvalidateAM2R11InstallCache()
     {
         // If the file exists, and its hash matches with ours, don't invalidate
         if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip") &&
@@ -86,6 +87,64 @@ public static class Profile
             return;
 
         isAM2R11InstalledCache = null;
+    }
+
+    /// <summary>
+    /// Checks if a Zip file is a valid AM2R_1.1 zip. 
+    /// </summary>
+    /// <param name="zipPath">Full Path to the Zip file to check.</param>
+    /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result</returns>
+    public static IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
+    {
+        const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
+        const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
+        const string am2rHash = "15253f7a66d6ea3feef004ebbee9b438";
+
+        string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
+
+        // Clean up in case folder exists already
+        if (Directory.Exists(tmpPath))
+            Directory.Delete(tmpPath, true);
+
+        Directory.CreateDirectory(tmpPath);
+
+        // Open archive
+        ZipArchive am2rZip = ZipFile.OpenRead(zipPath);
+
+        // Check if exe exists anywhere
+        ZipArchiveEntry am2rExe = am2rZip.Entries.FirstOrDefault(x => x.FullName.Contains("AM2R.exe"));
+        if (am2rExe == null)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
+        // Check if it's not in a subfolder. if it'd be in a subfolder, fullname would be "folder/AM2R.exe"
+        if (am2rExe.FullName != "AM2R.exe")
+            return IsZipAM2R11ReturnCodes.GameIsInASubfolder;
+        // Check validity
+        am2rExe.ExtractToFile(tmpPath + "/" + am2rExe.FullName);
+        if (HelperMethods.CalculateMD5(tmpPath + "/" + am2rExe.FullName) != am2rHash)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
+
+        // Check if data.win exists / is valid
+        ZipArchiveEntry dataWin = am2rZip.Entries.FirstOrDefault(x => x.FullName == "data.win");
+        if (dataWin == null)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+        dataWin.ExtractToFile(tmpPath + "/" + dataWin.FullName);
+        if (HelperMethods.CalculateMD5(tmpPath + "/" + dataWin.FullName) != dataWinHash)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+
+        // Check if d3d.dll exists / is valid
+        ZipArchiveEntry d3dx = am2rZip.Entries.FirstOrDefault(x => x.FullName == "D3DX9_43.dll");
+        if (d3dx == null)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
+        d3dx.ExtractToFile(tmpPath + "/" + d3dx.FullName);
+        if (HelperMethods.CalculateMD5(tmpPath + "/" + d3dx.FullName) != d3dHash)
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
+
+        // Clean up
+        Directory.Delete(tmpPath, true);
+
+        // If we didn't exit before, everything is fine
+        log.Info("AM2R_11 check successful!");
+        return IsZipAM2R11ReturnCodes.Successful;
     }
 
     /// <summary>
@@ -240,9 +299,7 @@ public static class Profile
 
         // Delete folder in Mods
         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
-        {
             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
-        }
 
         // Delete the zip file in Mods
         if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
@@ -254,9 +311,7 @@ public static class Profile
 
         // Delete folder in Profiles
         if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name))
-        {
             HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + "/Profiles/" + profile.Name);
-        }
 
         log.Info("Successfully deleted profile " + profile.Name + ".");
     }
@@ -497,6 +552,7 @@ public static class Profile
             progress.Report(100);
             return;
         }
+
         log.Info("Creating Android APK for profile " + profile.Name + ".");
 
         // Create working dir after some cleanup
@@ -781,63 +837,5 @@ public static class Profile
     {
         // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
         return Repository.IsValid(CrossPlatformOperations.CURRENTPATH + "/PatchData") && File.Exists(CrossPlatformOperations.CURRENTPATH + "/PatchData/profile.xml");
-    }
-
-    /// <summary>
-    /// Checks if a Zip file is a valid AM2R_1.1 zip.
-    /// </summary>
-    /// <param name="zipPath">Full Path to the Zip file to check.</param>
-    /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result</returns>
-    public static IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
-    {
-        const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
-        const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
-        const string am2rHash = "15253f7a66d6ea3feef004ebbee9b438";
-
-        string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
-
-        // Clean up in case folder exists already
-        if (Directory.Exists(tmpPath))
-            Directory.Delete(tmpPath, true);
-
-        Directory.CreateDirectory(tmpPath);
-
-        // Open archive
-        ZipArchive am2rZip = ZipFile.OpenRead(zipPath);
-
-        // Check if exe exists anywhere
-        ZipArchiveEntry am2rExe = am2rZip.Entries.FirstOrDefault(x => x.FullName.Contains("AM2R.exe"));
-        if (am2rExe == null)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
-        // Check if it's not in a subfolder. if it'd be in a subfolder, fullname would be "folder/AM2R.exe"
-        if (am2rExe.FullName != "AM2R.exe")
-            return IsZipAM2R11ReturnCodes.GameIsInASubfolder;
-        // Check validity
-        am2rExe.ExtractToFile(tmpPath + "/" + am2rExe.FullName);
-        if (HelperMethods.CalculateMD5(tmpPath + "/" + am2rExe.FullName) != am2rHash)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
-
-        // Check if data.win exists / is valid
-        ZipArchiveEntry dataWin = am2rZip.Entries.FirstOrDefault(x => x.FullName == "data.win");
-        if (dataWin == null)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
-        dataWin.ExtractToFile(tmpPath + "/" + dataWin.FullName);
-        if (HelperMethods.CalculateMD5(tmpPath + "/" + dataWin.FullName) != dataWinHash)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
-
-        // Check if d3d.dll exists / is valid
-        ZipArchiveEntry d3dx = am2rZip.Entries.FirstOrDefault(x => x.FullName == "D3DX9_43.dll");
-        if (d3dx == null)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
-        d3dx.ExtractToFile(tmpPath + "/" + d3dx.FullName);
-        if (HelperMethods.CalculateMD5(tmpPath + "/" + d3dx.FullName) != d3dHash)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
-
-        // Clean up
-        Directory.Delete(tmpPath, true);
-
-        // If we didn't exit before, everything is fine
-        log.Info("AM2R_11 check successful!");
-        return IsZipAM2R11ReturnCodes.Successful;
     }
 }

@@ -303,7 +303,7 @@
   <data name="ProfileNotes" xml:space="preserve">
     <value>游戏实例说明：</value>
   </data>
-  <data name="ProfileSettingsTab" xml:space="preserve">
+  <data name="ModSettingsTab" xml:space="preserve">
     <value>Mod 设置</value>
   </data>
   <data name="ProgressbarProgress" xml:space="preserve">

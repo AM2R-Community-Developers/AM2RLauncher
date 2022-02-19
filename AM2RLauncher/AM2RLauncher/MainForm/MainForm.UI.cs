@@ -1,5 +1,7 @@
 ﻿using AM2RLauncher.Core;
 using AM2RLauncher.Core.XML;
+using AM2RLauncher.Language;
+using AM2RLauncher.Properties;
 using Eto.Drawing;
 using Eto.Forms;
 using log4net;
@@ -30,15 +32,11 @@ namespace AM2RLauncher
         /// </summary>
         private const string VERSION = LauncherUpdater.VERSION;
 
-        /// <summary>
-        /// A <see cref="Bitmap"/> of the AM2R icon.
-        /// </summary>
-        private static readonly Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
 
         /// <summary>
-        /// An enum, that has possible states for our Launcher.
+        /// An enum, that has possible states for the play button.
         /// </summary>
-        public enum UpdateState
+        public enum PlayButtonState
         {
             Download,
             Downloading,
@@ -61,7 +59,7 @@ namespace AM2RLauncher
         /// <summary>
         /// This variable has the current global state of the Launcher.
         /// </summary>
-        private static UpdateState updateState = UpdateState.Download;
+        private static PlayButtonState updateState = PlayButtonState.Download;
         /// <summary>
         /// This variable has the current global statue of the <see cref="apkButton"/>.
         /// </summary>
@@ -100,13 +98,9 @@ namespace AM2RLauncher
                 if (OS.IsWindows)
                 {
                     Process current = Process.GetCurrentProcess();
-                    foreach (Process process in Process.GetProcessesByName(current.ProcessName))
-                    {
-                        if (process.Id == current.Id)
-                            continue;
+                    Process process = Process.GetProcessesByName(current.ProcessName).First(p => p.Id == current.Id);
+                    if (process != null)
                         Core.Core.SetForegroundWindow(process.MainWindowHandle);
-                        break;
-                    }
                 }
                 Environment.Exit(0);
             }
@@ -133,8 +127,10 @@ namespace AM2RLauncher
             #region VARIABLE INITIALIZATION
             log.Info("Beginning UI initialization...");
 
+            Bitmap am2rIcon = new Bitmap(AM2RLauncher.Properties.Resources.AM2RIcon);
+
             // System tray indicator
-            showButton = new ButtonMenuItem { Text = Language.Text.TrayButtonShow };
+            ButtonMenuItem showButton = new ButtonMenuItem { Text = Text.TrayButtonShow };
             trayIndicator = new TrayIndicator
             {
                 Menu = new ContextMenu(showButton),
@@ -150,6 +146,7 @@ namespace AM2RLauncher
             // Create array from validCount
             profileList = new List<ProfileXML>();
 
+            //TODO: whenever profileDropDown gets rewritten to use a datastore, scrap this
             profileNames = new List<ListItem>();
             foreach (var profile in profileList)
             {
@@ -159,22 +156,6 @@ namespace AM2RLauncher
             // Custom splash texts
             string splash = Splash.GetSplash();
             log.Info("Randomly chosen splash: " + splash);
-
-            // Load bitmaps
-            redditIcon = new Bitmap(AM2RLauncher.Properties.Resources.redditIcon48);
-            githubIcon = new Bitmap(AM2RLauncher.Properties.Resources.githubIcon48);
-            youtubeIcon = new Bitmap(AM2RLauncher.Properties.Resources.youtubeIcon48);
-            discordIcon = new Bitmap(AM2RLauncher.Properties.Resources.discordIcon48);
-            formBG = new Bitmap(AM2RLauncher.Properties.Resources.bgCentered);
-
-            // Load colors
-            colGreen = Color.FromArgb(142, 188, 35);
-            colRed = Color.FromArgb(188, 10, 35);
-            colInactive = Color.FromArgb(109, 109, 109);
-            colBGNoAlpha = Color.FromArgb(10, 10, 10);
-            colBG = Color.FromArgb(10, 10, 10, 80);
-            if (OS.IsLinux) colBG = colBGNoAlpha;   // XORG can't display alpha anyway, and Wayland breaks with it.
-            colBGHover = Color.FromArgb(17, 28, 13);
 
             Font smallButtonFont = new Font(SystemFont.Default, 10);
 
@@ -189,8 +170,8 @@ namespace AM2RLauncher
             foreach (var mirror in mirrorList)
             {
                 string text = mirror;
-                if (text.Contains("github.com")) text = Language.Text.MirrorGithubText;
-                else if (text.Contains("gitlab.com")) text = Language.Text.MirrorGitlabText;
+                if (text.Contains("github.com")) text = Text.MirrorGithubText;
+                else if (text.Contains("gitlab.com")) text = Text.MirrorGitlabText;
                 mirrorDescriptionList.Add(new ListItem() { Key = mirror, Text = text });
             }
             #endregion
@@ -246,7 +227,7 @@ namespace AM2RLauncher
             // APK button
             apkButton = new ColorButton
             {
-                Text = Language.Text.CreateAPK,
+                Text = Text.CreateAPK,
                 Height = 40,
                 Width = 250,
                 TextColor = colGreen,
@@ -286,7 +267,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 15,
-                Text = Language.Text.CurrentProfile,
+                Text = Text.CurrentProfile,
                 TextColor = colGreen
             };
 
@@ -315,7 +296,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 16,
-                Text = Language.Text.Author + " ",
+                Text = Text.Author + " ",
                 TextColor = colGreen
             };
 
@@ -325,7 +306,7 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBG,
                 Height = 16,
-                Text = Language.Text.VersionLabel + " ",
+                Text = Text.VersionLabel + " ",
                 TextColor = colGreen
             };
 
@@ -337,7 +318,7 @@ namespace AM2RLauncher
                 BackgroundColor = colBG,
                 Width = 20,
                 Height = 55,
-                Text = Language.Text.SaveLocationWarning,
+                Text = Text.SaveLocationWarning,
                 TextColor = colRed
             };
 
@@ -345,17 +326,21 @@ namespace AM2RLauncher
 
 
             // Social buttons
-            var redditButton = new ImageButton { ToolTip = Language.Text.RedditToolTip, Image = redditIcon };
-            redditButton.Click += RedditIconOnClick;
+            Bitmap redditIcon = new Bitmap(Resources.redditIcon48);
+            var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
+            redditButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R");
 
-            var githubButton = new ImageButton { ToolTip = Language.Text.GithubToolTip, Image = githubIcon };
-            githubButton.Click += GithubIconOnClick;
+            Bitmap githubIcon = new Bitmap(Resources.githubIcon48);
+            var githubButton = new ImageButton { ToolTip = Text.GithubToolTip, Image = githubIcon };
+            githubButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers");
 
-            var youtubeButton = new ImageButton { ToolTip = Language.Text.YoutubeToolTip, Image = youtubeIcon };
-            youtubeButton.Click += YoutubeIconOnClick;
+            Bitmap youtubeIcon = new Bitmap(Resources.youtubeIcon48);
+            var youtubeButton = new ImageButton { ToolTip = Text.YoutubeToolTip, Image = youtubeIcon };
+            youtubeButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates");
 
-            var discordButton = new ImageButton { ToolTip = Language.Text.DiscordToolTip, Image = discordIcon };
-            discordButton.Click += DiscordIconOnClick;
+            Bitmap discordIcon = new Bitmap(Resources.discordIcon48);
+            var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
+            discordButton.Click += (sender, e) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
 
 
             // Social button panel
@@ -369,7 +354,12 @@ namespace AM2RLauncher
 
 
             // Version number label
-            versionLabel = new Label { Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""), Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen, Font = new Font(SystemFont.Default, 12) };
+            Label versionLabel = new Label 
+            {
+                Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""),
+                Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen,
+                Font = new Font(SystemFont.Default, 12) 
+            };
 
             // Tie everything together
             var mainLayout = new DynamicLayout();
@@ -390,33 +380,34 @@ namespace AM2RLauncher
 
             #region TABS
 
+            #region MAIN PAGE
             // [MAIN PAGE]
-            mainPage = new TabPage
+            TabPage mainPage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
-                Text = Language.Text.PlayTab,
+                Text = Text.PlayTab,
                 Content = drawable
             };
+            #endregion
 
+            #region CHANGELOG PAGE
             // [CHANGELOG]
-
-            changelogUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/changelog.html");
-
-            changelogWebView = new WebView { Url = changelogUri };
+            Uri changelogUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/changelog.html");
+            WebView changelogWebView = new WebView { Url = changelogUri };
 
             if (OS.IsUnix && !isInternetThere)
                 changelogWebView = new WebView();
 
-            changelogNoConnectionLabel = new Label
+            Label changelogNoConnectionLabel = new Label
             {
-                Text = Language.Text.NoInternetConnection,
+                Text = Text.NoInternetConnection,
                 TextColor = colGreen
             };
 
-            changelogPage = new TabPage
+            TabPage changelogPage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
-                Text = Language.Text.ChangelogTab,
+                Text = Text.ChangelogTab,
 
                 Content = new TableLayout
                 {
@@ -427,22 +418,27 @@ namespace AM2RLauncher
                 }
             };
 
-            // [NEWS]
-            newsUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/news.html");
-            newsWebView = new WebView { Url = newsUri };
+            #endregion
 
+            #region NEWS PAGE
+
+            // [NEWS]
+            Uri newsUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/news.html");
+            WebView newsWebView = new WebView { Url = newsUri };
+
+            //TODO: why exactly is this check necessary?
             if (OS.IsUnix && !isInternetThere)
                 newsWebView = new WebView();
 
-            newsNoConnectionLabel = new Label
+            Label newsNoConnectionLabel = new Label
             {
-                Text = Language.Text.NoInternetConnection,
+                Text = Text.NoInternetConnection,
                 TextColor = colGreen
             };
 
-            newsPage = new TabPage
+            TabPage newsPage = new TabPage
             {
-                Text = Language.Text.NewsTab,
+                Text = Text.NewsTab,
                 BackgroundColor = colBGNoAlpha,
 
                 Content = new TableLayout
@@ -454,6 +450,7 @@ namespace AM2RLauncher
                 }
             };
 
+            //TODO: this is hack because on linux / mac the other way doesn't work. eto issue?
             if (OS.IsUnix && !isInternetThere)
             {
                 changelogPage.Content = new TableLayout
@@ -476,13 +473,17 @@ namespace AM2RLauncher
                 };
             }
 
+            #endregion
+
+            #region SETTINGS PAGE
+
             // [LAUNCHER SETTINGS]
             DynamicLayout settingsLayout = new DynamicLayout();
 
             // LanguageLabel
-            languageLabel = new Label
+            Label languageLabel = new Label
             {
-                Text = Language.Text.LanguageNotice,
+                Text = Text.LanguageNotice,
                 TextColor = colGreen
             };
 
@@ -490,7 +491,7 @@ namespace AM2RLauncher
 
             List<ListItem> languageList = new List<ListItem>
             {
-                Language.Text.SystemLanguage,
+                Text.SystemLanguage,
                 "Deutsch",
                 "English",
                 "Español",
@@ -525,7 +526,7 @@ namespace AM2RLauncher
             autoUpdateAM2RCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateAM2R")),
-                Text = Language.Text.AutoUpdateAM2R,
+                Text = Text.AutoUpdateAM2R,
                 TextColor = colGreen
             };
 
@@ -534,7 +535,7 @@ namespace AM2RLauncher
             autoUpdateLauncherCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("AutoUpdateLauncher")),
-                Text = Language.Text.AutoUpdateLauncher,
+                Text = Text.AutoUpdateLauncher,
                 TextColor = colGreen
             };
 
@@ -542,7 +543,7 @@ namespace AM2RLauncher
             hqMusicPCCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQPC")),
-                Text = Language.Text.HighQualityPC,
+                Text = Text.HighQualityPC,
                 TextColor = colGreen
             };
 
@@ -550,7 +551,7 @@ namespace AM2RLauncher
             hqMusicAndroidCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("MusicHQAndroid")),
-                Text = Language.Text.HighQualityAndroid,
+                Text = Text.HighQualityAndroid,
                 TextColor = colGreen
             };
 
@@ -558,17 +559,17 @@ namespace AM2RLauncher
             profileDebugLogCheck = new CheckBox
             {
                 Checked = bool.Parse(CrossPlatformOperations.ReadFromConfig("ProfileDebugLog")),
-                Text = Language.Text.ProfileDebugCheckBox,
+                Text = Text.ProfileDebugCheckBox,
                 TextColor = colGreen
             };
 
             // Custom environment variables label
-            customEnvVarLabel = new Label();
+            Label customEnvVarLabel = new Label();
             if (OS.IsLinux)
             {
                 customEnvVarLabel = new Label
                 {
-                    Text = Language.Text.CustomEnvVarLabel,
+                    Text = Text.CustomEnvVarLabel,
                     TextColor = colGreen
                 };
             }
@@ -588,7 +589,7 @@ namespace AM2RLauncher
             // Mirror list
             mirrorLabel = new Label
             {
-                Text = Language.Text.DownloadSource,
+                Text = Text.DownloadSource,
                 TextColor = colGreen
             };
 
@@ -611,7 +612,7 @@ namespace AM2RLauncher
             customMirrorCheck = new CheckBox
             {
                 Checked = Boolean.Parse(CrossPlatformOperations.ReadFromConfig("CustomMirrorEnabled")),
-                Text = Language.Text.CustomMirrorCheck,
+                Text = Text.CustomMirrorCheck,
                 TextColor = colGreen
             };
 
@@ -622,6 +623,8 @@ namespace AM2RLauncher
                 TextColor = colGreen
             };
 
+            EnableMirrorControlsAccordingly();
+
             settingsLayout.BeginHorizontal();
             settingsLayout.AddSpace();
             settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, profileDebugLogCheck, customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
@@ -631,18 +634,21 @@ namespace AM2RLauncher
             {
                 BackgroundColor = colBGNoAlpha,
                 Content = settingsLayout,
-                Text = Language.Text.LauncherSettingsTab
+                Text = Text.LauncherSettingsTab
             };
 
-            // [MOD SETTINGS]
+            #endregion
 
-            DynamicLayout profileLayout = new DynamicLayout();
+            #region MODSETTINGS PAGE
+
+            // [MOD SETTINGS]
+            DynamicLayout modSettingsLayout = new DynamicLayout();
 
 
             addModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.AddNewMod,
+                Text = Text.AddNewMod,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -659,12 +665,12 @@ namespace AM2RLauncher
 
             settingsProfileLabel = new Label
             {
-                Text = Language.Text.CurrentProfile,
+                Text = Text.CurrentProfile,
                 TextColor = colGreen,
                 Width = 275
             };
 
-            settingsProfileDropDown = new DropDown
+            modSettingsProfileDropDown = new DropDown
             {
                 TextColor = colGreen,
                 BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
@@ -672,14 +678,14 @@ namespace AM2RLauncher
 
             // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
             if (OS.IsLinux)
-                settingsProfileDropDown = new DropDown();
+                modSettingsProfileDropDown = new DropDown();
 
-            settingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
+            modSettingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
 
             profileButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.OpenProfileFolder,
+                Text = Text.OpenProfileFolder,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -692,7 +698,7 @@ namespace AM2RLauncher
             saveButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.OpenSaveFolder,
+                Text = Text.OpenSaveFolder,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -705,7 +711,7 @@ namespace AM2RLauncher
             updateModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.UpdateModButtonText,
+                Text = Text.UpdateModButtonText,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -718,7 +724,7 @@ namespace AM2RLauncher
             deleteModButton = new ColorButton
             {
                 ToolTip = null,
-                Text = Language.Text.DeleteModButtonText,
+                Text = Text.DeleteModButtonText,
                 Font = smallButtonFont,
                 Height = 30,
                 Width = 275,
@@ -736,20 +742,22 @@ namespace AM2RLauncher
                 SpellCheck = false,
                 Width = 275,
                 Height = 150,
-                Text = Language.Text.ProfileNotes
+                Text = Text.ProfileNotes
             };
 
-            profileLayout.BeginHorizontal();
-            profileLayout.AddSpace();
-            profileLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, settingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
-            profileLayout.AddSpace();
+            modSettingsLayout.BeginHorizontal();
+            modSettingsLayout.AddSpace();
+            modSettingsLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, modSettingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
+            modSettingsLayout.AddSpace();
 
-            profilePage = new TabPage
+            TabPage modSettingsPage = new TabPage
             {
                 BackgroundColor = colBGNoAlpha,
-                Content = profileLayout,
-                Text = Language.Text.ProfileSettingsTab
+                Content = modSettingsLayout,
+                Text = Text.ModSettingsTab
             };
+
+            #endregion
 
             #endregion
 
@@ -765,7 +773,7 @@ namespace AM2RLauncher
 
                     settingsPage,
 
-                    profilePage
+                    modSettingsPage
                 }
             };
 
@@ -782,7 +790,6 @@ namespace AM2RLauncher
             hqMusicAndroidCheck.CheckedChanged += HqMusicAndroidCheckChanged;
             hqMusicPCCheck.CheckedChanged += HqMusicPCCheckChanged;
             customMirrorCheck.CheckedChanged += CustomMirrorCheckChanged;
-            customMirrorCheck.LoadComplete += CustomMirrorCheckLoadComplete;
             apkButton.Click += ApkButtonClickEvent;
             apkButton.LoadComplete += (sender, e) => UpdateApkState();
             profileDropDown.LoadComplete += (sender, e) => UpdateProfileState();
@@ -790,11 +797,11 @@ namespace AM2RLauncher
             playButton.LoadComplete += PlayButtonLoadComplete;
             customMirrorTextBox.LostFocus += CustomMirrorTextBoxLostFocus;
             mirrorDropDown.SelectedIndexChanged += MirrorDropDownSelectedIndexChanged;
-            profileLayout.LoadComplete += ProfileLayoutLoadComplete;
+            modSettingsLayout.LoadComplete += ProfileLayoutLoadComplete;
             addModButton.Click += AddModButtonClicked;
-            profileButton.Click += ProfilesButtonClickEvent;
+            profileButton.Click += ProfileDataButtonClickEvent;
             saveButton.Click += SaveButtonClickEvent;
-            settingsProfileDropDown.SelectedIndexChanged += SettingsProfileDropDownSelectedIndexChanged;
+            modSettingsProfileDropDown.SelectedIndexChanged += ModSettingsProfileDropDownSelectedIndexChanged;
             deleteModButton.Click += DeleteModButtonClicked;
             updateModButton.Click += UpdateModButtonClicked;
             profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
@@ -802,8 +809,8 @@ namespace AM2RLauncher
                 customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
             //TODO: Retest if these now work on mac
-            newsWebView.DocumentLoaded += NewsWebViewDocumentLoaded;
-            changelogWebView.DocumentLoaded += ChangelogWebViewDocumentLoaded;
+            newsWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(newsPage, newsNoConnectionLabel);
+            changelogWebView.DocumentLoaded += (sender, e) => ChangeToEmptyPageOnNoInternet(changelogPage, changelogNoConnectionLabel);
 
             log.Info("Events linked successfully.");
 
@@ -815,40 +822,32 @@ namespace AM2RLauncher
         // Visual studio does it like this for normal winforms projects, so I just used the same format.
 
         /// <summary>The tray indicator</summary>
-        TrayIndicator trayIndicator;
-        /// <summary>The "Show" Button on the tray indicator</summary>
-        ButtonMenuItem showButton;
+        private TrayIndicator trayIndicator;
 
         /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
+        //TODO: this should be moved into AM2RLauncher.Core
         List<ProfileXML> profileList;
         /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
         List<ListItem> profileNames;
 
-        // Bitmaps
-        /// <summary>The Reddit icon.</summary>
-        private Bitmap redditIcon;
-        /// <summary>The Github icon.</summary>
-        private Bitmap githubIcon;
-        /// <summary>The YouTube icon.</summary>
-        private Bitmap youtubeIcon;
-        /// <summary>The Discord icon.</summary>
-        private Bitmap discordIcon;
         /// <summary>The planet Background.</summary>
-        private Bitmap formBG;
+        private readonly Bitmap formBG = new Bitmap(Resources.bgCentered);
 
         // Colors
         /// <summary>The main green color.</summary>
-        private Color colGreen;
+        private readonly Color colGreen = Color.FromArgb(142, 188, 35);
         /// <summary>The warning red color.</summary>
-        private Color colRed;
+        private readonly Color colRed = Color.FromArgb(188, 10, 35);
         /// <summary>The main inactive color.</summary>
-        private Color colInactive;
+        private readonly Color colInactive = Color.FromArgb(109, 109, 109);
         /// <summary>The black background color without alpha value.</summary>
-        private Color colBGNoAlpha;
+        private readonly Color colBGNoAlpha = Color.FromArgb(10, 10, 10);
         /// <summary>The black background color.</summary>
-        private Color colBG;
+        // XORG can't display alpha anyway, and Wayland breaks with it.
+        // TODO: that sounds like an Eto bug. investigate, try to open eto issue.
+        private readonly Color colBG = OS.IsLinux ? Color.FromArgb(10, 10, 10) : Color.FromArgb(10, 10, 10, 80);
         /// <summary>The lighter green color on hover.</summary>
-        private Color colBGHover;
+        private readonly Color colBGHover = Color.FromArgb(17, 28, 13);
 
         // Mirror lists
         /// <summary><see cref="List{String}"/> of mirror <see cref="string"/>s, used for actually working with mirrors.</summary>
@@ -857,7 +856,7 @@ namespace AM2RLauncher
         private List<ListItem> mirrorDescriptionList;
 
         // UI Elements
-        /// <summary>The main control of the <see cref="mainPage"/>, used to draw the <see cref="formBG"/> and hold the main interface.</summary>
+        /// <summary>The main control of the main page, used to draw the <see cref="formBG"/> and hold the main interface.</summary>
         private Drawable drawable;
 
         /// <summary>A <see cref="ColorButton"/> that acts as the main Button</summary>
@@ -875,8 +874,6 @@ namespace AM2RLauncher
         /// <summary>A <see cref="ColorButton"/> that is used to delete a mod</summary>
         private ColorButton deleteModButton;
 
-        /// <summary>The <see cref="Label"/> that gives information for <see cref="languageDropDown"/>.</summary>
-        private Label languageLabel;
         /// <summary>The <see cref="Label"/> that entitles <see cref="profileDropDown"/>.</summary>
         private Label profileLabel;
         /// <summary>The <see cref="Label"/> that gives author information for <see cref="profileDropDown"/>.</summary>
@@ -885,22 +882,12 @@ namespace AM2RLauncher
         private Label profileVersionLabel;
         /// <summary>The <see cref="Label"/> that gives information for <see cref="mirrorDropDown"/>.</summary>
         private Label mirrorLabel;
-        /// <summary>The <see cref="Label"/> that displays <see cref="VERSION"/>, aka the current launcher version.</summary>
-        private Label versionLabel;
-        /// <summary>The <see cref="Label"/> that gives information for <see cref="settingsProfileDropDown"/>.</summary>
+        /// <summary>The <see cref="Label"/> that gives information for <see cref="modSettingsProfileDropDown"/>.</summary>
         private Label settingsProfileLabel;
         /// <summary>The <see cref="Label"/> that compliments <see cref="progressBar"/>.</summary>
         private Label progressLabel;
-        /// <summary>The <see cref="Label"/> that gives a warning on failure to load the <see cref="newsWebView"/>.</summary>
-        private Label newsNoConnectionLabel;
-        /// <summary>The <see cref="Label"/> that gives a warning on failure to load the <see cref="changelogWebView"/>.</summary>
-        private Label changelogNoConnectionLabel;
         /// <summary>The <see cref="Label"/> that gives a warning if the current selected <see cref="ProfileXML"/> shares the same save location has default AM2R.</summary>
         private Label saveWarningLabel;
-        /// <summary>The <see cref="Label"/> that describes <see cref="customEnvVarTextBox"/>.</summary>
-        private Label customEnvVarLabel;
-
-
 
         /// <summary>A <see cref="CheckBox"/>, that indicates wether to automatically update AM2R or not.</summary>
         private CheckBox autoUpdateAM2RCheck;
@@ -922,37 +909,19 @@ namespace AM2RLauncher
         /// <summary>A <see cref="DropDown"/> where profiles can be chosen.</summary>
         private DropDown profileDropDown;
         /// <summary>A <see cref="DropDown"/> where profiles can be chosen (located in Profile Settings).</summary>
-        private DropDown settingsProfileDropDown;
+        //TODO: Use MVVM bindings: https://github.com/picoe/Eto/wiki/Data-Binding#mvvm-binding
+        private DropDown modSettingsProfileDropDown;
 
         /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>
         private TextBox customMirrorTextBox;
         /// <summary>A <see cref="TextBox"/>, where the user can input their custom environment variables.</summary>
         private TextBox customEnvVarTextBox;
 
-        /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="settingsProfileDropDown"/> are displayed.</summary>
+        /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="modSettingsProfileDropDown"/> are displayed.</summary>
         private TextArea profileNotesTextArea;
 
         /// <summary>A <see cref="ProgressBar"/> that can be used to show progress for a specific task.</summary>
         private ProgressBar progressBar;
-
-        /// <summary>The Uri used by <see cref="newsWebView"/>.</summary>
-        private Uri newsUri;
-        /// <summary>The Uri used by <see cref="changelogWebView"/>.</summary>
-        private Uri changelogUri;
-
-        /// <summary>A <see cref="WebView"/> to display the DistributionCenter news page.</summary>
-        private WebView newsWebView;
-        /// <summary>A <see cref="WebView"/> to display the DistributionCenter changelog page.</summary>
-        private WebView changelogWebView;
-
-        /// <summary>A <see cref="TabPage"/> for the Launcher's main interface.</summary>
-        private TabPage mainPage;
-        /// <summary>A <see cref="TabPage"/> for the Launcher's news integration.</summary>
-        private TabPage newsPage;
-        /// <summary>A <see cref="TabPage"/> for the Launcher's changelog integration.</summary>
-        private TabPage changelogPage;
-        /// <summary>A <see cref="TabPage"/> for the Launcher's profile settings.</summary>
-        private TabPage profilePage;
 
         #endregion
     }
