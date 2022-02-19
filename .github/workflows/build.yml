@@ -50,7 +50,7 @@ jobs:
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
     # Steps for uploading artifacts. We don't need them currently, so they're commented out.
     - name: Set Attributes
-      run: $ {{ matrix.ATTR }}
+      run: ${{ matrix.ATTR }}
     - name: Zip to Archive
       run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
     - name: Upload Artifacts
