@@ -50,11 +50,13 @@ public static class Core
     public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
 
     /// <summary>
-    /// Checks if this is ran from WINE
+    /// Checks if the Launcher is ran from WINE.
     /// </summary>
     /// <returns><see langword="true"/> if run from WINE, <see langword="false"/> if not.</returns>
     private static bool CheckIfRunFromWINE()
     {
+        // We check for wine by seeing if a reg entry exists.
+        // Not the best way, and could be removed from the future, but good enough for our purposes.
         if (OS.IsWindows && (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null))
             return true;
 

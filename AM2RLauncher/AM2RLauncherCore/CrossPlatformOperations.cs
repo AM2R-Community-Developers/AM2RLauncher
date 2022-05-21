@@ -48,21 +48,10 @@ public static class CrossPlatformOperations
         }
     }
 
-    private static string _currentPath;
-
     /// <summary>
     /// Current Path where the Launcher Data is located.
     /// </summary>
-    public static string CurrentPath
-    {
-        get
-        {
-            if (_currentPath is null)
-                _currentPath = GenerateCurrentPath();
-
-            return _currentPath;
-        }
-    }
+    public static readonly string CurrentPath = GenerateCurrentPath();
 
     /// <summary>
     /// Generates the mirror list, depending on the current Platform.

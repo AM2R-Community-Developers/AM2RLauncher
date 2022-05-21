@@ -55,7 +55,9 @@ public static class Splash
     {
         ":(",
         "All your machine are belong to MS",
-        "All your data are belong to us"
+        "All your data are belong to us",
+        "Go to Settings to activate AM2R.",
+        "(Not Responding)"
     };
 
     /// <summary>
@@ -73,6 +75,7 @@ public static class Splash
         "The quieter you are, the more Metroids you can hear.",
         "What you are referring to as AM2R, is in fact, GNU/AM2R.",
         "GNOME be gone!",
+        "Kurse you KDE!",
         "Go compile your own girlfriend. This one doesn't count, she's out of your league.",
         "Year 3115, NVIDIA still doesn't support Wayland.",
         "Was a mouse really that expensive, i3 users!?",
