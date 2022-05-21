@@ -3,7 +3,7 @@ using log4net;
 using log4net.Config;
 using System;
 using System.IO;
-using AM2RLauncher.Core;
+using AM2RLauncherLib;
 using log4net.Repository.Hierarchy;
 // ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace AM2RLauncher.Core;
+namespace AM2RLauncherLib;
 
 /// <summary>
 /// Class that does operations that work cross-platform.

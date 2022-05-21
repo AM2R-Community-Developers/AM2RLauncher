@@ -1,5 +1,5 @@
-﻿using AM2RLauncher.Core;
-using AM2RLauncher.Core.XML;
+﻿using AM2RLauncherLib;
+using AM2RLauncherLib.XML;
 using AM2RLauncher.Language;
 using Eto.Forms;
 using LibGit2Sharp;
@@ -158,7 +158,7 @@ namespace AM2RLauncher
                 // TODO: why do we delete patchdata if user cancels pulling?
                 log.Info(ex.Message);
                 MessageBox.Show(this, Text.CorruptPatchData, Text.ErrorWindowTitle, MessageBoxType.Error);
-                HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
+                HelperMethods.DeleteDirectory(AM2RLauncherLib.Core.PatchDataPath);
             }
             // This is for any exceptions from libgit
             catch (LibGit2SharpException ex)
@@ -202,7 +202,7 @@ namespace AM2RLauncher
             // Also, add a non-installable profile for it so people can access the older version or delete it from the mod manager.
             if ((profileList.Count > 0) && Profile.IsProfileInstalled(profileList[0]))
             {
-                ProfileXML installedUpdatesProfile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(Core.Core.ProfilesPath + "/Community Updates (Latest)/profile.xml"));
+                ProfileXML installedUpdatesProfile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(AM2RLauncherLib.Core.ProfilesPath + "/Community Updates (Latest)/profile.xml"));
 
                 if (installedUpdatesProfile.Version != profileList[0].Version)
                 {
@@ -247,14 +247,14 @@ namespace AM2RLauncher
                     try
                     {
                         // Cleanup invalid PatchData directory if it exists
-                        if (Directory.Exists(Core.Core.PatchDataPath))
+                        if (Directory.Exists(AM2RLauncherLib.Core.PatchDataPath))
                         {
                             log.Info("PatchData directory already exists, cleaning up...");
-                            HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
+                            HelperMethods.DeleteDirectory(AM2RLauncherLib.Core.PatchDataPath);
                         }
 
                         // Separate thread so launcher doesn't get locked
-                        await Task.Run(() => Repository.Clone(currentMirror, Core.Core.PatchDataPath, cloneOptions));
+                        await Task.Run(() => Repository.Clone(currentMirror, AM2RLauncherLib.Core.PatchDataPath, cloneOptions));
                     }
                     // We deliberately cancelled this, so no error handling
                     catch (UserCancelledException)
@@ -276,8 +276,8 @@ namespace AM2RLauncher
                         {
                             log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                             MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-                            if (Directory.Exists(Core.Core.PatchDataPath))
-                                HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
+                            if (Directory.Exists(AM2RLauncherLib.Core.PatchDataPath))
+                                HelperMethods.DeleteDirectory(AM2RLauncherLib.Core.PatchDataPath);
                         }
                         successful = false;
                     }
@@ -288,7 +288,7 @@ namespace AM2RLauncher
                         MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
 
                         if (Directory.Exists(CrossPlatformOperations.CurrentPath + " / PatchData"))
-                            HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
+                            HelperMethods.DeleteDirectory(AM2RLauncherLib.Core.PatchDataPath);
                         successful = false;
                     }
 
@@ -365,8 +365,8 @@ namespace AM2RLauncher
                     }
 
                     // We check if it exists first, because someone coughDRUIDcough might've copied it into here while on the showDialog
-                    if (fileFinder.FileName != Core.Core.AM2R11File)
-                        File.Copy(fileFinder.FileName, Core.Core.AM2R11File);
+                    if (fileFinder.FileName != AM2RLauncherLib.Core.AM2R11File)
+                        File.Copy(fileFinder.FileName, AM2RLauncherLib.Core.AM2R11File);
 
                     log.Info("AM2R_11.zip successfully imported.");
                     UpdateStateMachine();
@@ -607,7 +607,7 @@ namespace AM2RLauncher
             log.Info("Overwriting mirror in gitconfig.");
 
             // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
-            string gitConfigPath = Core.Core.PatchDataPath + "/.git/config";
+            string gitConfigPath = AM2RLauncherLib.Core.PatchDataPath + "/.git/config";
             if (!File.Exists(gitConfigPath)) return;
 
             string gitConfig = File.ReadAllText(gitConfigPath);
@@ -660,7 +660,7 @@ namespace AM2RLauncher
             log.Info("Overwriting mirror in gitconfig.");
 
             // Check if the gitConfig exists, if yes regex the gitURL, and replace it with the new current Mirror.
-            string gitConfigPath = Core.Core.PatchDataPath + "/.git/config";
+            string gitConfigPath = AM2RLauncherLib.Core.PatchDataPath + "/.git/config";
             if (!File.Exists(gitConfigPath)) return;
             string gitConfig = File.ReadAllText(gitConfigPath);
             Match match = gitURLRegex.Match(gitConfig);
@@ -712,7 +712,7 @@ namespace AM2RLauncher
 
             FileInfo modFile = new FileInfo(fileFinder.FileName);
             string modFileName = Path.GetFileNameWithoutExtension(modFile.Name);
-            string extractedModDir = Core.Core.ModsPath + "/" + modFileName;
+            string extractedModDir = AM2RLauncherLib.Core.ModsPath + "/" + modFileName;
 
             // Check first, if the directory is already there, if yes, throw error
             if (Directory.Exists(extractedModDir))
@@ -795,7 +795,7 @@ namespace AM2RLauncher
                 updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
             }
 
-            profileButton.Enabled = Directory.Exists(Core.Core.ProfilesPath + "/" + profileName);
+            profileButton.Enabled = Directory.Exists(AM2RLauncherLib.Core.ProfilesPath + "/" + profileName);
             profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
             saveButton.Enabled = true;
             saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
@@ -816,7 +816,7 @@ namespace AM2RLauncher
                 return;
             ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
             log.Info("User opened the profile directory for profile " + profile.Name + ", which is " + profile.SaveLocation);
-            CrossPlatformOperations.OpenFolder(Core.Core.ProfilesPath + "/" + profile.Name);
+            CrossPlatformOperations.OpenFolder(AM2RLauncherLib.Core.ProfilesPath + "/" + profile.Name);
         }
 
         /// <summary>
@@ -886,7 +886,7 @@ namespace AM2RLauncher
 
             FileInfo modFile = new FileInfo(fileFinder.FileName);
             string extractedName = Path.GetFileNameWithoutExtension(modFile.Name) + "_new";
-            string extractedModDir = Core.Core.ModsPath + "/" + extractedName;
+            string extractedModDir = AM2RLauncherLib.Core.ModsPath + "/" + extractedName;
 
             // If for some reason old files remain, delete them so that extraction doesn't throw
             if (Directory.Exists(extractedModDir))
@@ -940,7 +940,7 @@ namespace AM2RLauncher
             DeleteProfileAndAdjustLists(currentProfile);
 
             // Rename directory to take the old one's place
-            string originalFolder = Core.Core.ModsPath + "/" + Path.GetFileNameWithoutExtension(modFile.Name);
+            string originalFolder = AM2RLauncherLib.Core.ModsPath + "/" + Path.GetFileNameWithoutExtension(modFile.Name);
             Directory.Move(extractedModDir, originalFolder);
 
             // Adjust our lists so it gets recognized

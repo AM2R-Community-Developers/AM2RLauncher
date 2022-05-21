@@ -1,5 +1,5 @@
-﻿using AM2RLauncher.Core;
-using AM2RLauncher.Core.XML;
+﻿using AM2RLauncherLib;
+using AM2RLauncherLib.XML;
 using AM2RLauncher.Language;
 using Eto.Forms;
 using LibGit2Sharp;

@@ -1,5 +1,4 @@
-﻿using AM2RLauncher.Core.XML;
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -8,8 +7,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
+using AM2RLauncherLib.XML;
 
-namespace AM2RLauncher.Core;
+namespace AM2RLauncherLib;
 
 /// <summary>
 /// An enum, that has possible return codes for <see cref="Profile.CheckIfZipIsAM2R11"/>.

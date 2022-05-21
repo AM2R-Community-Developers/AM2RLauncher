@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace AM2RLauncher.Core.XML;
+namespace AM2RLauncherLib.XML;
 
 /// <summary>
 /// Class that handles how the mod settings are saved as XML.

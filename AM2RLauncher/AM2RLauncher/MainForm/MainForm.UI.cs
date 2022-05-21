@@ -1,5 +1,5 @@
-﻿using AM2RLauncher.Core;
-using AM2RLauncher.Core.XML;
+﻿using AM2RLauncherLib;
+using AM2RLauncherLib.XML;
 using AM2RLauncher.Language;
 using AM2RLauncher.Properties;
 using Eto.Drawing;
@@ -78,9 +78,9 @@ namespace AM2RLauncher
         /// </summary>
         private static string currentMirror;
 
-        private static readonly bool isInternetThere = Core.Core.IsInternetThere;
+        private static readonly bool isInternetThere = AM2RLauncherLib.Core.IsInternetThere;
 
-        private static readonly bool isThisRunningFromWine = Core.Core.IsThisRunningFromWine;
+        private static readonly bool isThisRunningFromWine = AM2RLauncherLib.Core.IsThisRunningFromWine;
 
         private static bool singleInstance;
 
@@ -100,7 +100,7 @@ namespace AM2RLauncher
                     Process current = Process.GetCurrentProcess();
                     Process process = Process.GetProcessesByName(current.ProcessName).First(p => p.Id == current.Id);
                     if (process != null)
-                        Core.Core.SetForegroundWindow(process.MainWindowHandle);
+                        AM2RLauncherLib.Core.SetForegroundWindow(process.MainWindowHandle);
                 }
                 Environment.Exit(0);
             }
@@ -828,7 +828,7 @@ namespace AM2RLauncher
         private TrayIndicator trayIndicator;
 
         /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
-        //TODO: this should be moved into AM2RLauncher.Core
+        //TODO: this should be moved into AM2RLauncherLib
         private List<ProfileXML> profileList;
         /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
         private List<ListItem> profileNames;

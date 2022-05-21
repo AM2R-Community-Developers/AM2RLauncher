@@ -1,7 +1,7 @@
 ﻿using Eto.Drawing;
 using System;
-using AM2RLauncher.Core;
-using AM2RLauncher.Core.XML;
+using AM2RLauncherLib;
+using AM2RLauncherLib.XML;
 using AM2RLauncher.Language;
 
 namespace AM2RLauncher

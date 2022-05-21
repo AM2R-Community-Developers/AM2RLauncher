@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace AM2RLauncher.Core.XML;
+namespace AM2RLauncherLib.XML;
 
 /// <summary>
 /// The <c>Serializer</c> class, that serializes to and deserializes from XML files.

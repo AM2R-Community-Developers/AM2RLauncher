@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace AM2RLauncher.Core;
+namespace AM2RLauncherLib;
 
 /// <summary>
 /// Class only for providing Splashes

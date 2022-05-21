@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace AM2RLauncher.Core;
+namespace AM2RLauncherLib;
 
 /// <summary>
 /// Class that has information about the current running operating system.

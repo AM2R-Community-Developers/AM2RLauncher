@@ -3,7 +3,7 @@ using log4net;
 using log4net.Config;
 using System;
 using System.IO;
-using AM2RLauncher.Core;
+using AM2RLauncherLib;
 using log4net.Repository.Hierarchy;
 // ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
@@ -43,7 +43,7 @@ internal static class MainClass
         #endif
 
         //Log Wine
-        if (Core.Core.IsThisRunningFromWine)
+        if (AM2RLauncherLib.Core.IsThisRunningFromWine)
             log.Info("Currently running from WINE!");
 
         // Try catch in case it ever crashes before actually getting to the Eto application

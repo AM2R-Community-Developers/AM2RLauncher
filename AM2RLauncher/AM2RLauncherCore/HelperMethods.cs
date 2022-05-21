@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 
-namespace AM2RLauncher.Core;
+namespace AM2RLauncherLib;
 
 /// <summary>
 /// Class that has various Helper functions. Basically anything that could be used outside the Launcher resides here.

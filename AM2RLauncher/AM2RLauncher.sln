@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher", "AM2RLauncher\AM2RLauncher.csproj", "{9B67055C-5AEF-4F83-AFE0-38E600183C9F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Core", "AM2RLauncherCore\AM2RLauncher.Core.csproj", "{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncherLib", "AM2RLauncherCore\AM2RLauncherLib.csproj", "{B3AAD6F3-41B9-4981-8CD4-FE683429AD95}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM2RLauncher.Gtk", "AM2RLauncher.Gtk\AM2RLauncher.Gtk.csproj", "{0A619FA8-61B4-48C6-9461-21B3FE137D03}"
 EndProject

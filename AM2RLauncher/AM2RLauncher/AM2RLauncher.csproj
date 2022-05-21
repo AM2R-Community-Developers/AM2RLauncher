@@ -35,7 +35,7 @@
   </ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\AM2RLauncherCore\AM2RLauncher.Core.csproj" />
+    <ProjectReference Include="..\AM2RLauncherCore\AM2RLauncherLib.csproj" />
   </ItemGroup>
   
   <ItemGroup>
