@@ -21,13 +21,13 @@ jobs:
         configuration: [Release]
         include:
           - os: ubuntu-latest
-            COMMAND: AM2RLauncher.Gtk -c Release -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
+            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net5.0/ubuntu.18.04-x64/publish/
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac -c Release -r osx-x64 --no-self-contained
+            COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
           - os: windows-latest
-            COMMAND: AM2RLauncher.Wpf -c Release -r win-x86 -o builds\win86 
+            COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
             ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
     runs-on: ${{ matrix.os }}
     
