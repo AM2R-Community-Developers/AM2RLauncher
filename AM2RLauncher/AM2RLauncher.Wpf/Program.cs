@@ -24,7 +24,7 @@ internal static class MainClass
     [STAThread]
     public static void Main()
     {
-        string launcherDataPath = CrossPlatformOperations.CURRENTPATH;
+        string launcherDataPath = CrossPlatformOperations.CurrentPath;
 
         // Make sure first, that the path exists
         if (!Directory.Exists(launcherDataPath))

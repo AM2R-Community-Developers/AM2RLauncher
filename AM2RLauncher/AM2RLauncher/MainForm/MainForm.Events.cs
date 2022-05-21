@@ -287,7 +287,7 @@ namespace AM2RLauncher
                         log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
 
-                        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + " / PatchData"))
+                        if (Directory.Exists(CrossPlatformOperations.CurrentPath + " / PatchData"))
                             HelperMethods.DeleteDirectory(Core.Core.PatchDataPath);
                         successful = false;
                     }

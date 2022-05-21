@@ -25,7 +25,7 @@ internal static class MainClass
     [STAThread]
     public static void Main()
     {
-        string launcherDataPath = CrossPlatformOperations.CURRENTPATH;
+        string launcherDataPath = CrossPlatformOperations.CurrentPath;
 
         // Make sure first, ~/.local/share/AM2RLauncher exists
         if (!Directory.Exists(launcherDataPath))

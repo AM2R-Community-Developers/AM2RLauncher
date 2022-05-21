@@ -111,7 +111,7 @@ namespace AM2RLauncher
             log.Info("Current OS is: " + OS.Name);
 
             // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
-            Environment.CurrentDirectory = CrossPlatformOperations.CURRENTPATH;
+            Environment.CurrentDirectory = CrossPlatformOperations.CurrentPath;
             log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
 
             // But log actual folder location nonetheless

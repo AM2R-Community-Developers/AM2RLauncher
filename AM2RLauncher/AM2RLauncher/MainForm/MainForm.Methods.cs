@@ -82,7 +82,7 @@ namespace AM2RLauncher
         {
             OpenFileDialog fileDialog = new OpenFileDialog
             {
-                Directory = new Uri(CrossPlatformOperations.CURRENTPATH),
+                Directory = new Uri(CrossPlatformOperations.CurrentPath),
                 MultiSelect = false,
                 Title = title
             };
@@ -133,8 +133,8 @@ namespace AM2RLauncher
             }
             if (OS.IsUnix)
             {
-                string launcherConfigPath = CrossPlatformOperations.NIXLAUNCHERCONFIGPATH;
-                string launcherConfigFilePath = launcherConfigPath + "/config.xml";
+                string launcherConfigFilePath = CrossPlatformOperations.NixLauncherConfigFilePath;
+                string launcherConfigPath = Path.GetDirectoryName(launcherConfigFilePath);
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // If folder doesn't exist, create it and the config file
@@ -178,8 +178,8 @@ namespace AM2RLauncher
             }
             else if (OS.IsUnix)
             {
-                string launcherConfigPath = CrossPlatformOperations.NIXLAUNCHERCONFIGPATH;
-                string launcherConfigFilePath = CrossPlatformOperations.NIXLAUNCHERCONFIGFILEPATH;
+                string launcherConfigFilePath = CrossPlatformOperations.NixLauncherConfigFilePath;
+                string launcherConfigPath = Path.GetDirectoryName(launcherConfigFilePath);
                 XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
                 // If folder doesn't exist, create it and the config file
@@ -208,8 +208,8 @@ namespace AM2RLauncher
         {
             if (OS.IsWindows)
             {
-                string oldConfigPath = CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
-                string newConfigPath = CrossPlatformOperations.LAUNCHERNAME + ".config";
+                string oldConfigPath = CrossPlatformOperations.LauncherName + ".oldCfg";
+                string newConfigPath = CrossPlatformOperations.LauncherName + ".config";
                 string oldConfigText = File.ReadAllText(oldConfigPath);
                 string newConfigText = File.ReadAllText(newConfigPath);
 
@@ -226,7 +226,7 @@ namespace AM2RLauncher
             }
             else if (OS.IsUnix)
             {
-                string launcherConfigFilePath = CrossPlatformOperations.NIXLAUNCHERCONFIGFILEPATH;
+                string launcherConfigFilePath = CrossPlatformOperations.NixLauncherConfigFilePath;
 
                 // For some reason deserializing and saving back again works, not exactly sure why, but I'll take it
                 XML.LauncherConfigXML launcherConfig = Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));

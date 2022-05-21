@@ -296,15 +296,15 @@ public static class Profile
         log.Info("Attempting to delete profile " + profile.Name + "...");
 
         // Delete folder in Mods
-        if (Directory.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath))
-            HelperMethods.DeleteDirectory(CrossPlatformOperations.CURRENTPATH + profile.DataPath);
+        if (Directory.Exists(CrossPlatformOperations.CurrentPath + profile.DataPath))
+            HelperMethods.DeleteDirectory(CrossPlatformOperations.CurrentPath + profile.DataPath);
 
         // Delete the zip file in Mods
-        if (File.Exists(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip"))
+        if (File.Exists(CrossPlatformOperations.CurrentPath + profile.DataPath + ".zip"))
         {
             // For some reason, it was set at read only, so we undo that here
-            File.SetAttributes(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip", FileAttributes.Normal);
-            File.Delete(CrossPlatformOperations.CURRENTPATH + profile.DataPath + ".zip");
+            File.SetAttributes(CrossPlatformOperations.CurrentPath + profile.DataPath + ".zip", FileAttributes.Normal);
+            File.Delete(CrossPlatformOperations.CurrentPath + profile.DataPath + ".zip");
         }
 
         // Delete folder in Profiles
@@ -368,7 +368,7 @@ public static class Profile
         log.Info("Profile folder created and AM2R_11.zip extracted.");
 
         // Set local dataPath for installation files
-        var dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
+        var dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
 
         string datawin = null, exe = null;
 
@@ -555,8 +555,8 @@ public static class Profile
         // Create working dir after some cleanup
         string apktoolPath = Core.PatchDataPath + "/utilities/android/apktool.jar",
                uberPath = Core.PatchDataPath + "/utilities/android/uber-apk-signer.jar",
-               tempDir = new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/temp").FullName,
-               dataPath = CrossPlatformOperations.CURRENTPATH + profile.DataPath;
+               tempDir = new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/temp").FullName,
+               dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
         if (Directory.Exists(tempDir))
             Directory.Delete(tempDir, true);
         Directory.CreateDirectory(tempDir);
@@ -615,14 +615,14 @@ public static class Profile
         CrossPlatformOperations.RunJavaJar("\"" + uberPath + "\" -a \"" + profile.Name + ".apk\"", tempDir);
 
         // Extra file cleanup
-        File.Copy(tempDir + "/" + profile.Name + "-aligned-debugSigned.apk", CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk", true);
-        log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk.");
+        File.Copy(tempDir + "/" + profile.Name + "-aligned-debugSigned.apk", CrossPlatformOperations.CurrentPath + "/" + profile.Name + ".apk", true);
+        log.Info(profile.Name + ".apk signed and moved to " + CrossPlatformOperations.CurrentPath + "/" + profile.Name + ".apk.");
         HelperMethods.DeleteDirectory(tempDir);
 
         // Done
         progress.Report(100);
         log.Info("Successfully created Android APK for profile " + profile.Name + ".");
-        CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CURRENTPATH + "/" + profile.Name + ".apk");
+        CrossPlatformOperations.OpenFolderAndSelectFile(CrossPlatformOperations.CurrentPath + "/" + profile.Name + ".apk");
     }
 
     /// <summary>
@@ -632,7 +632,7 @@ public static class Profile
     {
         // These are used on both windows and linux for game logging
         string savePath = OS.IsWindows ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
-            : profile.SaveLocation.Replace("~", CrossPlatformOperations.NIXHOME);
+            : profile.SaveLocation.Replace("~", CrossPlatformOperations.Home);
         DirectoryInfo logDir = new DirectoryInfo(savePath + "/logs");
         string date = String.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
 

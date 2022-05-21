@@ -22,10 +22,10 @@ namespace AM2RLauncher
         public const string VERSION = Core.Core.Version;
 
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
-        private static readonly string oldConfigPath = CrossPlatformOperations.CURRENTPATH + "/" + CrossPlatformOperations.LAUNCHERNAME + ".oldCfg";
+        private static readonly string oldConfigPath = CrossPlatformOperations.CurrentPath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
 
         /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
-        private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CURRENTPATH
+        private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CurrentPath
                                                                  : (OS.IsLinux ? Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory + "../../../"));
 
         /// <summary>
@@ -43,33 +43,33 @@ namespace AM2RLauncher
             // Update section
 
             // Clean old files that have been left
-            if (File.Exists(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak"))
+            if (File.Exists(CrossPlatformOperations.CurrentPath + "/AM2RLauncher.bak"))
             {
                 log.Info("AM2RLauncher.bak detected. Removing file.");
-                File.Delete(CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
+                File.Delete(CrossPlatformOperations.CurrentPath + "/AM2RLauncher.bak");
             }
             if (OS.IsWindows && File.Exists(oldConfigPath))
             {
-                log.Info(CrossPlatformOperations.LAUNCHERNAME + ".oldCfg detected. Removing file.");
+                log.Info(CrossPlatformOperations.LauncherName + ".oldCfg detected. Removing file.");
                 File.Delete(oldConfigPath);
             }
-            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/oldLib"))
+            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/oldLib"))
             {
                 log.Info("Old lib folder detected, removing folder.");
-                Directory.Delete(CrossPlatformOperations.CURRENTPATH + "/oldLib", true);
+                Directory.Delete(CrossPlatformOperations.CurrentPath + "/oldLib", true);
             }
 
             // Clean up old update libs
-            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
+            if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/lib"))
             {
-                foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
+                foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetFiles())
                 {
                     if (file.Name.EndsWith(".bak"))
                         file.Delete();
                 }
 
                 // Do the same for each subdirectory
-                foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
+                foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetDirectories())
                 {
                     foreach (FileInfo file in dir.GetFiles())
                     {
@@ -144,8 +144,8 @@ namespace AM2RLauncher
 
                 log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
-                string tmpUpdatePath = CrossPlatformOperations.CURRENTPATH + "/tmpupdate/";
-                string zipPath = CrossPlatformOperations.CURRENTPATH + "/launcher.zip";
+                string tmpUpdatePath = CrossPlatformOperations.CurrentPath + "/tmpupdate/";
+                string zipPath = CrossPlatformOperations.CurrentPath + "/launcher.zip";
 
                 // Clean tmpupdate
                 if (Directory.Exists(tmpUpdatePath))
@@ -177,27 +177,27 @@ namespace AM2RLauncher
                 log.Info("Updates successfully extracted to " + tmpUpdatePath);
 
                 File.Delete(zipPath);
-                File.Move(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME, CrossPlatformOperations.CURRENTPATH + "/AM2RLauncher.bak");
-                if (OS.IsWindows) File.Move(CrossPlatformOperations.LAUNCHERNAME + ".config", CrossPlatformOperations.LAUNCHERNAME + ".oldCfg");
+                File.Move(updatePath + "/" + CrossPlatformOperations.LauncherName, CrossPlatformOperations.CurrentPath + "/AM2RLauncher.bak");
+                if (OS.IsWindows) File.Move(CrossPlatformOperations.LauncherName + ".config", CrossPlatformOperations.LauncherName + ".oldCfg");
 
                 foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
                 {
-                    log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CURRENTPATH + "/" + file.Name);
+                    log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CurrentPath + "/" + file.Name);
                     File.Copy(file.FullName, updatePath + "/" + file.Name, true);
                 }
                 // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
-                if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CURRENTPATH + "/lib"))
+                if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/lib"))
                 {
                     // So, because Windows behavior is dumb...
 
                     // Rename all files in lib to *.bak
-                    foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetFiles())
+                    foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetFiles())
                     {
                         file.CopyTo(file.Directory + "/" +  file.Name + ".bak");
                     }
 
                     // Do the same for each sub directory
-                    foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CURRENTPATH + "/lib").GetDirectories())
+                    foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetDirectories())
                     {
                         foreach (FileInfo file in dir.GetFiles())
                         {
@@ -207,7 +207,7 @@ namespace AM2RLauncher
 
                     // Yes, the above calls could be recursive. No, I can't be bothered to make them as such.
                     if (Directory.Exists(tmpUpdatePath + "lib"))
-                        HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CURRENTPATH + "/lib");
+                        HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CurrentPath + "/lib");
                 }
 
                 Directory.Delete(tmpUpdatePath, true);
@@ -217,7 +217,7 @@ namespace AM2RLauncher
                 log.Info("Files extracted. Preparing to restart executable...");
                 if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");
 
-                System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LAUNCHERNAME);
+                System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LauncherName);
                 Environment.Exit(0);
             }
             else

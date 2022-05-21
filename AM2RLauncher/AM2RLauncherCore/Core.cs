@@ -27,22 +27,22 @@ public static class Core
     /// <summary>
     /// Path where the Launcher's PatchData folder is located.
     /// </summary>
-    public static readonly string PatchDataPath = CrossPlatformOperations.CURRENTPATH + "/PatchData";
+    public static readonly string PatchDataPath = CrossPlatformOperations.CurrentPath + "/PatchData";
 
     /// <summary>
     /// Path where the AM2R_11.zip is located.
     /// </summary>
-    public static readonly string AM2R11File = CrossPlatformOperations.CURRENTPATH + "/AM2R_11.zip";
+    public static readonly string AM2R11File = CrossPlatformOperations.CurrentPath + "/AM2R_11.zip";
 
     /// <summary>
     /// Path where the Launcher's Profiles folder is located.
     /// </summary>
-    public static readonly string ProfilesPath = CrossPlatformOperations.CURRENTPATH + "/Profiles";
+    public static readonly string ProfilesPath = CrossPlatformOperations.CurrentPath + "/Profiles";
 
     /// <summary>
     /// Path where the Launcher's Mods folder is located.
     /// </summary>
-    public static readonly string ModsPath = CrossPlatformOperations.CURRENTPATH + "/Mods";
+    public static readonly string ModsPath = CrossPlatformOperations.CurrentPath + "/Mods";
 
     /// <summary>
     /// Checks if this is run via WINE.

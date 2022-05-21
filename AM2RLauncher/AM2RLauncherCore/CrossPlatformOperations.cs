@@ -1,7 +1,6 @@
 ﻿using log4net;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -21,36 +20,49 @@ public static class CrossPlatformOperations
     /// <summary>
     /// Name of the Launcher executable.
     /// </summary>
-    public static readonly string LAUNCHERNAME = AppDomain.CurrentDomain.FriendlyName;
+    public static readonly string LauncherName = AppDomain.CurrentDomain.FriendlyName;
 
     /// <summary>
-    /// Path to the Home Folder on *Nix-based systems.
+    /// Path to the Home Folder.
     /// </summary>
-    public static readonly string NIXHOME = Environment.GetEnvironmentVariable("HOME");
+    public static readonly string Home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
     /// <summary>
-    /// Path to the Config folder on Linux-based systems.
+    /// Config file path for *nix based systems. <br/>
     /// </summary>
-    private static readonly string LINUXXDGCONFIG = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+    /// <remarks>
+    /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher/config.xml <br/>
+    /// Mac: Will point to ~/Library/Preferences/AM2RLauncher/config.xml. <br/>
+    /// Anything else: <see langword="null"/>
+    /// </remarks>
+    public static string NixLauncherConfigFilePath
+    {
+        get
+        {
+            switch (OS.Name)
+            {
+                case "Linux": return $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}/AM2RLauncher/config.xml";
+                case "Mac": return $"{Home}/Library/Preferences/AM2RLauncher/config.xml";
+                default: return null;
+            }
+        }
+    }
+
+    private static string _currentPath;
 
     /// <summary>
-    /// Path to the Config file folder on *nix based systems. <br/>
-    /// Linux: Will point to XDG_CONFIG_HOME/AM2RLauncher <br/>
-    /// Mac: Will point to ~/Library/Preferences/AM2RLauncher
+    /// Current Path where the Launcher Data is located.
     /// </summary>
-    public static readonly string NIXLAUNCHERCONFIGPATH = OS.IsLinux ? (String.IsNullOrWhiteSpace(LINUXXDGCONFIG) ? NIXHOME + "/.config"
-            : LINUXXDGCONFIG) + "/AM2RLauncher"
-        : NIXHOME + "/Library/Preferences/AM2RLauncher";
+    public static string CurrentPath
+    {
+        get
+        {
+            if (_currentPath is null)
+                _currentPath = GenerateCurrentPath();
 
-    /// <summary>
-    /// Config file path for *nix based systems. Will be <see cref="NIXLAUNCHERCONFIGPATH"/> + "/config.xml".
-    /// </summary>
-    public static readonly string NIXLAUNCHERCONFIGFILEPATH = NIXLAUNCHERCONFIGPATH + "/config.xml";
-
-    /// <summary>
-    /// Current Path where the Launcher is located. For more info, check <see cref="GenerateCurrentPath"/>.
-    /// </summary>
-    public static readonly string CURRENTPATH = GenerateCurrentPath();
+            return _currentPath;
+        }
+    }
 
     /// <summary>
     /// Generates the mirror list, depending on the current Platform.
@@ -116,7 +128,7 @@ public static class CrossPlatformOperations
         // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
         // And on Nix systems, we want to replace ~ with its corresponding env var
         string realPath = OS.IsWindows ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
-            : path.Replace("~", NIXHOME);
+            : path.Replace("~", Home);
         if (!Directory.Exists(realPath))
         {
             log.Info(realPath + " did not exist and was created");
@@ -146,7 +158,7 @@ public static class CrossPlatformOperations
         // We have to replace forward slashes with backslashes here on windows because explorer.exe is picky...
         // And on nix systems, we want to replace ~ with its corresponding env var
         string realPath = OS.IsWindows ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
-            : path.Replace("~", NIXHOME);
+            : path.Replace("~", Home);
         if (!File.Exists(realPath))
         {
             log.Error(realPath + "did not exist, operation to open its folder was cancelled!");
@@ -257,16 +269,16 @@ public static class CrossPlatformOperations
         if (original == output)
             output += "_";
 
-        string arguments = "-f -d -s \"" + original.Replace(CURRENTPATH + "/", "") + "\" \"" + patch.Replace(CURRENTPATH + "/", "")
-                           + "\" \"" + output.Replace(CURRENTPATH + "/", "") + "\"";
+        string arguments = "-f -d -s \"" + original.Replace(CurrentPath + "/", "") + "\" \"" + patch.Replace(CurrentPath + "/", "")
+                           + "\" \"" + output.Replace(CurrentPath + "/", "") + "\"";
 
         if (OS.IsWindows)
         {
             // We want some fancy parameters for Windows because the terminal scares end users :(
             ProcessStartInfo parameters = new ProcessStartInfo
             {
-                FileName = CURRENTPATH + "/PatchData/utilities/xdelta/xdelta3.exe",
-                WorkingDirectory = CURRENTPATH + "",
+                FileName = CurrentPath + "/PatchData/utilities/xdelta/xdelta3.exe",
+                WorkingDirectory = CurrentPath + "",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 Arguments = arguments
@@ -282,7 +294,7 @@ public static class CrossPlatformOperations
             {
                 FileName = "xdelta3",
                 Arguments = arguments,
-                WorkingDirectory = CURRENTPATH
+                WorkingDirectory = CurrentPath
             };
 
             using Process proc = Process.Start(parameters);
@@ -333,19 +345,20 @@ public static class CrossPlatformOperations
     }
 
     /// <summary>
-    /// Figures out what the AM2RLauncher's <see cref="CURRENTPATH"/> should be.<br/>
+    /// Figures out what the AM2RLauncher's <see cref="CurrentPath"/> should be.<br/>
+    /// </summary>
+    /// <remarks>
     /// Determination is as follows:
     /// <list type="number">
     ///     <item><b>$AM2RLAUNCHERDATA</b> environment variable is read and folders are recursively generated.</item>
     ///     <item>The current OS is checked. For Windows, the path where the executable is located will be returned.<br/>
     ///     For Linux, <b>$XDG_DATA_HOME/AM2RLauncher</b> will be returned.
     ///     Should <b>$XDG_DATA_HOME</b> be empty, it will default to <b>$HOME/.local/share</b>.<br/>
-    ///     For Mac, <b>HOME/Library/AM2RLauncher"</b> will be returned.</item>
+    ///     For Mac, <b>HOME/Library/Application Support/AM2RLauncher"</b> will be returned.</item>
     ///     <item>The path where the executable is located will be returned.</item>
     /// </list>
-    /// Should any errors occur, it falls down to the next step.
-    /// </summary>
-    /// <returns></returns>
+    /// Should any errors occur, it falls down to the next step.</remarks>
+    /// <returns>The path where the AM2RLauncher can store its data.</returns>
     private static string GenerateCurrentPath()
     {
         // First, we check if the user has a custom AM2RLAUNCHERDATA env var
@@ -375,35 +388,26 @@ public static class CrossPlatformOperations
         }
         else if (OS.IsLinux)
         {
-            // First check if XDG_DATA_HOME is set, if not we'll use ~/.local/share
-            string xdgDataHome = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
-            if (String.IsNullOrWhiteSpace(xdgDataHome))
-            {
-                log.Info("Using default Linux CurrentPath.");
-                xdgDataHome = NIXHOME + "/.local/share";
-            }
 
-            // Add AM2RLauncher to the end of the dataPath
-            xdgDataHome += "/AM2RLauncher";
+            // Linux has the Path at XDG_DATA_HOME/AM2RLauncher
+            string linuxPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/AM2RLauncher";
 
             try
             {
-                // This will create the directories recursively if they don't exist
-                Directory.CreateDirectory(xdgDataHome);
-
-                // Our env var is now set and directories exist
-                log.Info("CurrentPath is set to " + xdgDataHome);
-                return xdgDataHome;
+                Directory.CreateDirectory(linuxPath);
+                log.Info($"CurrentPath is set to {linuxPath}");
+                return linuxPath;
             }
             catch (Exception ex)
             {
-                log.Error($"There was an error with '{xdgDataHome}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
+                log.Error($"There was an error with '{linuxPath}'!\n{ex.Message} {ex.StackTrace}. Falling back to defaults.");
             }
         }
         else if (OS.IsMac)
         {
-            //Mac has the Path at HOME/Library/AM2RLauncher
-            string macPath = NIXHOME + "/Library/AM2RLauncher";
+            // Cannot use SpecialFolders here, as the current .NET version returns them wrongly.
+            // Mac has the Path at HOME/Application Support/Library/AM2RLauncher
+            string macPath = Home + "/Library/Application Support/AM2RLauncher";
             try
             {
                 Directory.CreateDirectory(macPath);
@@ -421,6 +425,4 @@ public static class CrossPlatformOperations
         log.Info("Something went wrong, falling back to the default CurrentPath.");
         return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
     }
-
-
 }
