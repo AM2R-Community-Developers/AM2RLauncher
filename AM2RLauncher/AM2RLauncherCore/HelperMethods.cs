@@ -102,9 +102,9 @@ public static class HelperMethods
         if (!File.Exists(filename))
             return "";
 
-        using var stream = File.OpenRead(filename);
-        using var md5 = MD5.Create();
-        var hash = md5.ComputeHash(stream);
+        using FileStream stream = File.OpenRead(filename);
+        using MD5 md5 = MD5.Create();
+        byte[] hash = md5.ComputeHash(stream);
         return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
     }
 
@@ -131,7 +131,7 @@ public static class HelperMethods
         // If new name already exists, run the rollover algorithm on it!
         if (File.Exists(fileName))
             RecursiveRollover(fileName, max);
-        
+
         //TODO: this can fail if one doesn't have permissions to move or delete the file
         // If index is less than max, rename file.
         if (index < max)

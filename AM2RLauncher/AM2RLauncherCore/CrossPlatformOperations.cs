@@ -80,7 +80,7 @@ public static class CrossPlatformOperations
             return new List<string>
             {
                 "https://github.com/Miepee/AM2R-Autopatcher-Mac.git"
-                //TODO: make mac official at some point:tm:, put this on gitlab
+                //TODO: make mac official at some point:tm: and mirror it on gitlab
             };
 
         }
@@ -290,7 +290,7 @@ public static class CrossPlatformOperations
             proc?.WaitForExit();
         }
 
-        if (originalOutput == output || !File.Exists(output))
+        if ((originalOutput == output) || !File.Exists(output))
             return;
 
         File.Delete(originalOutput);

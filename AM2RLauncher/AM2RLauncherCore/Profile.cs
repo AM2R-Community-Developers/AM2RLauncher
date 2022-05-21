@@ -18,7 +18,7 @@ public enum IsZipAM2R11ReturnCodes
 {
     Successful,
     MissingOrInvalidAM2RExe,
-    MissingOrInvalidD3DX9_43Dll,
+    MissingOrInvalidD3DX943Dll,
     MissingOrInvalidDataWin,
     GameIsInASubfolder
 }
@@ -34,7 +34,6 @@ public static class Profile
     /// </summary>
     private static readonly ILog log = Core.Log;
 
-
     /// <summary>
     /// Caches the result of <see cref="Is11Installed"/> so that we don't extract and verify it too often.
     /// </summary>
@@ -46,7 +45,7 @@ public static class Profile
     private static string lastAM2R11ZipMD5 = "";
 
     /// <summary>
-    /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip exists.
+    /// Checks if AM2R 1.1 has been installed already, aka if a valid AM2R 1.1 Zip in AM2RLauncherData exists.
     /// This method will store the result in a cache and return that, unless it's invalidated by <paramref name="invalidateCache"/>.
     /// </summary>
     /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated.</param>
@@ -63,7 +62,7 @@ public static class Profile
         // Return safely if file doesn't exist
         if (!File.Exists(am2r11file)) return false;
         lastAM2R11ZipMD5 = HelperMethods.CalculateMD5(am2r11file);
-        var returnCode = CheckIfZipIsAM2R11(am2r11file);
+        IsZipAM2R11ReturnCodes returnCode = CheckIfZipIsAM2R11(am2r11file);
         // Check if it's valid, if not log it, rename it and silently leave
         if (returnCode != IsZipAM2R11ReturnCodes.Successful)
         {
@@ -82,7 +81,7 @@ public static class Profile
     private static void InvalidateAM2R11InstallCache()
     {
         // If the file exists, and its hash matches with ours, don't invalidate
-        if ((HelperMethods.CalculateMD5(Core.AM2R11File) == lastAM2R11ZipMD5))
+        if (HelperMethods.CalculateMD5(Core.AM2R11File) == lastAM2R11ZipMD5)
             return;
 
         isAM2R11InstalledCache = null;
@@ -133,10 +132,10 @@ public static class Profile
         // Check if d3d.dll exists / is valid
         ZipArchiveEntry d3dx = am2rZip.Entries.FirstOrDefault(x => x.FullName == "D3DX9_43.dll");
         if (d3dx == null)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX943Dll;
         d3dx.ExtractToFile(tmpPath + "/" + d3dx.FullName);
         if (HelperMethods.CalculateMD5(tmpPath + "/" + d3dx.FullName) != d3dHash)
-            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX9_43Dll;
+            return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX943Dll;
 
         // Clean up
         Directory.Delete(tmpPath, true);
@@ -368,18 +367,19 @@ public static class Profile
         log.Info("Profile folder created and AM2R_11.zip extracted.");
 
         // Set local dataPath for installation files
-        var dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
+        string dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
 
-        string datawin = null, exe = null;
+        string dataWin = null;
+        string exe = null;
 
         if (OS.IsWindows)
         {
-            datawin = "data.win";
+            dataWin = "data.win";
             exe = "AM2R.exe";
         }
         else if (OS.IsLinux)
         {
-            datawin = "game.unx";
+            dataWin = "game.unx";
             // Use the exe name based on the desktop file in the AppImage, rather than hard coding it.
             string desktopContents = File.ReadAllText(Core.PatchDataPath + "/data/AM2R.AppDir/AM2R.desktop");
             exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
@@ -387,7 +387,7 @@ public static class Profile
         }
         else if (OS.IsMac)
         {
-            datawin = "game.ios";
+            dataWin = "game.ios";
             exe = "Mac_Runner";
         }
         else
@@ -409,13 +409,13 @@ public static class Profile
             }
             else
             {
-                CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/data.xdelta", profilePath + "/" + datawin);
+                CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/data.xdelta", profilePath + "/" + dataWin);
                 CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
             }
         }
         else if (OS.IsUnix) // YYC and VM look exactly the same on Linux and Mac so we're all good here.
         {
-            CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + datawin);
+            CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/data.win", dataPath + "/game.xdelta", profilePath + "/" + dataWin);
             CrossPlatformOperations.ApplyXdeltaPatch(profilePath + "/AM2R.exe", dataPath + "/AM2R.xdelta", profilePath + "/" + exe);
             // Just in case the resulting file isn't chmod-ed...
             Process.Start("chmod", "+x  \"" + profilePath + "/" + exe + "\"")?.WaitForExit();
@@ -456,9 +456,11 @@ public static class Profile
             profilePath = profilePath.Substring(0, profilePath.LastIndexOf("/"));
 
             // Rename all songs to lowercase
-            foreach (var file in new DirectoryInfo(assetsPath).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(assetsPath).GetFiles())
+            {
                 if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
                     File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
+            }
 
             // Copy AppImage template to here
             HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/AM2R.AppDir", profilePath + "/AM2R.AppDir/");
@@ -495,16 +497,21 @@ public static class Profile
         else if (OS.IsMac)
         {
             // Rename all songs to lowercase
-            foreach (var file in new DirectoryInfo(profilePath).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(profilePath).GetFiles())
+            {
                 if (file.Name.EndsWith(".ogg") && !File.Exists(file.DirectoryName + "/" + file.Name.ToLower()))
                     File.Move(file.FullName, file.DirectoryName + "/" + file.Name.ToLower());
+            }
+
             // Loading custom fonts crashes on Mac, so we delete those if they exist
             if (Directory.Exists(profilePath + "/lang/fonts"))
                 Directory.Delete(profilePath + "/lang/fonts", true);
+
             // Move Frameworks, Info.plist and PkgInfo over
             HelperMethods.DirectoryCopy(Core.PatchDataPath + "/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
             File.Copy(dataPath + "/Info.plist", profilePath.Replace("Resources", "") + "/Info.plist", true);
             File.Copy(Core.PatchDataPath + "/data/PkgInfo", profilePath.Replace("Resources", "") + "/PkgInfo", true);
+
             //Put profilePath back to what it was before
             profilePath = profilesHomePath + "/" + profile.Name;
         }
@@ -513,7 +520,8 @@ public static class Profile
         // tldr; check if we're in PatchData or not
         if (new DirectoryInfo(dataPath).Parent?.Name == "PatchData")
             File.Copy(dataPath + "/../profile.xml", profilePath + "/profile.xml");
-        else File.Copy(dataPath + "/profile.xml", profilePath + "/profile.xml");
+        else
+            File.Copy(dataPath + "/profile.xml", profilePath + "/profile.xml");
 
         // Installed datafiles
         progress.Report(100);
@@ -675,7 +683,7 @@ public static class Profile
 
             log.Info("CWD of Profile is " + proc.WorkingDirectory);
 
-            using var p = Process.Start(proc);
+            using Process p = Process.Start(proc);
             Core.SetForegroundWindow(p.MainWindowHandle);
             p.WaitForExit();
         }
@@ -817,7 +825,7 @@ public static class Profile
 
             log.Info("CWD of Profile is " + proc.WorkingDirectory);
 
-            using var p = Process.Start(proc);
+            using Process p = Process.Start(proc);
             p?.WaitForExit();
         }
         else
