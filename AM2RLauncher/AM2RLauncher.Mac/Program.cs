@@ -2,10 +2,10 @@
 using log4net;
 using log4net.Config;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using AM2RLauncher.Core;
 using log4net.Repository.Hierarchy;
+// ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
 namespace AM2RLauncher.Mac;
 
@@ -32,15 +32,15 @@ internal static class MainClass
             Directory.CreateDirectory(launcherDataPath);
 
         // Now, see if log4netConfig exists, if not write it again.
-        if (!File.Exists(launcherDataPath + "/log4net.config"))
-            File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
+        if (!File.Exists($"{launcherDataPath}/log4net.config"))
+            File.WriteAllText($"{launcherDataPath}/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
 
         // Configure logger
         XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
 
         // if we're on debug, always set logLevel to debug
         #if DEBUG
-                ((Logger)log.Logger).Level = log4net.Core.Level.Debug;
+        ((Logger)log.Logger).Level = log4net.Core.Level.Debug;
         #endif
 
         try
@@ -53,8 +53,8 @@ internal static class MainClass
         catch (Exception e)
         {
             log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
-            Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
-            Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
+            Console.WriteLine($"{Language.Text.UnhandledException}\n{e.Message}\n*****Stack Trace*****\n\n{e.StackTrace}");
+            Console.WriteLine($"Check the logs at {launcherDataPath} for more info!");
         }
     }
 
@@ -63,10 +63,10 @@ internal static class MainClass
     /// </summary>
     private static void MacLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        log.Error($"An unhandled exception has occurred: \n*****Stack Trace*****\n\n{e.ExceptionObject}");
         Application.Instance.Invoke(() =>
         {
-            MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "Mac", MessageBoxType.Error);
+            MessageBox.Show($"{Language.Text.UnhandledException}\n*****Stack Trace*****\n\n{e.ExceptionObject}", "Mac", MessageBoxType.Error);
         });
     }
 }

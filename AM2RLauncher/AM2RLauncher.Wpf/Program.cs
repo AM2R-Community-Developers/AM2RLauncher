@@ -3,9 +3,9 @@ using log4net;
 using log4net.Config;
 using System;
 using System.IO;
-using System.Reflection;
 using AM2RLauncher.Core;
 using log4net.Repository.Hierarchy;
+// ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
 namespace AM2RLauncher.Wpf;
 
@@ -31,11 +31,11 @@ internal static class MainClass
             Directory.CreateDirectory(launcherDataPath);
 
         // Now, see if log4netConfig exists, if not write it again.
-        if (!File.Exists(launcherDataPath + "/log4net.config"))
-            File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
+        if (!File.Exists($"{launcherDataPath}/log4net.config"))
+            File.WriteAllText($"{launcherDataPath}/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
 
         // Configure logger
-        XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
+        XmlConfigurator.Configure(new FileInfo($"{launcherDataPath}/log4net.config"));
 
         // if we're on debug, always set log level to debug
         #if DEBUG
@@ -56,8 +56,8 @@ internal static class MainClass
         }
         catch (Exception e)
         {
-            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
-            System.Windows.Forms.MessageBox.Show(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace, "Microsoft .NET Framework",
+            log.Error($"An unhandled exception has occurred: \n*****Stack Trace*****\n\n{e.StackTrace}");
+            System.Windows.Forms.MessageBox.Show($"{Language.Text.UnhandledException}\n{e.Message}\n*****Stack Trace*****\n\n{e.StackTrace}", "Microsoft .NET Framework",
                 System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
         }
     }
@@ -67,7 +67,7 @@ internal static class MainClass
     /// </summary>
     private static void WinLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
-        MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "Microsoft .NET Framework", MessageBoxType.Error);
+        log.Error($"An unhandled exception has occurred: \n*****Stack Trace*****\n\n{e.ExceptionObject}");
+        MessageBox.Show($"{Language.Text.UnhandledException}\n*****Stack Trace*****\n\n{e.ExceptionObject}", "Microsoft .NET Framework", MessageBoxType.Error);
     }
 }

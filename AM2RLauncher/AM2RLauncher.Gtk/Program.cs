@@ -2,6 +2,7 @@
 using log4net;
 using log4net.Config;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ using AM2RLauncher.Core;
 using log4net.Repository.Hierarchy;
 using Application = Eto.Forms.Application;
 using FileInfo = System.IO.FileInfo;
+// ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
 namespace AM2RLauncher.Gtk;
 
@@ -34,11 +36,11 @@ internal static class MainClass
             Directory.CreateDirectory(launcherDataPath);
 
         // Now, see if log4netConfig exists, if not write it again.
-        if (!File.Exists(launcherDataPath + "/log4net.config"))
-            File.WriteAllText(launcherDataPath + "/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
+        if (!File.Exists($"{launcherDataPath}/log4net.config"))
+            File.WriteAllText($"{launcherDataPath}/log4net.config", Properties.Resources.log4netContents.Replace("${DATADIR}", launcherDataPath));
 
         // Configure logger
-        XmlConfigurator.Configure(new FileInfo(launcherDataPath + "/log4net.config"));
+        XmlConfigurator.Configure(new FileInfo($"{launcherDataPath}/log4net.config"));
 
         // if we're on debug, always set log level to debug
         #if DEBUG
@@ -50,10 +52,11 @@ internal static class MainClass
         {
             string osRelease = File.ReadAllText("/etc/os-release");
             Regex lineRegex = new Regex(".*=.*");
-            var results = lineRegex.Matches(osRelease).ToList();
-            var version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
-            log.Info("Current Distro: " + results.FirstOrDefault(x => x.Value.Contains("NAME"))?.Value.Substring(5).Replace("\"", "") +
-                     (version == null ? "" : " " + version.Value.Substring(8).Replace("\"", "")));
+            List<Match> results = lineRegex.Matches(osRelease).ToList();
+            Match version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
+            string distroName = results.FirstOrDefault(x => x.Value.Contains("NAME"))?.Value[5..].Replace("\"", "");
+            string versionName = version == null ? "" : version.Value[8..].Replace("\"", "");
+            log.Info($"Current Distro: {distroName} {versionName}");
         }
         else
             log.Error("Couldn't determine the currently running distro!");
@@ -68,9 +71,9 @@ internal static class MainClass
         }
         catch (Exception e)
         {
-            log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.StackTrace);
-            Console.WriteLine(Language.Text.UnhandledException + "\n" + e.Message + "\n*****Stack Trace*****\n\n" + e.StackTrace);
-            Console.WriteLine("Check the logs at " + launcherDataPath + " for more info!");
+            log.Error($"An unhandled exception has occurred: \n*****Stack Trace*****\n\n{e.StackTrace}");
+            Console.WriteLine($"{Language.Text.UnhandledException}\n{e.Message}\n*****Stack Trace*****\n\n{e.StackTrace}");
+            Console.WriteLine($"Check the logs at {launcherDataPath} for more info!");
         }
     }
 
@@ -79,10 +82,10 @@ internal static class MainClass
     /// </summary>
     private static void GTKLauncher_UnhandledException(object sender, Eto.UnhandledExceptionEventArgs e)
     {
-        log.Error("An unhandled exception has occurred: \n*****Stack Trace*****\n\n" + e.ExceptionObject);
+        log.Error($"An unhandled exception has occurred: \n*****Stack Trace*****\n\n{e.ExceptionObject}");
         Application.Instance.Invoke(() =>
         {
-            MessageBox.Show(Language.Text.UnhandledException + "\n*****Stack Trace*****\n\n" + e.ExceptionObject, "GTK", MessageBoxType.Error);
+            MessageBox.Show($"{Language.Text.UnhandledException}\n*****Stack Trace*****\n\n{e.ExceptionObject}", "GTK", MessageBoxType.Error);
         });
     }
 }
