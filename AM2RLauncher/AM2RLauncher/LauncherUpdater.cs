@@ -31,7 +31,7 @@ namespace AM2RLauncher
         /// <summary>
         /// Our log object, that handles logging the current execution to a file.
         /// </summary>
-        private static readonly ILog log = LogManager.GetLogger(typeof(MainForm));
+        private static readonly ILog log = LogManager.GetLogger(typeof(LauncherUpdater));
 
         /// <summary>
         /// Performs the entire AM2RLauncher update procedure.
