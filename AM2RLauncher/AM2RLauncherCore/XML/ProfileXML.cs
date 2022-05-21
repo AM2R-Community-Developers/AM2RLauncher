@@ -54,7 +54,7 @@ public class ProfileXML
     [XmlAttribute("ProfileNotes")]
     public string ProfileNotes
     { get; set; }
-    /// <summary>This gets calculated at runtime, by the MainForm. Indicates where the install data for the mod is stored.</summary>
+    /// <summary>This gets calculated at runtime, by the Launcher. Indicates where the install data for the mod is stored.</summary>
     [XmlIgnore]
     public string DataPath
     { get; set; }

@@ -8,7 +8,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AM2RLauncherLib.XML;
-using log4net.Util;
 
 namespace AM2RLauncherLib;
 
@@ -90,52 +89,58 @@ public static class Profile
     /// <summary>
     /// Checks if a Zip file is a valid AM2R_1.1 zip.
     /// </summary>
-    /// <param name="zipPath">Full Path to the Zip file to check.</param>
+    /// <param name="zipPath">Full Path to the Zip file to validate.</param>
     /// <returns><see cref="IsZipAM2R11ReturnCodes"/> detailing the result</returns>
     public static IsZipAM2R11ReturnCodes CheckIfZipIsAM2R11(string zipPath)
     {
         const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
         const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
         const string am2rHash = "15253f7a66d6ea3feef004ebbee9b438";
-
         string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
 
         // Clean up in case folder exists already
         if (Directory.Exists(tmpPath))
             Directory.Delete(tmpPath, true);
-
         Directory.CreateDirectory(tmpPath);
 
         // Open archive
         ZipArchive am2rZip = ZipFile.OpenRead(zipPath);
 
+
         // Check if exe exists anywhere
         ZipArchiveEntry am2rExe = am2rZip.Entries.FirstOrDefault(x => x.FullName.Contains("AM2R.exe"));
         if (am2rExe == null)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
+
         // Check if it's not in a subfolder. if it'd be in a subfolder, fullname would be "folder/AM2R.exe"
         if (am2rExe.FullName != "AM2R.exe")
             return IsZipAM2R11ReturnCodes.GameIsInASubfolder;
+
         // Check validity
         am2rExe.ExtractToFile($"{tmpPath}/{am2rExe.FullName}");
         if (HelperMethods.CalculateMD5($"{tmpPath}/{am2rExe.FullName}") != am2rHash)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe;
 
+
         // Check if data.win exists / is valid
         ZipArchiveEntry dataWin = am2rZip.Entries.FirstOrDefault(x => x.FullName == "data.win");
         if (dataWin == null)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+
         dataWin.ExtractToFile($"{tmpPath}/{dataWin.FullName}");
         if (HelperMethods.CalculateMD5($"{tmpPath}/{dataWin.FullName}") != dataWinHash)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin;
+
 
         // Check if d3d.dll exists / is valid
         ZipArchiveEntry d3dx = am2rZip.Entries.FirstOrDefault(x => x.FullName == "D3DX9_43.dll");
         if (d3dx == null)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX943Dll;
+
         d3dx.ExtractToFile($"{tmpPath}/{d3dx.FullName}");
         if (HelperMethods.CalculateMD5($"{tmpPath}/{d3dx.FullName}") != d3dHash)
             return IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX943Dll;
+
 
         // Clean up
         Directory.Delete(tmpPath, true);
@@ -146,7 +151,7 @@ public static class Profile
     }
 
     /// <summary>
-    /// Git Pulls from the repository.
+    /// Git Pulls patching content from the repository.
     /// </summary>
     public static void PullPatchData(Func<TransferProgress, bool> transferProgressHandlerMethod)
     {
@@ -214,19 +219,15 @@ public static class Profile
             if (!File.Exists($"{dir.FullName}/profile.xml"))
                 continue;
 
-            ProfileXML prof = Serializer.Deserialize<ProfileXML>(File.ReadAllText($"{dir.FullName}/profile.xml"));
+            ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText($"{dir.FullName}/profile.xml"));
+            profile.DataPath = $"/Mods/{dir.Name}";
+
             // Safety check for non-installable profiles
-            if (prof.Installable || IsProfileInstalled(prof))
-            {
-                prof.DataPath = $"/Mods/{dir.Name}";
-                profileList.Add(prof);
-            }
             // If not installable and isn't installed, remove it
-            else if (!IsProfileInstalled(prof))
-            {
-                prof.DataPath = $"/Mods/{dir.Name}";
-                DeleteProfile(prof);
-            }
+            if (!profile.Installable && IsProfileInstalled(profile))
+                DeleteProfile(profile);
+            else
+                profileList.Add(profile);
         }
 
         log.Info($"Loaded {profileList.Count} profile(s).");
@@ -242,6 +243,7 @@ public static class Profile
         // Temporarily serialize and deserialize to essentially "clone" the variable as otherwise we'd modify references
         File.WriteAllText($"{Path.GetTempPath()}/{profile.Name}", Serializer.Serialize<ProfileXML>(profile));
         profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText($"{Path.GetTempPath()}/{profile.Name}"));
+        File.Delete($"{Path.GetTempPath()}/{profile.Name}");
 
         string originalName = profile.Name;
         // Change name to include version and be unique
@@ -322,12 +324,11 @@ public static class Profile
     {
         log.Info($"Installing profile {profile.Name}...");
 
-        string profilesHomePath = Core.ProfilesPath;
-        string profilePath = $"{profilesHomePath}/{profile.Name}";
+        string profilePath = $"{Core.ProfilesPath}/{profile.Name}";
 
         // Failsafe for Profiles directory
-        if (!Directory.Exists(profilesHomePath))
-            Directory.CreateDirectory(profilesHomePath);
+        if (!Directory.Exists(Core.ProfilesPath))
+            Directory.CreateDirectory(Core.ProfilesPath);
 
         // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
         if (Directory.Exists(profilePath))
@@ -336,7 +337,7 @@ public static class Profile
         // Create profile directory
         Directory.CreateDirectory(profilePath);
 
-        // Switch profilePath on Gtk
+        // Switch profilePath on Linux and Mac, as they need special handling
         if (OS.IsLinux)
         {
             profilePath += "/assets";
@@ -346,22 +347,18 @@ public static class Profile
         {
             // Folder structure for mac is like this:
             // am2r.app -> Contents
-            //     -Frameworks (some libs)
-            //     -MacOS (runner)
-            //     -Resources (asset path)
+            //             |-Frameworks (some libs)
+            //             |-MacOS (runner)
+            //             |-Resources (asset path)
             profilePath += "/AM2R.app/Contents";
             Directory.CreateDirectory(profilePath);
             Directory.CreateDirectory($"{profilePath}/MacOS");
             Directory.CreateDirectory($"{profilePath}/Resources");
             profilePath += "/Resources";
-
-            log.Info("ProfileInstallation: Created folder structure.");
         }
 
         // Extract 1.1
         ZipFile.ExtractToDirectory(Core.AM2R11File, profilePath);
-
-        // Extracted 1.1
         progress.Report(33);
         log.Info("Profile folder created and AM2R_11.zip extracted.");
 
@@ -394,16 +391,16 @@ public static class Profile
             log.Error($"{OS.Name} does not have valid runner / data.win names!");
         }
 
+        // Patch runner and data file.
         log.Info($"Attempting to patch in {profilePath}");
-
         if (OS.IsWindows)
         {
-            // Patch game executable
             if (profile.UsesYYC)
             {
                 CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/data.win", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
 
                 // Delete 1.1's data.win, we don't need it anymore!
+                // TODO: *theoretically* if someone would make some game like serradius in gms2 and push that as a yyc am2r mod, this *will* break!
                 File.Delete($"{profilePath}/data.win");
             }
             else
@@ -412,11 +409,12 @@ public static class Profile
                 CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
             }
         }
-        else if (OS.IsUnix) // YYC and VM look exactly the same on Linux and Mac so we're all good here.
+        // YYC and VM look exactly the same on Linux and Mac so we're all good here.
+        else if (OS.IsUnix)
         {
             CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/data.win", $"{dataPath}/game.xdelta", $"{profilePath}/{dataWin}");
             CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
-            // Just in case the resulting file isn't chmod-ed...
+            // Just in case the resulting file isn't set as executable...
             Process.Start("chmod", $"+x  \"{profilePath}/{exe}\"")?.WaitForExit();
 
             // These are not needed by linux or Mac at all, so we delete them
@@ -426,7 +424,7 @@ public static class Profile
 
             // Move exe one directory out on Linux, move to MacOS folder instead on Mac
             if (OS.IsLinux)
-                File.Move($"{profilePath}/{exe}", $"{profilePath.Substring(0, profilePath.LastIndexOf("/"))}/{exe}");
+                File.Move($"{profilePath}/{exe}", $"{profilePath}/../{exe}");
             else
                 File.Move($"{profilePath}/{exe}", $"{profilePath.Replace("Resources", "MacOS")}/{exe}");
         }
@@ -446,7 +444,6 @@ public static class Profile
         // HQ music
         if (!profile.UsesCustomMusic && useHqMusic)
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", profilePath);
-
 
         // Linux post-process
         if (OS.IsLinux)
@@ -473,9 +470,10 @@ public static class Profile
             File.Copy($"{profilePath}/{exe}", $"{profilePath}/AM2R.AppDir/usr/bin/{exe}");
 
             progress.Report(66);
-            log.Info("Gtk-specific formatting finished.");
+            log.Info("Linux specific formatting finished.");
 
-            // Temp save the currentWorkingDirectory and console.error, change it to profilePath and null, call the script, and change it back.
+            // Temp save the currentWorkingDirectory and STDERR, change it to profilePath and null, call the tool, and change it back.
+            // Reason why STDERR is changed is because the tool prints some output to there that we don't want
             string workingDir = Directory.GetCurrentDirectory();
             TextWriter cliError = Console.Error;
             Directory.SetCurrentDirectory(profilePath);
@@ -512,17 +510,17 @@ public static class Profile
             File.Copy($"{Core.PatchDataPath}/data/PkgInfo", $"{profilePath.Replace("Resources", "")}/PkgInfo", true);
 
             //Put profilePath back to what it was before
-            profilePath = $"{profilesHomePath}/{profile.Name}";
+            profilePath = $"{Core.ProfilesPath}/{profile.Name}";
         }
 
         // Copy profile.xml so we can grab data to compare for updates later!
-        // tldr; check if we're in PatchData or not
+        // check if we're in PatchData or not, as we need to search for profile.xml in different locations.
         if (new DirectoryInfo(dataPath).Parent?.Name == "PatchData")
             File.Copy($"{dataPath}/../profile.xml", $"{profilePath}/profile.xml");
         else
             File.Copy($"{dataPath}/profile.xml", $"{profilePath}/profile.xml");
 
-        // Installed datafiles
+        // Done
         progress.Report(100);
         log.Info($"Successfully installed profile {profile.Name}.");
     }
@@ -560,10 +558,12 @@ public static class Profile
         log.Info($"Creating Android APK for profile {profile.Name}.");
 
         // Create working dir after some cleanup
-        string apktoolPath = $"{Core.PatchDataPath}/utilities/android/apktool.jar",
-               uberPath = $"{Core.PatchDataPath}/utilities/android/uber-apk-signer.jar",
-               tempDir = new DirectoryInfo($"{CrossPlatformOperations.CurrentPath}/temp").FullName,
-               dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
+        string apktoolPath = $"{Core.PatchDataPath}/utilities/android/apktool.jar";
+        string uberPath = $"{Core.PatchDataPath}/utilities/android/uber-apk-signer.jar";
+        string tempDir = new DirectoryInfo($"{CrossPlatformOperations.CurrentPath}/temp").FullName;
+        string dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
+
+        // Clean up in case Directory exists already
         if (Directory.Exists(tempDir))
             Directory.Delete(tempDir, true);
         Directory.CreateDirectory(tempDir);
@@ -583,6 +583,7 @@ public static class Profile
 
         if (useHqMusic)
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", workingDir);
+
         // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
         foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
             File.Copy(file.FullName, $"{workingDir}/{file.Name}");
@@ -637,6 +638,7 @@ public static class Profile
     /// </summary>
     public static void RunGame(ProfileXML profile, bool useLogging, string envVars = "")
     {
+        //TODO: double check this and clean
         // These are used on both windows and linux for game logging
         string savePath = OS.IsWindows ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
             : profile.SaveLocation.Replace("~", CrossPlatformOperations.Home);

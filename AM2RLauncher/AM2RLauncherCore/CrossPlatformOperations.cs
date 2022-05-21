@@ -253,6 +253,7 @@ public static class CrossPlatformOperations
     /// <param name="output">Full Path to the output file.</param>
     public static void ApplyXdeltaPatch(string original, string patch, string output)
     {
+        //TODO: some slight cleanup
         // For *whatever reason* **sometimes** xdelta patching doesn't work, if output = original. So I'm fixing that here.
         string originalOutput = output;
         if (original == output)
@@ -297,6 +298,7 @@ public static class CrossPlatformOperations
         File.Move(output, originalOutput);
     }
 
+    //TODO: doc and cleanup
     public static void RunJavaJar(string arguments = null, string workingDirectory = null)
     {
         workingDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
