@@ -78,9 +78,9 @@ namespace AM2RLauncher
         /// </summary>
         private static string currentMirror;
 
-        private static readonly bool isInternetThere = AM2RLauncherLib.Core.IsInternetThere;
+        private static readonly bool isInternetThere = Core.IsInternetThere;
 
-        private static readonly bool isThisRunningFromWine = AM2RLauncherLib.OS.IsThisRunningFromWine;
+        private static readonly bool isThisRunningFromWine = OS.IsThisRunningFromWine;
 
         private static bool singleInstance;
 
@@ -100,7 +100,7 @@ namespace AM2RLauncher
                     Process current = Process.GetCurrentProcess();
                     Process process = Process.GetProcessesByName(current.ProcessName).First(p => p.Id == current.Id);
                     if (process != null)
-                        AM2RLauncherLib.Core.SetForegroundWindow(process.MainWindowHandle);
+                        Core.SetForegroundWindow(process.MainWindowHandle);
                 }
                 Environment.Exit(0);
             }

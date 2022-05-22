@@ -1,5 +1,4 @@
 ﻿using AM2RLauncherLib;
-using AM2RLauncher;
 using Eto.Forms;
 using log4net;
 using System;
@@ -19,7 +18,7 @@ namespace AM2RLauncher
         // Auto updating is fun!
 
         /// <summary>The Version that identifies this current release.</summary>
-        public const string VERSION = AM2RLauncherLib.Core.Version;
+        public const string VERSION = Core.Version;
 
         /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
         private static readonly string oldConfigPath = CrossPlatformOperations.CurrentPath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
