@@ -45,7 +45,7 @@ internal static class MainClass
 
         try
         {
-            Application macLauncher = new Application(Eto.Platforms.Mac64);
+            Application macLauncher = new Application(Eto.Platforms.macOS);
             LauncherUpdater.Main();
             macLauncher.UnhandledException += MacLauncher_UnhandledException;
             macLauncher.Run(new MainForm());
