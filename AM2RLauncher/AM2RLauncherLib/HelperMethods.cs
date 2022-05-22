@@ -33,9 +33,7 @@ public static class HelperMethods
 
         if (!dir.Exists)
         {
-            throw new DirectoryNotFoundException(
-                "Source directory does not exist or could not be found: "
-                + sourceDirName);
+            throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDirName}");
         }
 
         DirectoryInfo[] dirs = dir.GetDirectories();
@@ -96,6 +94,8 @@ public static class HelperMethods
     /// </summary>
     /// <param name="filename">Full Path to the file whose MD5 hash is supposed to be calculated.</param>
     /// <returns>The MD5 hash as a <see cref="string"/>, empty string if file does not exist.</returns>
+    /*TODO: in the future we should use sha256, as both md5 and sha1 are unsafe.
+    This however needs to wait, until we somehow can find a way to publish the windows launcher as .net core...*/
     public static string CalculateMD5(string filename)
     {
         // Check if File exists first
@@ -150,7 +150,7 @@ public static class HelperMethods
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
         try
         {
-            HttpWebResponse _ = (HttpWebResponse)request.GetResponse();
+            request.GetResponse();
         }
         catch (WebException)
         {

@@ -80,7 +80,7 @@ namespace AM2RLauncher
 
         private static readonly bool isInternetThere = AM2RLauncherLib.Core.IsInternetThere;
 
-        private static readonly bool isThisRunningFromWine = AM2RLauncherLib.Core.IsThisRunningFromWine;
+        private static readonly bool isThisRunningFromWine = AM2RLauncherLib.OS.IsThisRunningFromWine;
 
         private static bool singleInstance;
 

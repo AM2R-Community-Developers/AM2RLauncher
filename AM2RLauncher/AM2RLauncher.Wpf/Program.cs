@@ -43,7 +43,7 @@ internal static class MainClass
         #endif
 
         //Log Wine
-        if (Core.IsThisRunningFromWine) log.Info("Currently running from WINE!");
+        if (OS.IsThisRunningFromWine) log.Info("Currently running from WINE!");
 
         // Try catch in case it ever crashes before actually getting to the Eto application
         try

@@ -43,25 +43,6 @@ public static class Core
     public static readonly string ModsPath = CrossPlatformOperations.CurrentPath + "/Mods";
 
     /// <summary>
-    /// Checks if this is run via WINE.
-    /// </summary>
-    public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
-
-    /// <summary>
-    /// Checks if the Launcher is ran from WINE.
-    /// </summary>
-    /// <returns><see langword="true"/> if run from WINE, <see langword="false"/> if not.</returns>
-    private static bool CheckIfRunFromWINE()
-    {
-        // We check for wine by seeing if a reg entry exists.
-        // Not the best way, and could be removed from the future, but good enough for our purposes.
-        if (OS.IsWindows && (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null))
-            return true;
-
-        return false;
-    }
-
-    /// <summary>
     /// This is used on Windows only. This sets a window to be in foreground, is used i.e. to fix am2r just being hidden.
     /// </summary>
     /// <param name="hWnd">Pointer to the process you want to have in the foreground.</param>

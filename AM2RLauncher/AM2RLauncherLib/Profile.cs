@@ -666,7 +666,7 @@ public static class Profile
 
                 stream.WriteLine($"AM2RLauncher {Core.Version} log generated at {date}");
 
-                if (Core.IsThisRunningFromWine)
+                if (OS.IsThisRunningFromWine)
                     stream.WriteLine("Using WINE!");
 
                 stream.Flush();
