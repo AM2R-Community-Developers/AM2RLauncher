@@ -86,7 +86,7 @@ public static class CrossPlatformOperations
         }
 
         // Should never occur, but...
-        log.Error(OS.Name + " has no mirror lists!");
+        log.Error($"{OS.Name} has no mirror lists!");
         return new List<string>();
     }
 
@@ -98,14 +98,10 @@ public static class CrossPlatformOperations
     /// <param name="url">The URL of the website to be opened.</param>
     public static void OpenURL(string url)
     {
-        if (OS.IsWindows)
-            Process.Start(url);
-        else if (OS.IsLinux)
-            Process.Start("xdg-open", url);
-        else if (OS.IsMac)
-            Process.Start("open", url);
-        else
-            log.Error(OS.Name + " can't open URLs!");
+        if (OS.IsWindows) Process.Start(url);
+        else if (OS.IsLinux) Process.Start("xdg-open", url);
+        else if (OS.IsMac) Process.Start("open", url);
+        else log.Error($"{OS.Name} can't open URLs!");
     }
 
     /// <summary>
@@ -120,7 +116,7 @@ public static class CrossPlatformOperations
             : path.Replace("~", Home);
         if (!Directory.Exists(realPath))
         {
-            log.Info(realPath + " did not exist and was created");
+            log.Info($"{realPath} did not exist and was created");
             Directory.CreateDirectory(realPath);
         }
 
@@ -128,13 +124,12 @@ public static class CrossPlatformOperations
         if (OS.IsWindows)
             // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
             Process.Start("explorer.exe", $"\"{realPath}\"");
-        // Linux only opens the directory bc opening and selecting a file is pain
         else if (OS.IsLinux)
             Process.Start("xdg-open", $"\"{realPath}\"");
         else if (OS.IsMac)
             Process.Start("open", $"\"{realPath}\"");
         else
-            log.Error(OS.Name + " can't open folders!");
+            log.Error($"{OS.Name} can't open folders!");
     }
 
     /// <summary>
@@ -150,7 +145,7 @@ public static class CrossPlatformOperations
             : path.Replace("~", Home);
         if (!File.Exists(realPath))
         {
-            log.Error(realPath + "did not exist, operation to open its folder was cancelled!");
+            log.Error($"{realPath}did not exist, operation to open its folder and select it was cancelled!");
             return;
         }
 
@@ -159,15 +154,17 @@ public static class CrossPlatformOperations
             // And we're using explorer.exe to prevent people from stuffing system commands in here wholesale. That would be bad.
             Process.Start("explorer.exe", $"/select, \"{realPath}\"");
         else if (OS.IsLinux)
+            // Linux only opens the directory because opening and selecting a file requires some dbus stuff I don't want to bother for now
+            // If anyone wants to do a PR, feel free to!
             Process.Start("xdg-open", $"\"{Path.GetDirectoryName(realPath)}\"");
         else if (OS.IsMac)
             Process.Start("open", $"-R \"{realPath}\"");
         else
-            log.Error(OS.Name + " can't open select files in file explorer!");
+            log.Error($"{OS.Name} can't open select files in file explorer!");
     }
 
     /// <summary>
-    /// Checks if command-line Java is installed.
+    /// Checks if command-line Java is installed and located in PATH.
     /// </summary>
     /// <returns><see langword="true"/> if it is installed, <see langword="false"/> if not.</returns>
     public static bool IsJavaInstalled()
@@ -185,6 +182,8 @@ public static class CrossPlatformOperations
             process = "java";
             arguments = "-version";
         }
+        else
+            log.Error($"{OS.Name} has no java process/arguments");
 
         ProcessStartInfo javaStart = new ProcessStartInfo
         {
@@ -197,11 +196,11 @@ public static class CrossPlatformOperations
 
         Process java = new Process { StartInfo = javaStart };
 
-        // This is primarily for linux, but could be happening on windows as well
+        // This is primarily for unix, but could be happening on windows as well
+        // This gets triggered, if "java" cannot be found.
         try
         {
             java.Start();
-
             java.WaitForExit();
         }
         catch (System.ComponentModel.Win32Exception)
@@ -213,7 +212,7 @@ public static class CrossPlatformOperations
     }
 
     /// <summary>
-    /// Checks if command-line xdelta is installed on non-Windows systems.
+    /// Checks if command-line xdelta is installed and located in PATH.
     /// </summary>
     /// <returns><see langword="true"/> if it is installed, <see langword="false"/> if not.</returns>
     public static bool CheckIfXdeltaIsInstalled()
@@ -248,57 +247,50 @@ public static class CrossPlatformOperations
     /// <summary>
     /// This applies an Xdelta Patch cross-platform.
     /// </summary>
-    /// <param name="original">Full Path to the original file.</param>
-    /// <param name="patch">Full Path to the Xdelta patch to apply.</param>
-    /// <param name="output">Full Path to the output file.</param>
-    public static void ApplyXdeltaPatch(string original, string patch, string output)
+    /// <param name="originalFile">Full Path to the original file.</param>
+    /// <param name="patchFile">Full Path to the Xdelta patch to apply.</param>
+    /// <param name="outputFile">Full Path to the output file.</param>
+    /// <remarks>This method assumes that Xdelta is already installed and located in PATH, except
+    /// for Windows, where it uses the provided one.</remarks>
+    public static void ApplyXdeltaPatch(string originalFile, string patchFile, string outputFile)
     {
-        //TODO: some slight cleanup
-        // For *whatever reason* **sometimes** xdelta patching doesn't work, if output = original. So I'm fixing that here.
-        string originalOutput = output;
-        if (original == output)
-            output += "_";
+        // For *whatever reason* **sometimes** xdelta patching doesn't work, if outputFile = originalFile. So I'm fixing that here.
+        string originalOutput = outputFile;
+        if (originalFile == outputFile)
+            outputFile += "_";
 
-        string arguments = "-f -d -s \"" + original.Replace(CurrentPath + "/", "") + "\" \"" + patch.Replace(CurrentPath + "/", "")
-                           + "\" \"" + output.Replace(CurrentPath + "/", "") + "\"";
+        //TODO: why is currentPath taken out of all the paths? investigate!
+        string arguments = $"-f -d -s \"{originalFile.Replace($"{CurrentPath}/", "")}\" \"{patchFile.Replace($"{CurrentPath}/", "")}\" \"{outputFile.Replace($"{CurrentPath}/", "")}\"";
 
-        if (OS.IsWindows)
+
+        ProcessStartInfo parameters = new ProcessStartInfo
         {
-            // We want some fancy parameters for Windows because the terminal scares end users :(
-            ProcessStartInfo parameters = new ProcessStartInfo
-            {
-                FileName = CurrentPath + "/PatchData/utilities/xdelta/xdelta3.exe",
-                WorkingDirectory = CurrentPath + "",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                Arguments = arguments
-            };
+            FileName = OS.IsWindows ? $"{CurrentPath}/PatchData/utilities/xdelta/xdelta3.exe" : "xdelta3",
+            WorkingDirectory = $"{CurrentPath}",
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            Arguments = arguments
+        };
 
-            using Process proc = new Process { StartInfo = parameters };
-            proc.Start();
-            proc.WaitForExit();
-        }
-        else if (OS.IsUnix)
-        {
-            ProcessStartInfo parameters = new ProcessStartInfo
-            {
-                FileName = "xdelta3",
-                Arguments = arguments,
-                WorkingDirectory = CurrentPath
-            };
+        using Process proc = new Process { StartInfo = parameters };
+        proc.Start();
+        proc.WaitForExit();
 
-            using Process proc = Process.Start(parameters);
-            proc?.WaitForExit();
-        }
 
-        if ((originalOutput == output) || !File.Exists(output))
+        if ((originalOutput == outputFile) || !File.Exists(outputFile))
             return;
 
         File.Delete(originalOutput);
-        File.Move(output, originalOutput);
+        File.Move(outputFile, originalOutput);
     }
 
-    //TODO: doc and cleanup
+    /// <summary>
+    /// Runs a Java jar file cross-platform.
+    /// </summary>
+    /// <param name="arguments">The arguments for the jar file.</param>
+    /// <param name="workingDirectory">The working directory for the jar process.
+    /// If <see langword="null"/> then it will fallback to the users' Home directory</param>
+    /// <remarks>This assumes that Java is installed and located in PATH.</remarks>
     public static void RunJavaJar(string arguments = null, string workingDirectory = null)
     {
         workingDirectory ??= Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -315,11 +307,13 @@ public static class CrossPlatformOperations
             proc = "java";
             javaArgs = "-jar";
         }
+        else
+            log.Error($"{OS.Name} has no java process!");
 
         ProcessStartInfo jarStart = new ProcessStartInfo
         {
             FileName = proc,
-            Arguments = javaArgs + " " + arguments,
+            Arguments = $"{javaArgs} {arguments}",
             WorkingDirectory = workingDirectory,
             UseShellExecute = false,
             CreateNoWindow = true
@@ -331,7 +325,6 @@ public static class CrossPlatformOperations
         };
 
         jarProcess.Start();
-
         jarProcess.WaitForExit();
     }
 
@@ -362,7 +355,7 @@ public static class CrossPlatformOperations
                 Directory.CreateDirectory(am2rLauncherDataEnvVar);
 
                 // Our env var is now set and directories exist
-                log.Info("CurrentPath is set to " + am2rLauncherDataEnvVar);
+                log.Info($"CurrentPath is set to {am2rLauncherDataEnvVar}");
                 return am2rLauncherDataEnvVar;
             }
             catch (Exception ex)
@@ -398,7 +391,7 @@ public static class CrossPlatformOperations
         {
             // Cannot use SpecialFolders here, as the current .NET version returns them wrongly.
             // Mac has the Path at HOME/Application Support/Library/AM2RLauncher
-            string macPath = Home + "/Library/Application Support/AM2RLauncher";
+            string macPath = $"{Home}/Library/Application Support/AM2RLauncher";
             try
             {
                 Directory.CreateDirectory(macPath);
@@ -411,7 +404,7 @@ public static class CrossPlatformOperations
             }
         }
         else
-            log.Error(OS.Name + " has no current path!");
+            log.Error($"{OS.Name} has no current path!");
 
         log.Info("Something went wrong, falling back to the default CurrentPath.");
         return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);

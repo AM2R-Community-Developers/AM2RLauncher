@@ -677,7 +677,6 @@ public static class Profile
             }
 
             ProcessStartInfo proc = new ProcessStartInfo();
-
             proc.WorkingDirectory = $"{Core.ProfilesPath}/{profile.Name}";
             proc.FileName = $"{proc.WorkingDirectory}/AM2R.exe";
             proc.Arguments = arguments;
