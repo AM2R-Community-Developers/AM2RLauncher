@@ -19,7 +19,7 @@ public partial class MainForm : Form
     /// <param name="value">The value that <see cref="progressBar"/> should be set to.</param>
     /// <param name="min">The min value that <see cref="progressBar"/> should be set to.</param>
     /// <param name="max">The max value that <see cref="progressBar"/> should be set to.</param>
-    private void UpdateProgressBar(int value, int min = 0, int max = 100)
+    private void UpdateProgressBar(int value, int min, int max)
     {
         Application.Instance.Invoke(() =>
         {

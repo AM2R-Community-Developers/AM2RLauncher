@@ -21,7 +21,6 @@ namespace AM2RLauncher;
 /// </summary>
 public partial class MainForm : Form
 {
-    // Load reference to logger
     /// <summary>
     /// Our log object, that handles logging the current execution to a file.
     /// </summary>
@@ -30,7 +29,7 @@ public partial class MainForm : Form
     /// <summary>
     /// The current Launcher version.
     /// </summary>
-    private const string VERSION = LauncherUpdater.VERSION;
+    private const string VERSION = Core.Version;
 
     /// <summary>
     /// This variable has the current global state of the Launcher.
@@ -44,7 +43,7 @@ public partial class MainForm : Form
     /// <summary>
     /// Stores the index for <see cref="profileDropDown"/>.
     /// </summary>
-    private static int? profileIndex = null;
+    private static int? profileIndex;
 
     /// <summary>
     /// Stores the current mirror from either <see cref="currentMirror"/> or <see cref="customMirrorTextBox"/>.
@@ -89,23 +88,20 @@ public partial class MainForm : Form
         }
 
         log.Info("Mutex check passed. Entering main thread.");
-        log.Info("Current Launcher Version: " + VERSION);
-        log.Info("Current Platform-ID is: " + Platform.ID);
-        log.Info("Current OS is: " + OS.Name);
+        log.Info($"Current Launcher Version: {VERSION}");
+        log.Info($"Current Platform-ID is: {Platform.ID}");
+        log.Info($"Current OS is: {OS.Name}");
 
         // Set the Current Directory to the path the Launcher is located. Fixes some relative path issues.
-        Environment.CurrentDirectory = CrossPlatformOperations.CurrentPath;
-        log.Info("Set Launcher CWD to " + Environment.CurrentDirectory);
-
-        // But log actual folder location nonetheless
-        log.Info("Actual Launcher location: " + Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory));
+        Environment.CurrentDirectory = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) ?? Environment.CurrentDirectory;
+        log.Info($"Launcher Location is at {Environment.CurrentDirectory}. Used as CWD.");
 
         // Set the language to what User wanted or choose local language
         string userLanguage = ReadFromConfig("Language").ToLower();
         if (!userLanguage.Equals("default"))
             Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultures(CultureTypes.AllCultures).First(c => c.NativeName.ToLower().Contains(userLanguage));
 
-        log.Info("Language has been set to: " + Thread.CurrentThread.CurrentUICulture.EnglishName);
+        log.Info($"Language has been set to: {Thread.CurrentThread.CurrentUICulture.EnglishName}");
 
         #region VARIABLE INITIALIZATION
         log.Info("Beginning UI initialization...");
@@ -132,21 +128,17 @@ public partial class MainForm : Form
         //TODO: whenever profileDropDown gets rewritten to use a datastore, scrap this
         List<ListItem> profileNames = new List<ListItem>();
         foreach (ProfileXML profile in profileList)
-        {
             profileNames.Add(profile.Name);
-        }
 
         // Custom splash texts
         string splash = Splash.GetSplash();
-        log.Info("Randomly chosen splash: " + splash);
+        log.Info($"Randomly chosen splash: {splash}");
 
         Font smallButtonFont = new Font(SystemFont.Default, 10);
 
-        // Create mirror list - eventually this should be platform specific!
-        // We do this as a List<Uri> so we can add more dynamically on user input... if necessary.
+        // Create mirror list
         mirrorList = CrossPlatformOperations.GenerateMirrorList();
 
-        // Create mirror list
         // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
         List<ListItem> mirrorDescriptionList = new List<ListItem>();
         // Add each entry dynamically instead of hard-coding it to two. If we have neither a github or gitlab mirror, we use the mirror itself as text
@@ -160,7 +152,7 @@ public partial class MainForm : Form
         #endregion
 
         Icon = new Icon(1f, am2rIcon);
-        Title = "AM2RLauncher " + VERSION + ": " + splash;
+        Title = $"AM2RLauncher {VERSION}: {splash}";
         MinimumSize = new Size(500, 400);
         // TODO: for some reason, this doesn't work on Linux. Was reported at eto, stays here until its fixed
         ClientSize = new Size(Int32.Parse(ReadFromConfig("Width")), Int32.Parse(ReadFromConfig("Height")));
@@ -169,7 +161,7 @@ public partial class MainForm : Form
             ClientSize = new Size(500, ClientSize.Height);
         if (OS.IsWindows && (ClientSize.Height < 400))
             ClientSize = new Size(ClientSize.Width, 400);
-        log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
+        log.Info($"Start the launcher with Size: {ClientSize.Width}, {ClientSize.Height}");
         if (Boolean.Parse(ReadFromConfig("IsMaximized"))) Maximize();
 
         Drawable drawable = new Drawable { BackgroundColor = colorBGNoAlpha };
@@ -188,7 +180,6 @@ public partial class MainForm : Form
         // PLAY button
         playButton = new ColorButton
         {
-            ToolTip = "",
             BackgroundColorHover = colorBGHover,
             Height = 40,
             Width = 250,
@@ -199,12 +190,9 @@ public partial class MainForm : Form
             FrameColorDisabled = colorInactive
         };
 
-        UpdateStateMachine();
-
-        SetPlayButtonState(updateState);
-
         centerInterface.AddRow(playButton);
 
+        //TODO: consider making the spacers global?
         // 2px spacer between playButton and apkButton (Windows only)
         if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colorBG, Height = 2 });
 
@@ -280,7 +268,6 @@ public partial class MainForm : Form
         {
             BackgroundColor = colorBG,
             Height = 16,
-            Text = Text.Author + " ",
             TextColor = colorGreen
         };
 
@@ -290,7 +277,6 @@ public partial class MainForm : Form
         {
             BackgroundColor = colorBG,
             Height = 16,
-            Text = Text.VersionLabel + " ",
             TextColor = colorGreen
         };
 
@@ -340,7 +326,7 @@ public partial class MainForm : Form
         // Version number label
         Label versionLabel = new Label
         {
-            Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""),
+            Text = $"v{VERSION}{(isThisRunningFromWine ? "-WINE" : "")}",
             Width = 48, TextAlignment = TextAlignment.Right, TextColor = colorGreen,
             Font = new Font(SystemFont.Default, 12)
         };
@@ -507,7 +493,7 @@ public partial class MainForm : Form
 
         if (languageDropDown.SelectedIndex == -1)
         {
-            log.Info("User has tried to use " + tmpLanguage + " as a Language, but it was not found. Reverting to System Language");
+            log.Info($"User has tried to use {tmpLanguage} as a Language, but it was not found. Reverting to System Language");
             languageDropDown.SelectedIndex = 0;
         }
 
@@ -518,7 +504,6 @@ public partial class MainForm : Form
             Text = Text.AutoUpdateAM2R,
             TextColor = colorGreen
         };
-
 
         // autoUpdateLauncher checkbox
         autoUpdateLauncherCheck = new CheckBox
@@ -552,6 +537,7 @@ public partial class MainForm : Form
             TextColor = colorGreen
         };
 
+        //TODO: potentially make this on all platforms?
         // Custom environment variables label
         Label customEnvVarLabel = new Label();
         if (OS.IsLinux)
@@ -633,10 +619,8 @@ public partial class MainForm : Form
         // [MOD SETTINGS]
         DynamicLayout modSettingsLayout = new DynamicLayout();
 
-
         addModButton = new ColorButton
         {
-            ToolTip = null,
             Text = Text.AddNewMod,
             Font = smallButtonFont,
             Height = 30,
@@ -673,7 +657,6 @@ public partial class MainForm : Form
 
         profileButton = new ColorButton
         {
-            ToolTip = null,
             Text = Text.OpenProfileFolder,
             Font = smallButtonFont,
             Height = 30,
@@ -686,7 +669,6 @@ public partial class MainForm : Form
 
         saveButton = new ColorButton
         {
-            ToolTip = null,
             Text = Text.OpenSaveFolder,
             Font = smallButtonFont,
             Height = 30,
@@ -699,7 +681,6 @@ public partial class MainForm : Form
 
         updateModButton = new ColorButton
         {
-            ToolTip = null,
             Text = Text.UpdateModButtonText,
             Font = smallButtonFont,
             Height = 30,
@@ -712,7 +693,6 @@ public partial class MainForm : Form
 
         deleteModButton = new ColorButton
         {
-            ToolTip = null,
             Text = Text.DeleteModButtonText,
             Font = smallButtonFont,
             Height = 30,
@@ -731,7 +711,6 @@ public partial class MainForm : Form
             SpellCheck = false,
             Width = 275,
             Height = 150,
-            Text = Text.ProfileNotes
         };
 
         modSettingsLayout.BeginHorizontal();
