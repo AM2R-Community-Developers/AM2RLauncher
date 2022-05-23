@@ -585,6 +585,7 @@ public static class Profile
         progress.Report(14);
 
         // Decompile AM2RWrapper.apk
+        //TODO: double check if this still works on machines with non-ascii characters. See explanation in CrossPlatformOperations.PatchXdelta
         CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" d \"{dataPath}/android/AM2RWrapper.apk\"", tempDir);
         log.Info("AM2RWrapper decompiled.");
         progress.Report(28);

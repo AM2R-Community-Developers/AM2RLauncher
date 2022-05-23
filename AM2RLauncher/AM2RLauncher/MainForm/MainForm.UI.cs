@@ -825,13 +825,13 @@ public partial class MainForm : Form
     // Visual studio does it like this for normal winforms projects, so I just used the same format.
 
     /// <summary>The tray indicator</summary>
-    private TrayIndicator trayIndicator;
+    private readonly TrayIndicator trayIndicator;
 
     /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
     //TODO: this should be moved into AM2RLauncherLib
     private List<ProfileXML> profileList;
     /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
-    private List<ListItem> profileNames;
+    private readonly List<ListItem> profileNames;
 
     /// <summary>The planet Background.</summary>
     private readonly Bitmap formBG = new Bitmap(Resources.bgCentered);
@@ -854,73 +854,73 @@ public partial class MainForm : Form
 
     // Mirror lists
     /// <summary><see cref="List{String}"/> of mirror <see cref="string"/>s, used for actually working with mirrors.</summary>
-    private List<string> mirrorList;
+    private readonly List<string> mirrorList;
     /// <summary><see cref="List{ListItem}"/> of <see cref="ListItem"/> so that Eto's annoying IListItem interface is appeased. Used for mirror name display in DropDowns.</summary>
-    private List<ListItem> mirrorDescriptionList;
+    private readonly List<ListItem> mirrorDescriptionList;
 
     /// <summary>A <see cref="ColorButton"/> that acts as the main Button</summary>
-    private ColorButton playButton;
+    private readonly ColorButton playButton;
     /// <summary>A <see cref="ColorButton"/> which is only used for creating APK's</summary>
-    private ColorButton apkButton;
+    private readonly ColorButton apkButton;
     /// <summary>A <see cref="ColorButton"/> that is used to add mods.</summary>
-    private ColorButton addModButton;
+    private readonly ColorButton addModButton;
     /// <summary>A <see cref="ColorButton"/> that will open the game files directory for the selected mod.</summary>
-    private ColorButton profileButton;
+    private readonly ColorButton profileButton;
     /// <summary>A <see cref="ColorButton"/> that will open the save directory for the selected mod.</summary>
-    private ColorButton saveButton;
+    private readonly ColorButton saveButton;
     /// <summary>A <see cref="ColorButton"/> that is used to update a mod</summary>
-    private ColorButton updateModButton;
+    private readonly ColorButton updateModButton;
     /// <summary>A <see cref="ColorButton"/> that is used to delete a mod</summary>
-    private ColorButton deleteModButton;
+    private readonly ColorButton deleteModButton;
 
     /// <summary>The <see cref="Label"/> that entitles <see cref="profileDropDown"/>.</summary>
-    private Label profileLabel;
+    private readonly Label profileLabel;
     /// <summary>The <see cref="Label"/> that gives author information for <see cref="profileDropDown"/>.</summary>
-    private Label profileAuthorLabel;
+    private readonly Label profileAuthorLabel;
     /// <summary>The <see cref="Label"/> that gives version information for <see cref="profileDropDown"/>.</summary>
-    private Label profileVersionLabel;
+    private readonly Label profileVersionLabel;
     /// <summary>The <see cref="Label"/> that gives information for <see cref="mirrorDropDown"/>.</summary>
-    private Label mirrorLabel;
+    private readonly Label mirrorLabel;
     /// <summary>The <see cref="Label"/> that gives information for <see cref="modSettingsProfileDropDown"/>.</summary>
-    private Label settingsProfileLabel;
+    private readonly Label settingsProfileLabel;
     /// <summary>The <see cref="Label"/> that compliments <see cref="progressBar"/>.</summary>
-    private Label progressLabel;
+    private readonly Label progressLabel;
     /// <summary>The <see cref="Label"/> that gives a warning if the current selected <see cref="ProfileXML"/> shares the same save location has default AM2R.</summary>
-    private Label saveWarningLabel;
+    private readonly Label saveWarningLabel;
 
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to automatically update AM2R or not.</summary>
-    private CheckBox autoUpdateAM2RCheck;
+    private readonly CheckBox autoUpdateAM2RCheck;
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to automatically update the AM2RLauncher or not.</summary>
-    private CheckBox autoUpdateLauncherCheck;
+    private readonly CheckBox autoUpdateLauncherCheck;
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to use a custom mirror or not.</summary>
-    private CheckBox customMirrorCheck;
+    private readonly CheckBox customMirrorCheck;
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to use HQ Music when patching to PC or not.</summary>
-    private CheckBox hqMusicPCCheck;
+    private readonly CheckBox hqMusicPCCheck;
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to use HQ Music when patching to Android or not.</summary>
-    private CheckBox hqMusicAndroidCheck;
+    private readonly CheckBox hqMusicAndroidCheck;
     /// <summary>A <see cref="CheckBox"/>, that indicates whether to create debug logs for profiles.</summary>
-    private CheckBox profileDebugLogCheck;
+    private readonly CheckBox profileDebugLogCheck;
 
     /// <summary>A <see cref="DropDown"/> where languages can be chosen.</summary>
-    private DropDown languageDropDown;
+    private readonly DropDown languageDropDown;
     /// <summary>A <see cref="DropDown"/> where mirrors can be chosen.</summary>
-    private DropDown mirrorDropDown;
+    private readonly DropDown mirrorDropDown;
     /// <summary>A <see cref="DropDown"/> where profiles can be chosen.</summary>
-    private DropDown profileDropDown;
+    private readonly DropDown profileDropDown;
     /// <summary>A <see cref="DropDown"/> where profiles can be chosen (located in Profile Settings).</summary>
     //TODO: Use MVVM bindings: https://github.com/picoe/Eto/wiki/Data-Binding#mvvm-binding
-    private DropDown modSettingsProfileDropDown;
+    private readonly DropDown modSettingsProfileDropDown;
 
     /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>
-    private TextBox customMirrorTextBox;
+    private readonly TextBox customMirrorTextBox;
     /// <summary>A <see cref="TextBox"/>, where the user can input their custom environment variables.</summary>
-    private TextBox customEnvVarTextBox;
+    private readonly TextBox customEnvVarTextBox;
 
     /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="modSettingsProfileDropDown"/> are displayed.</summary>
-    private TextArea profileNotesTextArea;
+    private readonly TextArea profileNotesTextArea;
 
     /// <summary>A <see cref="ProgressBar"/> that can be used to show progress for a specific task.</summary>
-    private ProgressBar progressBar;
+    private readonly ProgressBar progressBar;
 
     #endregion
 }

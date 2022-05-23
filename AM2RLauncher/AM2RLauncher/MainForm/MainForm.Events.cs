@@ -435,7 +435,14 @@ public partial class MainForm : Form
                 string envVarText = customEnvVarTextBox?.Text;
                 bool createDebugLogs = profileDebugLogCheck.Checked.Value;
 
-                await Task.Run(() => Profile.RunGame(profile, createDebugLogs, envVarText));
+                try
+                {
+                    await Task.Run(() => Profile.RunGame(profile, createDebugLogs, envVarText));
+                }
+                catch
+                {
+                    // ignore any errors that occur.
+                }
 
                 ShowInTaskbar = true;
                 trayIndicator.Visible = false;

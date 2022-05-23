@@ -259,9 +259,10 @@ public static class CrossPlatformOperations
         if (originalFile == outputFile)
             outputFile += "_";
 
-        //TODO: why is currentPath taken out of all the paths? investigate!
+        // The reason why currentPath is taken out of all paths, is because xdelta (windows?) breaks if it has non-ascii characters
+        // So for users who have a russian username for example, this would just throw.
+        // By replacing the currentPath and setting the working directory to where we want it to be, we ensure to only have our ascii characters.
         string arguments = $"-f -d -s \"{originalFile.Replace($"{CurrentPath}/", "")}\" \"{patchFile.Replace($"{CurrentPath}/", "")}\" \"{outputFile.Replace($"{CurrentPath}/", "")}\"";
-
 
         ProcessStartInfo parameters = new ProcessStartInfo
         {
