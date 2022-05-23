@@ -11,6 +11,7 @@ on:
     paths-ignore: 
       - 'README.md'
       - '.github/**'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,12 +22,15 @@ jobs:
         configuration: [Release]
         include:
           - os: ubuntu-latest
+            ATTR: echo Nothing-to-do
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net5.0/ubuntu.18.04-x64/publish/
           - os: macOS-latest
+            ATTR: xattr -rd com.apple.quarantine AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
             COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
           - os: windows-latest
+            ATTR: echo Nothing-to-do
             COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
             ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
     runs-on: ${{ matrix.os }}
@@ -45,10 +49,12 @@ jobs:
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
     # Steps for uploading artifacts. We don't need them currently, so they're commented out.
-    #- name: Zip to Archive
-    #  run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
-    #- name: Upload Artifacts
-    #  uses: actions/upload-artifact@v1.0.0
-    #  with:
-    #    name: ${{ matrix.os }}
-    #    path: ${{ matrix.os }}.zip
+    - name: Set Attributes
+      run: ${{ matrix.ATTR }}
+    - name: Zip to Archive
+      run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: ${{ matrix.os }}
+        path: ${{ matrix.os }}.zip
