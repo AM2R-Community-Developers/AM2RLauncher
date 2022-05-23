@@ -23,6 +23,7 @@ public class LauncherConfigXML
     [XmlAttribute("Language")]
     public string Language
     { get; set; }
+    //TODO: use of "HQ" capitalization should be consistent within project!
     /// <summary>Indicates whether or not to use High-quality music when patching to PC. Used for <see cref="MainForm.hqMusicPCCheck"/></summary>
     [XmlAttribute("MusicHQPC")]
     public bool MusicHQPC
@@ -75,22 +76,22 @@ public class LauncherConfigXML
     // Set is basically the same, but instead of returning it, we set the property value, which would be followed after the `='.
     // So LauncherConfigXML[property] = hellWorld would set the value of `property` to `hellWorld`
     /// <summary>
-    /// An Indexer for <see cref="ProfileXML"/>. Not to be used directly, use <see cref="CrossPlatformOperations.WriteToConfig(string, object)"/>
-    /// or <see cref="CrossPlatformOperations.ReadFromConfig(string)"/> instead!
+    /// An Indexer for <see cref="AM2RLauncherLib.XML.ProfileXML"/>. Not to be used directly, use <see cref="AM2RLauncher.MainForm.WriteToConfig(string, object)"/>
+    /// or <see cref="AM2RLauncher.MainForm.ReadFromConfig(string)"/> instead!
     /// </summary>
     /// <param name="property">The property to get or set.</param>
     /// <returns>The value of <paramref name="property"/> as an <see cref="object"/> if used as a get, <see cref="Void"/> if used as a set.</returns>
     public object this[string property]
     {
-    get
-    {
-        // This is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
-        return typeof(LauncherConfigXML).GetProperties().First(p => p.CanRead && p.Name == property).GetValue(this).ToString();
-    }
-    set
-    {
-        typeof(LauncherConfigXML).GetProperties().First(p => p.CanWrite && p.Name == property).SetValue(this, value);
-    }
+        get
+        {
+            // This is gonna throw an exception, if the property can't be found. because of null.GetValue(this)
+            return typeof(LauncherConfigXML).GetProperties().First(p => p.CanRead && p.Name == property).GetValue(this).ToString();
+        }
+        set
+        {
+            typeof(LauncherConfigXML).GetProperties().First(p => p.CanWrite && p.Name == property).SetValue(this, value);
+        }
     }
 
     /// <summary>
