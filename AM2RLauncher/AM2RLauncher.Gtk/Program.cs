@@ -53,8 +53,8 @@ internal static class MainClass
             string osRelease = File.ReadAllText("/etc/os-release");
             Regex lineRegex = new Regex(".*=.*");
             List<Match> results = lineRegex.Matches(osRelease).ToList();
-            Match version = results.FirstOrDefault(x => x.Value.Contains("VERSION"));
-            string distroName = results.FirstOrDefault(x => x.Value.Contains("NAME"))?.Value[5..].Replace("\"", "");
+            Match version = results.FirstOrDefault(x => x.Value.StartsWith("VERSION"));
+            string distroName = results.FirstOrDefault(x => x.Value.StartsWith("NAME"))?.Value[5..].Replace("\"", "");
             string versionName = version == null ? "" : version.Value[8..].Replace("\"", "");
             log.Info($"Current Distro: {distroName} {versionName}");
         }

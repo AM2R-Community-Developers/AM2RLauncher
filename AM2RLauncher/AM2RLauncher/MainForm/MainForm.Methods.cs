@@ -123,13 +123,14 @@ public partial class MainForm : Form
     /// <returns>The value from <paramref name="property"/> as a string</returns>
     public static string ReadFromConfig(string property)
     {
-        log.Info($"Reading {property} from config.");
         if (OS.IsWindows)
         {
             // We use the configuration manager in order to read `property` from the app.config and then return it
             ConnectionStringSettings appConfig = ConfigurationManager.ConnectionStrings[property];
             if (appConfig == null) throw new ArgumentException("The property " + property + " could not be found.");
-            return appConfig.ConnectionString;
+            string value = appConfig.ConnectionString;
+            log.Info($"Reading {property} from config with value {value}.");
+            return value;
         }
         if (OS.IsUnix)
         {
@@ -148,7 +149,9 @@ public partial class MainForm : Form
             launcherConfig = Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
 
             // This uses the indexer, which means, we can use the variable in order to get the property. Look at LauncherConfigXML for more info
-            return launcherConfig[property]?.ToString();
+            string value = launcherConfig[property]?.ToString();
+            log.Info($"Reading {property} from config with value {value}.");
+            return value;
         }
 
         log.Error(OS.Name + " has no config to read from!");
