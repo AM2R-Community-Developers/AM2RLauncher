@@ -375,7 +375,7 @@ public static class CrossPlatformOperations
         {
 
             // Linux has the Path at XDG_DATA_HOME/AM2RLauncher
-            string linuxPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/AM2RLauncher";
+            string linuxPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.DoNotVerify)}/AM2RLauncher";
 
             try
             {

@@ -136,7 +136,7 @@ public static class LauncherUpdater
             // hardcoded string, since also temporarily until it gets supported one day.
             if (OS.IsMac)
             {
-                MessageBox.Show("Your current version is outdated! The newest version is " + onlineVersion + "." +
+                MessageBox.Show("Your current version is outdated! The newest version is " + onlineVersion + ". " +
                                 "Please recompile AM2RLauncher again or disable auto-updating");
                 return;
             }
