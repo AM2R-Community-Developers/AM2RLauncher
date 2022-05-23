@@ -11,6 +11,30 @@ namespace AM2RLauncher;
 /// </summary>
 public partial class MainForm
 {
+
+    /// <summary>
+    /// An enum, that has possible states for the play button.
+    /// </summary>
+    public enum PlayButtonState
+    {
+        Download,
+        Downloading,
+        Select11,
+        Install,
+        Installing,
+        Play,
+        Playing
+    }
+
+    /// <summary>
+    /// An enum, that has different states for <see cref="apkButton"/>.
+    /// </summary>
+    public enum ApkButtonState
+    {
+        Create,
+        Creating
+    }
+
     /// <summary>
     /// Updates <see cref="updateState"/>, <see cref="playButton"/>, <see cref="apkButtonState"/>, and <see cref="apkButton"/> according to the current conditions.
     /// </summary>
@@ -128,7 +152,7 @@ public partial class MainForm
         }
         if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
 
-        Color col = profileDropDown.Enabled ? colGreen : colInactive;
+        Color col = profileDropDown.Enabled ? colorGreen : colorInactive;
 
         if (OS.IsWindows)
             profileDropDown.TextColor = col;
@@ -162,7 +186,7 @@ public partial class MainForm
 
         string selectedProfileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
 
-        settingsProfileLabel.TextColor = colGreen;
+        settingsProfileLabel.TextColor = colorGreen;
         modSettingsProfileDropDown.Enabled = enabled;
         profileButton.Enabled = enabled;
         profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, selectedProfileName);
@@ -180,7 +204,7 @@ public partial class MainForm
             deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, selectedProfileName);
         }
 
-        Color col = enabled ? colGreen : colInactive;
+        Color col = enabled ? colorGreen : colorInactive;
 
         if (OS.IsWindows)
             modSettingsProfileDropDown.TextColor = col;
@@ -376,7 +400,7 @@ public partial class MainForm
         // Not sure why the dropdown menu needs this hack, but the textBox does not.
         //TODO: eto feature request
         if (OS.IsWindows)
-            mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colGreen : colInactive;
-        mirrorLabel.TextColor = !enabled ? colGreen : colInactive;
+            mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colorGreen : colorInactive;
+        mirrorLabel.TextColor = !enabled ? colorGreen : colorInactive;
     }
 }

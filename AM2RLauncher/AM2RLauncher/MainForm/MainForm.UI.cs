@@ -32,30 +32,6 @@ public partial class MainForm : Form
     /// </summary>
     private const string VERSION = LauncherUpdater.VERSION;
 
-
-    /// <summary>
-    /// An enum, that has possible states for the play button.
-    /// </summary>
-    public enum PlayButtonState
-    {
-        Download,
-        Downloading,
-        Select11,
-        Install,
-        Installing,
-        Play,
-        Playing
-    }
-
-    /// <summary>
-    /// An enum, that has different states for <see cref="apkButton"/>.
-    /// </summary>
-    public enum ApkButtonState
-    {
-        Create,
-        Creating
-    }
-
     /// <summary>
     /// This variable has the current global state of the Launcher.
     /// </summary>
@@ -69,24 +45,31 @@ public partial class MainForm : Form
     /// Stores the index for <see cref="profileDropDown"/>.
     /// </summary>
     private static int? profileIndex = null;
-    /// <summary>
-    /// Stores the index for <see cref="mirrorDropDown"/>.
-    /// </summary>
-    private static int mirrorIndex = 0;
+
     /// <summary>
     /// Stores the current mirror from either <see cref="currentMirror"/> or <see cref="customMirrorTextBox"/>.
     /// </summary>
     private static string currentMirror;
 
+    /// <summary>
+    /// Indicates whether or not we have established an internet connection.
+    /// </summary>
     private static readonly bool isInternetThere = Core.IsInternetThere;
 
+    /// <summary>
+    /// Checks if the Launcher is run via WINE.
+    /// </summary>
     private static readonly bool isThisRunningFromWine = OS.IsThisRunningFromWine;
 
+    /// <summary>
+    /// Used for Mutex, checks if there's only a single instance of the Launcher running.
+    /// </summary>
     private static bool singleInstance;
 
     // This mutex needs to CONTINUE existing for the entire application's lifetime, or else the rest of this won't ever work!
     // We're basically using it to key a thread and scan for other instances of that tag.
-    private Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
+    // ReSharper disable once UnusedMember.Local - needs to exist
+    private readonly Mutex mutex = new Mutex(true, "AM2RLauncher", out singleInstance);
 
     public MainForm()
     {
@@ -147,8 +130,8 @@ public partial class MainForm : Form
         profileList = new List<ProfileXML>();
 
         //TODO: whenever profileDropDown gets rewritten to use a datastore, scrap this
-        profileNames = new List<ListItem>();
-        foreach (var profile in profileList)
+        List<ListItem> profileNames = new List<ListItem>();
+        foreach (ProfileXML profile in profileList)
         {
             profileNames.Add(profile.Name);
         }
@@ -165,9 +148,9 @@ public partial class MainForm : Form
 
         // Create mirror list
         // We do this as a list<listItem> for 1) make this dynamic and 2) make ETO happy
-        mirrorDescriptionList = new List<ListItem>();
+        List<ListItem> mirrorDescriptionList = new List<ListItem>();
         // Add each entry dynamically instead of hard-coding it to two. If we have neither a github or gitlab mirror, we use the mirror itself as text
-        foreach (var mirror in mirrorList)
+        foreach (string mirror in mirrorList)
         {
             string text = mirror;
             if (text.Contains("github.com")) text = Text.MirrorGithubText;
@@ -189,7 +172,7 @@ public partial class MainForm : Form
         log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
         if (Boolean.Parse(ReadFromConfig("IsMaximized"))) Maximize();
 
-        Drawable drawable = new Drawable { BackgroundColor = colBGNoAlpha };
+        Drawable drawable = new Drawable { BackgroundColor = colorBGNoAlpha };
 
         // Drawable paint event
         drawable.Paint += DrawablePaintEvent;
@@ -200,20 +183,20 @@ public partial class MainForm : Form
         #region MAIN WINDOW
 
         // Center buttons/interface panel
-        var centerInterface = new DynamicLayout();
+        DynamicLayout centerInterface = new DynamicLayout();
 
         // PLAY button
         playButton = new ColorButton
         {
             ToolTip = "",
-            BackgroundColorHover = colBGHover,
+            BackgroundColorHover = colorBGHover,
             Height = 40,
             Width = 250,
-            TextColor = colGreen,
-            TextColorDisabled = colInactive,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            FrameColorDisabled = colInactive
+            TextColor = colorGreen,
+            TextColorDisabled = colorInactive,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            FrameColorDisabled = colorInactive
         };
 
         UpdateStateMachine();
@@ -223,7 +206,7 @@ public partial class MainForm : Form
         centerInterface.AddRow(playButton);
 
         // 2px spacer between playButton and apkButton (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 2 });
+        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colorBG, Height = 2 });
 
         // APK button
         apkButton = new ColorButton
@@ -231,10 +214,10 @@ public partial class MainForm : Form
             Text = Text.CreateAPK,
             Height = 40,
             Width = 250,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         centerInterface.AddRow(apkButton);
@@ -246,30 +229,30 @@ public partial class MainForm : Form
         };
 
         // 4px spacer between APK button and progressBar (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 4 });
+        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colorBG, Height = 4 });
 
         centerInterface.AddRow(progressBar);
 
         progressLabel = new Label
         {
-            BackgroundColor = colBG,
+            BackgroundColor = colorBG,
             Height = 15,
             Text = "",
-            TextColor = colGreen,
+            TextColor = colorGreen,
             Visible = false
         };
 
         centerInterface.AddRow(progressLabel);
 
         // 3px spacer between progressBar and profile label (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colBG, Height = 3 });
+        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = colorBG, Height = 3 });
 
         profileLabel = new Label
         {
-            BackgroundColor = colBG,
+            BackgroundColor = colorBG,
             Height = 15,
             Text = Text.CurrentProfile,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         centerInterface.AddRow(profileLabel);
@@ -281,8 +264,8 @@ public partial class MainForm : Form
         // Mac gets a default BackgroundColor because it looks waaaaaaay better.
         profileDropDown = new DropDown
         {
-            TextColor = colGreen,
-            BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
+            TextColor = colorGreen,
+            BackgroundColor = OS.IsWindows ? colorBGNoAlpha : new Color()
         };
         // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
         if (OS.IsLinux)
@@ -295,20 +278,20 @@ public partial class MainForm : Form
         // Profiles label
         profileAuthorLabel = new Label
         {
-            BackgroundColor = colBG,
+            BackgroundColor = colorBG,
             Height = 16,
             Text = Text.Author + " ",
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         centerInterface.AddRow(profileAuthorLabel);
 
         profileVersionLabel = new Label
         {
-            BackgroundColor = colBG,
+            BackgroundColor = colorBG,
             Height = 16,
             Text = Text.VersionLabel + " ",
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         centerInterface.AddRow(profileVersionLabel);
@@ -316,11 +299,11 @@ public partial class MainForm : Form
         saveWarningLabel = new Label
         {
             Visible = false,
-            BackgroundColor = colBG,
+            BackgroundColor = colorBG,
             Width = 20,
             Height = 55,
             Text = Text.SaveLocationWarning,
-            TextColor = colRed
+            TextColor = colorRed
         };
 
         centerInterface.AddRow(saveWarningLabel);
@@ -345,7 +328,7 @@ public partial class MainForm : Form
 
 
         // Social button panel
-        var socialPanel = new DynamicLayout();
+        DynamicLayout socialPanel = new DynamicLayout();
         socialPanel.BeginVertical();
         socialPanel.AddRow(redditButton);
         socialPanel.AddRow(githubButton);
@@ -358,12 +341,12 @@ public partial class MainForm : Form
         Label versionLabel = new Label
         {
             Text = "v" + VERSION + (isThisRunningFromWine ? "-WINE" : ""),
-            Width = 48, TextAlignment = TextAlignment.Right, TextColor = colGreen,
+            Width = 48, TextAlignment = TextAlignment.Right, TextColor = colorGreen,
             Font = new Font(SystemFont.Default, 12)
         };
 
         // Tie everything together
-        var mainLayout = new DynamicLayout();
+        DynamicLayout mainLayout = new DynamicLayout();
 
         mainLayout.BeginHorizontal();
         mainLayout.AddColumn(null, socialPanel);
@@ -373,7 +356,7 @@ public partial class MainForm : Form
         mainLayout.AddSpace();
 
         // Yes, I'm hard-coding this string. Linux users can english.
-        mainLayout.AddColumn(versionLabel, isThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = colRed, TextAlignment = TextAlignment.Right } : null);
+        mainLayout.AddColumn(versionLabel, isThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = colorRed, TextAlignment = TextAlignment.Right } : null);
 
         drawable.Content = mainLayout;
 
@@ -385,7 +368,7 @@ public partial class MainForm : Form
         // [MAIN PAGE]
         TabPage mainPage = new TabPage
         {
-            BackgroundColor = colBGNoAlpha,
+            BackgroundColor = colorBGNoAlpha,
             Text = Text.PlayTab,
             Content = drawable
         };
@@ -402,13 +385,13 @@ public partial class MainForm : Form
         Label changelogNoConnectionLabel = new Label
         {
             Text = Text.NoInternetConnection,
-            TextColor = colGreen,
-            TextAlignment = TextAlignment.Center,
+            TextColor = colorGreen,
+            TextAlignment = TextAlignment.Center
         };
 
         TabPage changelogPage = new TabPage
         {
-            BackgroundColor = colBGNoAlpha,
+            BackgroundColor = colorBGNoAlpha,
             Text = Text.ChangelogTab,
 
             Content = new TableLayout
@@ -435,14 +418,14 @@ public partial class MainForm : Form
         Label newsNoConnectionLabel = new Label
         {
             Text = Text.NoInternetConnection,
-            TextColor = colGreen,
+            TextColor = colorGreen,
             TextAlignment = TextAlignment.Center
         };
 
         TabPage newsPage = new TabPage
         {
             Text = Text.NewsTab,
-            BackgroundColor = colBGNoAlpha,
+            BackgroundColor = colorBGNoAlpha,
 
             Content = new TableLayout
             {
@@ -487,7 +470,7 @@ public partial class MainForm : Form
         Label languageLabel = new Label
         {
             Text = Text.LanguageNotice,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         // Language DropDown menu
@@ -508,16 +491,19 @@ public partial class MainForm : Form
 
         languageDropDown = new DropDown
         {
-            TextColor = colGreen,
-            BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
+            TextColor = colorGreen,
+            BackgroundColor = OS.IsWindows ? colorBGNoAlpha : new Color()
         };
         if (OS.IsLinux)
             languageDropDown = new DropDown();
 
         languageDropDown.Items.AddRange(languageList);
 
-        var tmpLanguage = ReadFromConfig("Language");
-        languageDropDown.SelectedIndex = tmpLanguage == "Default" ? 0 : languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
+        string tmpLanguage = ReadFromConfig("Language");
+        if (tmpLanguage == "Default")
+            languageDropDown.SelectedIndex = 0;
+        else
+            languageDropDown.SelectedIndex = languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
 
         if (languageDropDown.SelectedIndex == -1)
         {
@@ -530,7 +516,7 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("AutoUpdateAM2R")),
             Text = Text.AutoUpdateAM2R,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
 
@@ -539,7 +525,7 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("AutoUpdateLauncher")),
             Text = Text.AutoUpdateLauncher,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         // HQ music, PC
@@ -547,7 +533,7 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("MusicHQPC")),
             Text = Text.HighQualityPC,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         // HQ music, Android
@@ -555,7 +541,7 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("MusicHQAndroid")),
             Text = Text.HighQualityAndroid,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         // Create game debug logs
@@ -563,7 +549,7 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("ProfileDebugLog")),
             Text = Text.ProfileDebugCheckBox,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         // Custom environment variables label
@@ -573,7 +559,7 @@ public partial class MainForm : Form
             customEnvVarLabel = new Label
             {
                 Text = Text.CustomEnvVarLabel,
-                TextColor = colGreen
+                TextColor = colorGreen
             };
         }
 
@@ -584,8 +570,8 @@ public partial class MainForm : Form
             customEnvVarTextBox = new TextBox
             {
                 Text = ReadFromConfig("CustomEnvVar"),
-                BackgroundColor = colBGNoAlpha,
-                TextColor = colGreen
+                BackgroundColor = colorBGNoAlpha,
+                TextColor = colorGreen
             };
         }
 
@@ -593,20 +579,20 @@ public partial class MainForm : Form
         mirrorLabel = new Label
         {
             Text = Text.DownloadSource,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         mirrorDropDown = new DropDown
         {
-            TextColor = colGreen,
-            BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
+            TextColor = colorGreen,
+            BackgroundColor = OS.IsWindows ? colorBGNoAlpha : new Color()
         };
         if (OS.IsLinux)
             mirrorDropDown = new DropDown();
 
         mirrorDropDown.Items.AddRange(mirrorDescriptionList);   // As above, find a way to get this inside the dropDown definition
-        mirrorIndex = (Int32.Parse(ReadFromConfig("MirrorIndex")) < mirrorDropDown.Items.Count) ? Int32.Parse(ReadFromConfig("MirrorIndex"))
-            : 0;
+        int mirrorIndex = Int32.Parse(ReadFromConfig("MirrorIndex"));
+        if (mirrorIndex >= mirrorDropDown.Items.Count) mirrorIndex = 0;
         mirrorDropDown.SelectedIndex = mirrorIndex;
 
         currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
@@ -616,14 +602,14 @@ public partial class MainForm : Form
         {
             Checked = Boolean.Parse(ReadFromConfig("CustomMirrorEnabled")),
             Text = Text.CustomMirrorCheck,
-            TextColor = colGreen
+            TextColor = colorGreen
         };
 
         customMirrorTextBox = new TextBox
         {
             Text = ReadFromConfig("CustomMirrorText"),
-            BackgroundColor = colBGNoAlpha,
-            TextColor = colGreen
+            BackgroundColor = colorBGNoAlpha,
+            TextColor = colorGreen
         };
 
         EnableMirrorControlsAccordingly();
@@ -635,7 +621,7 @@ public partial class MainForm : Form
 
         TabPage settingsPage = new TabPage
         {
-            BackgroundColor = colBGNoAlpha,
+            BackgroundColor = colorBGNoAlpha,
             Content = settingsLayout,
             Text = Text.LauncherSettingsTab
         };
@@ -655,10 +641,10 @@ public partial class MainForm : Form
             Font = smallButtonFont,
             Height = 30,
             Width = 275,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         Label modSpacer = new Label
@@ -669,14 +655,14 @@ public partial class MainForm : Form
         settingsProfileLabel = new Label
         {
             Text = Text.CurrentProfile,
-            TextColor = colGreen,
+            TextColor = colorGreen,
             Width = 275
         };
 
         modSettingsProfileDropDown = new DropDown
         {
-            TextColor = colGreen,
-            BackgroundColor = OS.IsWindows ? colBGNoAlpha : new Color()
+            TextColor = colorGreen,
+            BackgroundColor = OS.IsWindows ? colorBGNoAlpha : new Color()
         };
 
         // In order to not have conflicting theming, we just always respect the users theme for dropdown on GTK.
@@ -692,10 +678,10 @@ public partial class MainForm : Form
             Font = smallButtonFont,
             Height = 30,
             Width = 275,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         saveButton = new ColorButton
@@ -705,10 +691,10 @@ public partial class MainForm : Form
             Font = smallButtonFont,
             Height = 30,
             Width = 275,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         updateModButton = new ColorButton
@@ -718,10 +704,10 @@ public partial class MainForm : Form
             Font = smallButtonFont,
             Height = 30,
             Width = 275,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         deleteModButton = new ColorButton
@@ -731,17 +717,17 @@ public partial class MainForm : Form
             Font = smallButtonFont,
             Height = 30,
             Width = 275,
-            TextColor = colGreen,
-            BackgroundColor = colBG,
-            FrameColor = colGreen,
-            BackgroundColorHover = colBGHover
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
         };
 
         profileNotesTextArea = new TextArea
         {
             ReadOnly = true,
-            BackgroundColor = colBGNoAlpha,
-            TextColor = colInactive,
+            BackgroundColor = colorBGNoAlpha,
+            TextColor = colorInactive,
             SpellCheck = false,
             Width = 275,
             Height = 150,
@@ -755,7 +741,7 @@ public partial class MainForm : Form
 
         TabPage modSettingsPage = new TabPage
         {
-            BackgroundColor = colBGNoAlpha,
+            BackgroundColor = colorBGNoAlpha,
             Content = modSettingsLayout,
             Text = Text.ModSettingsTab
         };
@@ -830,33 +816,29 @@ public partial class MainForm : Form
     /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
     //TODO: this should be moved into AM2RLauncherLib
     private List<ProfileXML> profileList;
-    /// <summary><see cref="List{T}"/> of <see cref="ListItem"/>s so that Eto's annoying <see cref="IListItem"/> interface is appeased. Used for profile name display in DropDowns.</summary>
-    private readonly List<ListItem> profileNames;
 
     /// <summary>The planet Background.</summary>
     private readonly Bitmap formBG = new Bitmap(Resources.bgCentered);
 
     // Colors
     /// <summary>The main green color.</summary>
-    private readonly Color colGreen = Color.FromArgb(142, 188, 35);
+    private readonly Color colorGreen = Color.FromArgb(142, 188, 35);
     /// <summary>The warning red color.</summary>
-    private readonly Color colRed = Color.FromArgb(188, 10, 35);
+    private readonly Color colorRed = Color.FromArgb(188, 10, 35);
     /// <summary>The main inactive color.</summary>
-    private readonly Color colInactive = Color.FromArgb(109, 109, 109);
+    private readonly Color colorInactive = Color.FromArgb(109, 109, 109);
     /// <summary>The black background color without alpha value.</summary>
-    private readonly Color colBGNoAlpha = Color.FromArgb(10, 10, 10);
+    private readonly Color colorBGNoAlpha = Color.FromArgb(10, 10, 10);
     /// <summary>The black background color.</summary>
     // XORG can't display alpha anyway, and Wayland breaks with it.
     // TODO: that sounds like an Eto issue. investigate, try to open eto issue.
-    private readonly Color colBG = OS.IsLinux ? Color.FromArgb(10, 10, 10) : Color.FromArgb(10, 10, 10, 80);
+    private readonly Color colorBG = OS.IsLinux ? Color.FromArgb(10, 10, 10) : Color.FromArgb(10, 10, 10, 80);
     /// <summary>The lighter green color on hover.</summary>
-    private readonly Color colBGHover = Color.FromArgb(17, 28, 13);
+    private readonly Color colorBGHover = Color.FromArgb(17, 28, 13);
 
     // Mirror lists
     /// <summary><see cref="List{String}"/> of mirror <see cref="string"/>s, used for actually working with mirrors.</summary>
     private readonly List<string> mirrorList;
-    /// <summary><see cref="List{ListItem}"/> of <see cref="ListItem"/> so that Eto's annoying IListItem interface is appeased. Used for mirror name display in DropDowns.</summary>
-    private readonly List<ListItem> mirrorDescriptionList;
 
     /// <summary>A <see cref="ColorButton"/> that acts as the main Button</summary>
     private readonly ColorButton playButton;

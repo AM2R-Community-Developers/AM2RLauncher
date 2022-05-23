@@ -39,13 +39,13 @@ public partial class MainForm : Form
         // Safety check
         if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.Items.Count != 0)) return;
         addModButton.Enabled = false;
-        settingsProfileLabel.TextColor = colInactive;
+        settingsProfileLabel.TextColor = colorInactive;
         modSettingsProfileDropDown.Enabled = false;
         profileButton.Enabled = false;
         saveButton.Enabled = false;
         updateModButton.Enabled = false;
         deleteModButton.Enabled = false;
-        profileNotesTextArea.TextColor = colInactive;
+        profileNotesTextArea.TextColor = colorInactive;
     }
 
     /// <summary>
@@ -790,7 +790,7 @@ public partial class MainForm : Form
             deleteModButton.ToolTip = null;
             updateModButton.Enabled = false;
             updateModButton.ToolTip = null;
-            profileNotesTextArea.TextColor = colInactive;
+            profileNotesTextArea.TextColor = colorInactive;
         }
         else
         {
@@ -808,7 +808,7 @@ public partial class MainForm : Form
 
         if (modSettingsProfileDropDown.SelectedIndex < 0 || modSettingsProfileDropDown.Items.Count == 0)
             return;
-        profileNotesTextArea.TextColor = colGreen;
+        profileNotesTextArea.TextColor = colorGreen;
         profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[modSettingsProfileDropDown.SelectedIndex].ProfileNotes;
 
     }
