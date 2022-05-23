@@ -322,7 +322,7 @@ public partial class MainForm
         else
         {
             // We know that profiles exist at this point, so we're going to point it to 0 instead so the following code doesn't fail
-            if (profIndexString == "null")
+            if ((profIndexString == "null") || String.IsNullOrWhiteSpace(profIndexString))
                 profIndexString = "0";
 
             // We parse from the settings, and check if profiles got deleted from the last time the launcher has been selected. if yes, we revert the last selection to 0;

@@ -61,7 +61,6 @@ public static class HelperMethods
 
     }
 
-
     /// <summary>
     /// This is a custom method, that deletes a Directory. The reason this is used, instead of <see cref="Directory.Delete(string)"/>,
     /// is because this one sets the attributes of all files to be deletable, while <see cref="Directory.Delete(string)"/> does not do that on it's own.
@@ -113,6 +112,7 @@ public static class HelperMethods
     /// </summary>
     /// <param name="logFile">The log file to begin the rollover from.</param>
     /// <param name="max">The maximum amount of log files to retain. Default is 9, as that's the highest digit.</param>
+    //TODO: double check this method
     public static void RecursiveRollover(string logFile, int max = 9)
     {
         int index = 1;

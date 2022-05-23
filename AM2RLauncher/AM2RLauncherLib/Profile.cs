@@ -2,10 +2,13 @@
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using AM2RLauncherLib.XML;
 
@@ -148,6 +151,16 @@ public static class Profile
         // If we didn't exit before, everything is fine
         log.Info("AM2R_11 check successful!");
         return IsZipAM2R11ReturnCodes.Successful;
+    }
+
+    /// <summary>
+    /// Checks if the repository has been validly cloned already.
+    /// </summary>
+    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
+    public static bool IsPatchDataCloned()
+    {
+        // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
+        return File.Exists($"{Core.PatchDataPath}/profile.xml") && Repository.IsValid(Core.PatchDataPath);
     }
 
     /// <summary>
@@ -634,21 +647,25 @@ public static class Profile
     }
 
     /// <summary>
-    /// Runs the Game, works cross platform.
+    /// Runs the game from a given profile.
     /// </summary>
+    /// <param name="profile">The <see cref="ProfileXML"/> that should be run.</param>
+    /// <param name="useLogging">Whether game logging should take place.</param>
+    /// <param name="envVars">Environment variables with which the game should be launched. Linux only.</param>
     public static void RunGame(ProfileXML profile, bool useLogging, string envVars = "")
     {
-        //TODO: double check this and clean
-        // These are used on both windows and linux for game logging
-        string savePath = OS.IsWindows ? profile.SaveLocation.Replace("%localappdata%", Environment.GetEnvironmentVariable("LOCALAPPDATA"))
-            : profile.SaveLocation.Replace("~", CrossPlatformOperations.Home);
+        // These are used on all OS for game logging
+        string savePath = OS.IsWindows ? Environment.ExpandEnvironmentVariables(profile.SaveLocation)
+                                        : profile.SaveLocation.Replace("~", CrossPlatformOperations.Home);
         DirectoryInfo logDir = new DirectoryInfo($"{savePath}/logs");
-        string date = String.Join("-", DateTime.Now.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
+        string date = DateTime.Now.ToString("yyyy.MM.dd HH-mm-ss");
+        string logFile = $"{logDir.FullName}/{profile.Name}.txt";
+        string gameDirectory = $"{Core.ProfilesPath}/{profile.Name}";
 
         log.Info($"Launching game profile {profile.Name}.");
         if (OS.IsWindows)
         {
-            // Sets the arguments to empty, or to the profiles save path/logs and create time based logs. Creates the folder if necessary.
+            // Sets the arguments to empty, or to the profiles' logs folder to create time based logs.
             string arguments = "";
 
             // Game logging
@@ -656,143 +673,111 @@ public static class Profile
             {
                 log.Info($"Performing logging setup for profile {profile.Name}.");
 
+                // Check if directory exists, and roll log file over if necessary
                 if (!Directory.Exists(logDir.FullName))
                     Directory.CreateDirectory(logDir.FullName);
 
-                if (File.Exists($"{logDir.FullName}/{profile.Name}.txt"))
-                    HelperMethods.RecursiveRollover($"{logDir.FullName}/{profile.Name}.txt", 5);
+                if (File.Exists(logFile))
+                    HelperMethods.RecursiveRollover(logFile, 5);
 
-                StreamWriter stream = File.AppendText($"{logDir.FullName}/{profile.Name}.txt");
-
-                stream.WriteLine($"AM2RLauncher {Core.Version} log generated at {date}");
-
+                // Write log header to file
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append($"AM2RLauncher {Core.Version} log generated at {date}");
                 if (OS.IsThisRunningFromWine)
-                    stream.WriteLine("Using WINE!");
+                    stringBuilder.Append("Using WINE!");
+                File.WriteAllText(logFile, stringBuilder.ToString());
 
-                stream.Flush();
-
-                stream.Close();
-
-                arguments = $"-debugoutput \"{logDir.FullName}/{profile.Name}.txt\" -output \"{logDir.FullName}/{profile.Name}.txt\"";
+                arguments = $"-debugoutput \"{logFile}\" -output \"{logFile}\"";
             }
 
-            ProcessStartInfo proc = new ProcessStartInfo();
-            proc.WorkingDirectory = $"{Core.ProfilesPath}/{profile.Name}";
-            proc.FileName = $"{proc.WorkingDirectory}/AM2R.exe";
-            proc.Arguments = arguments;
+            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = gameDirectory,
+                FileName = $"{gameDirectory}/AM2R.exe",
+                Arguments = arguments
+            };
 
-            log.Info($"CWD of Profile is {proc.WorkingDirectory}");
+            log.Info($"CWD of Profile is {processStartInfo.WorkingDirectory}");
 
-            using Process p = Process.Start(proc);
-            Core.SetForegroundWindow(p.MainWindowHandle);
-            p.WaitForExit();
+            using Process process = new Process { StartInfo = processStartInfo };
+            process.Start();
+            Core.SetForegroundWindow(process.MainWindowHandle);
+            process.WaitForExit();
         }
         else if (OS.IsLinux)
         {
-
             ProcessStartInfo startInfo = new ProcessStartInfo();
             log.Info($"User does {(String.IsNullOrWhiteSpace(envVars) ? "not" : "")} have custom environment variables set.");
 
-            //TODO: make this more readable at one day
+            // Set environment variables to startInfo
             if (!String.IsNullOrWhiteSpace(envVars))
             {
-                for (int i = 0; i < envVars.Count(f => f == '='); i++)
+                // All env vars are of format "myVar=myValue foo=bar" etc., so split them by space
+                string[] providedVariables = envVars.Split(' ');
+                foreach (string providedVariable in providedVariables)
                 {
-                    // Env var variable
-                    string variable = envVars.Substring(0, envVars.IndexOf('='));
-                    envVars = envVars.Replace($"{variable}=", "");
-
-                    // This thing here is the value parser. Since values are sometimes in quotes, i need to compensate for them.
-                    int valueSubstringLength;
-                    if (envVars[0] != '"') // If value is not embedded in "", check if there are spaces left. If yes, get the index of the space, if not that was the last
-                    {
-                        if (envVars.IndexOf(' ') >= 0)
-                            valueSubstringLength = envVars.IndexOf(' ') + 1;
-                        else
-                            valueSubstringLength = envVars.Length;
-                    }
-                    else // If value is embedded in "", check if there are spaces after the "". if yes, get index of that, if not that was the last
-                    {
-                        int secondQuoteIndex = envVars.IndexOf('"', envVars.IndexOf('"') + 1);
-                        if (envVars.IndexOf(' ', secondQuoteIndex) >= 0)
-                            valueSubstringLength = envVars.IndexOf(' ', secondQuoteIndex) + 1;
-                        else
-                            valueSubstringLength = envVars.Length;
-                    }
-                    // Env var value
-                    string value = envVars.Substring(0, valueSubstringLength);
-                    envVars = envVars.Substring(value.Length);
+                    // After that, we split by '=' where the left is the variable and right is the value
+                    // If there is a malformed env var, this will throw.
+                    string[] variableAsArray = providedVariable.Split('=');
+                    string variable = variableAsArray[0];
+                    string value = variableAsArray[1];
 
                     log.Info($"Adding user variable \"{variable}\" with value \"{value}\"");
                     startInfo.EnvironmentVariables[variable] = value;
                 }
             }
 
-            // If we're supposed to log profiles, add events that track those and append them to this var. otherwise keep it null
-            string terminalOutput = null;
-
             startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = $"{Core.ProfilesPath}/{profile.Name}";
-            startInfo.FileName = $"{startInfo.WorkingDirectory}/AM2R.AppImage";
+            startInfo.WorkingDirectory = gameDirectory;
+            startInfo.FileName = $"{gameDirectory}/AM2R.AppImage";
 
             log.Info($"CWD of Profile is {startInfo.WorkingDirectory}");
 
-            log.Debug("Launching game with following variables: ");
-            foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
+            if (log.IsDebugEnabled)
             {
-                log.Debug($"Key: \"{item.Key}\" Value: \"{item.Value}\"");
+                log.Debug("Launching game with following variables: ");
+                foreach (System.Collections.DictionaryEntry item in startInfo.EnvironmentVariables)
+                    log.Debug($"Key: \"{item.Key}\" Value: \"{item.Value}\"");
             }
 
-            using (Process p = new Process())
+            using Process process = new Process();
+            process.StartInfo = startInfo;
+
+            // Game logging
+            if (useLogging)
             {
-                p.StartInfo = startInfo;
-                if (useLogging)
-                {
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.OutputDataReceived += (_, e) => { terminalOutput += $"{e.Data}\n"; };
+                log.Info($"Performing logging setup for profile {profile.Name}.");
 
-                    p.StartInfo.RedirectStandardError = true;
-                    p.ErrorDataReceived += (_, e) => { terminalOutput += $"{e.Data}\n"; };
-                }
-
-                p.Start();
-
-                if (useLogging)
-                {
-                    p.BeginOutputReadLine();
-                    p.BeginErrorReadLine();
-                }
-
-                p.WaitForExit();
-            }
-
-            if (terminalOutput != null)
-            {
-                log.Info($"Performed logging setup for profile {profile.Name}.");
-
+                // Check if directory exists, and roll log file over if necessary
                 if (!Directory.Exists(logDir.FullName))
                     Directory.CreateDirectory(logDir.FullName);
 
-                if (File.Exists($"{logDir.FullName}/{profile.Name}.txt"))
-                    HelperMethods.RecursiveRollover($"{logDir.FullName}/{profile.Name}.txt", 5);
+                if (File.Exists(logFile))
+                    HelperMethods.RecursiveRollover(logFile, 5);
 
-                StreamWriter stream = File.AppendText($"{logDir.FullName}/{profile.Name}.txt");
+                // Write log header to file
+                File.WriteAllText(logFile, $"AM2RLauncher {Core.Version} log generated at {date}");
 
-                // Write general info
-                stream.WriteLine($"AM2RLauncher {Core.Version} log generated at {date}");
+                // Append STDOUT and STDERR to file if we get anything.
+                // Should this maybe be done synchronously?
+                process.StartInfo.RedirectStandardOutput = true;
+                process.OutputDataReceived += (_, e) => { File.AppendAllText(logFile, $"{e.Data}\n"); };
 
-                // Write what was in the terminal
-                stream.WriteLine(terminalOutput);
-
-                stream.Flush();
-
-                stream.Close();
+                process.StartInfo.RedirectStandardError = true;
+                process.ErrorDataReceived += (_, e) => { File.AppendAllText(logFile, $"{e.Data}\n"); };
             }
 
+            process.Start();
+            if (useLogging)
+            {
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+            }
+            process.WaitForExit();
         }
         else if (OS.IsMac)
         {
-            // Sets the arguments to only open the game, or append the profiles save path/logs and create time based logs. Creates the folder if necessary.
+            // Sets the arguments to only open, or to the profiles' logs folder to create time based logs.
             string arguments = "AM2R.app -W";
 
             // Game logging
@@ -800,47 +785,35 @@ public static class Profile
             {
                 log.Info($"Performing logging setup for profile {profile.Name}.");
 
+                // Check if directory exists, and roll log file over if necessary
                 if (!Directory.Exists(logDir.FullName))
                     Directory.CreateDirectory(logDir.FullName);
 
-                if (File.Exists($"{logDir.FullName}/{profile.Name}.txt"))
-                    HelperMethods.RecursiveRollover($"{logDir.FullName}/{profile.Name}.txt", 5);
+                if (File.Exists(logFile))
+                    HelperMethods.RecursiveRollover(logFile, 5);
 
-                StreamWriter stream = File.AppendText($"{logDir.FullName}/{profile.Name}.txt");
+                // Write log header to file
+                File.WriteAllText(logFile, $"AM2RLauncher {Core.Version} log generated at {date}");
 
-                stream.WriteLine($"AM2RLauncher {Core.Version} log generated at {date}");
-
-                stream.Flush();
-
-                stream.Close();
-
-                arguments += $" --stdout \"{logDir.FullName}/{profile.Name}.txt\" --stderr \"{logDir.FullName}/{profile.Name}.txt\"";
+                arguments += $" --stdout \"{logFile}\" --stderr \"{logFile}\"";
             }
 
-            ProcessStartInfo proc = new ProcessStartInfo();
+            ProcessStartInfo processStartInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = gameDirectory,
+                FileName = "open",
+                Arguments = arguments
+            };
 
-            proc.WorkingDirectory = $"{Core.ProfilesPath}/{profile.Name}";
-            proc.FileName = "open";
-            proc.Arguments = arguments;
+            log.Info($"CWD of Profile is {processStartInfo.WorkingDirectory}");
 
-            log.Info($"CWD of Profile is {proc.WorkingDirectory}");
-
-            using Process p = Process.Start(proc);
-            p?.WaitForExit();
+            using Process process = new Process { StartInfo = processStartInfo };
+            process.Start();
+            process.WaitForExit();
         }
         else
             log.Error($"{OS.Name} cannot run games!");
 
         log.Info($"Profile {profile.Name} process exited.");
-    }
-
-    /// <summary>
-    /// Checks if the repository has been validly cloned already.
-    /// </summary>
-    /// <returns><see langword="true"/> if yes, <see langword="false"/> if not.</returns>
-    public static bool IsPatchDataCloned()
-    {
-        // isValid seems to only check for a .git folder, and there are cases where that exists, but not the profile.xml
-        return File.Exists($"{Core.PatchDataPath}/profile.xml") && Repository.IsValid(Core.PatchDataPath);
     }
 }

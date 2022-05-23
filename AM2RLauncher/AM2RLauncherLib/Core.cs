@@ -43,7 +43,7 @@ public static class Core
     public static readonly string ModsPath = CrossPlatformOperations.CurrentPath + "/Mods";
 
     /// <summary>
-    /// This is used on Windows only. This sets a window to be in foreground, is used i.e. to fix am2r just being hidden.
+    /// This is used on Windows only. This sets a window to be in foreground. It's used i.e. to fix AM2R just being hidden.
     /// </summary>
     /// <param name="hWnd">Pointer to the process you want to have in the foreground.</param>
     /// <returns></returns>
