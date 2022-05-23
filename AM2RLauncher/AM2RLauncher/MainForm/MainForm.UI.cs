@@ -181,9 +181,10 @@ public partial class MainForm : Form
         MinimumSize = new Size(500, 400);
         // TODO: for some reason, this doesn't work on Linux. Was reported at eto, stays here until its fixed
         ClientSize = new Size(Int32.Parse(ReadFromConfig("Width")), Int32.Parse(ReadFromConfig("Height")));
-        if (ClientSize.Width < 500)
+        // Workaround for above problem
+        if (OS.IsWindows && (ClientSize.Width < 500))
             ClientSize = new Size(500, ClientSize.Height);
-        if (ClientSize.Height < 400)
+        if (OS.IsWindows && (ClientSize.Height < 400))
             ClientSize = new Size(ClientSize.Width, 400);
         log.Info("Start the launcher with Size: " + ClientSize.Width + ", " + ClientSize.Height);
         if (Boolean.Parse(ReadFromConfig("IsMaximized"))) Maximize();
@@ -398,7 +399,6 @@ public partial class MainForm : Form
         if (OS.IsUnix && !isInternetThere)
             changelogWebView = new WebView();
 
-        //TODO: these clip on gtk, Eto issue
         Label changelogNoConnectionLabel = new Label
         {
             Text = Text.NoInternetConnection,

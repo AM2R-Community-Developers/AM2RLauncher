@@ -2,9 +2,11 @@
 using Eto.Forms;
 using log4net;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Reflection;
 
 namespace AM2RLauncher;
 
@@ -24,8 +26,20 @@ public static class LauncherUpdater
     private static readonly string oldConfigPath = CrossPlatformOperations.CurrentPath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
 
     /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
-    private static readonly string updatePath = OS.IsWindows ? CrossPlatformOperations.CurrentPath
-        : (OS.IsLinux ? Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) : Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory + "../../../"));
+    private static string updatePath
+    {
+        get
+        {
+            if (OS.IsWindows)
+                return Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            if (OS.IsLinux)
+                return Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+            if (OS.IsMac)
+                // TODO: double check on mac if this is correct
+                return Path.GetDirectoryName($"{AppDomain.CurrentDomain.BaseDirectory}../../../");
+            throw new NotSupportedException($"{OS.Name} does not have an update path!");
+        }
+    }
 
     /// <summary>
     /// Our log object, that handles logging the current execution to a file.
@@ -154,7 +168,7 @@ public static class LauncherUpdater
 
             try
             {
-                using var client = new WebClient();
+                using WebClient client = new WebClient();
                 string platformSuffix = "";
                 if (OS.IsWindows) platformSuffix = "_win";
                 else if (OS.IsLinux) platformSuffix = "_lin";
@@ -179,7 +193,7 @@ public static class LauncherUpdater
             File.Move(updatePath + "/" + CrossPlatformOperations.LauncherName, CrossPlatformOperations.CurrentPath + "/AM2RLauncher.bak");
             if (OS.IsWindows) File.Move(CrossPlatformOperations.LauncherName + ".config", CrossPlatformOperations.LauncherName + ".oldCfg");
 
-            foreach (var file in new DirectoryInfo(tmpUpdatePath).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(tmpUpdatePath).GetFiles())
             {
                 log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CurrentPath + "/" + file.Name);
                 File.Copy(file.FullName, updatePath + "/" + file.Name, true);
@@ -214,9 +228,9 @@ public static class LauncherUpdater
             MainForm.CopyOldConfigToNewConfig();
 
             log.Info("Files extracted. Preparing to restart executable...");
-            if (OS.IsLinux) System.Diagnostics.Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");
+            if (OS.IsLinux) Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");
 
-            System.Diagnostics.Process.Start(updatePath + "/" + CrossPlatformOperations.LauncherName);
+            Process.Start(updatePath + "/" + CrossPlatformOperations.LauncherName);
             Environment.Exit(0);
         }
         else
