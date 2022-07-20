@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
 namespace AM2RLauncherLib;
@@ -141,18 +142,14 @@ public static class HelperMethods
     }
 
     /// <summary>
-    /// Checks if we currently have an internet connection, by pinging github.
+    /// Checks if we currently have an internet connection, by pinging GitHub.
     /// </summary>
     /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
     public static bool IsConnectedToInternet()
     {
         log.Info("Checking internet connection...");
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
-        try
-        {
-            request.GetResponse();
-        }
-        catch (WebException)
+        PingReply pingReply = new Ping().Send("https://github.com");
+        if (pingReply?.Status != IPStatus.Success)
         {
             log.Info("Internet connection failed.");
             return false;
