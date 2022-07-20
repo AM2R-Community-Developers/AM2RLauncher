@@ -19,6 +19,7 @@ Linux needs the following dependencies installed:
 As well as these dependencies to run AM2R:
 - 32-bit version of `libpulse`
 - 32-bit version of `openal`
+- 32-bit version of your graphics drivers
 
 Optionally, for APK creation any Java runtime is needed.
 
@@ -35,7 +36,7 @@ sudo apt update && sudo apt install libc6:i386 libncurses5:i386 libstdc++6:i386
 ### Arch Linux
 On Arch Linux you can install them by running this:  
 (Multilib repositories are required, instructions on how to enable them can be found [here](https://wiki.archlinux.org/title/Official_repositories#Enabling_multilib))  
-`sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-openal lib32-libpulse jre-openjdk`
+`sudo pacman -S --needed dotnet-runtime fuse2 gtk3 libappindicator-gtk3 openssl webkit2gtk xdelta3 lib32-mesa lib32-openal lib32-libpulse jre-openjdk`
 
 ### Fedora
 On Fedora you can install them by running this command:  
