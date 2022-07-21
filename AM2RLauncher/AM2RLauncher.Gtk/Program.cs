@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AM2RLauncherLib;
-using log4net.Repository.Hierarchy;
 using Application = Eto.Forms.Application;
 using FileInfo = System.IO.FileInfo;
 // ReSharper disable LocalizableElement - we want hardcoded strings for console writes.

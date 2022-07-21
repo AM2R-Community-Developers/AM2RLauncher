@@ -4,7 +4,6 @@ using log4net.Config;
 using System;
 using System.IO;
 using AM2RLauncherLib;
-using log4net.Repository.Hierarchy;
 // ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
 namespace AM2RLauncher.Mac;

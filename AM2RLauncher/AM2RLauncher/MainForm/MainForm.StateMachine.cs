@@ -180,7 +180,6 @@ public partial class MainForm
 
             case PlayButtonState.Install:
             case PlayButtonState.Play: enabled = true; break;
-
         }
         if (apkButtonState == ApkButtonState.Creating) enabled = false;
 

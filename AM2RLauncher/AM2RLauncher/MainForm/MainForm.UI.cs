@@ -731,7 +731,7 @@ public partial class MainForm : Form
             TextColor = colorInactive,
             SpellCheck = false,
             Width = 275,
-            Height = 150,
+            Height = 150
         };
 
         modSettingsLayout.BeginHorizontal();
