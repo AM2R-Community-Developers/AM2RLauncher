@@ -110,12 +110,8 @@ public partial class MainForm : Form
             }
         }
 
-        // This needs to be made invisible, otherwise a tray indicator will be visible (on linux?) that clicking crashes the application
-        //TODO: this sounds like an eto issue. check if this can get reproduced.
-        trayIndicator.Visible = false;
-
         if (e.Cancel)
-            log.Info("Cancelled MainForm closing event during UpdateState." + updateState + ".");
+            log.Info($"Cancelled MainForm closing event during UpdateState.{updateState}.");
         else
             log.Info("Successfully closed MainForm. Exiting main thread.");
     }
@@ -172,12 +168,12 @@ public partial class MainForm : Form
                 MessageBox.Show(this, Text.InternetConnectionDrop, Text.WarningWindowTitle, MessageBoxType.Warning);
             }
             // Error message on protected folders. See this for more info: https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/controlled-folders
-            else if (errMessage.Contains("access is denied"))
+            /*else if (errMessage.Contains("access is denied")) TODO: implement this
             {
                 // Needs localizable text, logging and message box
                 // Also, check if this is the right place for it.
                 throw new NotImplementedException();
-            }
+            }*/
             else
             {
                 log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);

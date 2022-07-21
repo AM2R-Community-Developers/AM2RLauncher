@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using AM2RLauncherLib;
 using Application = Eto.Forms.Application;
 using FileInfo = System.IO.FileInfo;
+using log4net.Repository.Hierarchy;
+
 // ReSharper disable LocalizableElement - we want hardcoded strings for console writes.
 
 namespace AM2RLauncher.Gtk;
