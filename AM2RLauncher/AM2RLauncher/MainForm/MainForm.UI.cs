@@ -504,7 +504,7 @@ public partial class MainForm : Form
             Text = Text.AutoUpdateAM2R,
             TextColor = colorGreen
         };
-
+        
         // autoUpdateLauncher checkbox
         autoUpdateLauncherCheck = new CheckBox
         {
@@ -602,7 +602,28 @@ public partial class MainForm : Form
 
         settingsLayout.BeginHorizontal();
         settingsLayout.AddSpace();
-        settingsLayout.AddColumn(null, languageLabel, languageDropDown, autoUpdateAM2RCheck, autoUpdateLauncherCheck, hqMusicPCCheck, hqMusicAndroidCheck, profileDebugLogCheck, customEnvVarLabel, (Control)customEnvVarTextBox ?? new Label(), mirrorLabel, mirrorDropDown, customMirrorCheck, customMirrorTextBox, null);
+        List<Control> settingsElements = new List<Control>
+        {
+            null, 
+            languageLabel, 
+            languageDropDown, 
+            autoUpdateAM2RCheck, 
+            autoUpdateLauncherCheck, 
+            hqMusicPCCheck, 
+            hqMusicAndroidCheck, 
+            profileDebugLogCheck, 
+            customEnvVarLabel, 
+            (Control)customEnvVarTextBox ?? new Label(),
+            mirrorLabel, 
+            mirrorDropDown, 
+            customMirrorCheck, 
+            customMirrorTextBox, 
+            null
+        };
+        #if NOAUTOUPDATE
+        settingsElements.Remove(autoUpdateLauncherCheck);
+        #endif
+        settingsLayout.AddColumn(settingsElements.ToArray());
         settingsLayout.AddSpace();
 
         TabPage settingsPage = new TabPage

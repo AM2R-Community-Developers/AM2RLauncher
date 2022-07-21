@@ -51,6 +51,11 @@ public static class LauncherUpdater
     /// </summary>
     public static void Main()
     {
+        #if NOAUTOUPDATE
+        log.Info("On \"No auto update\" configuration, skipping auto update.");
+        return;
+        #endif
+        
         log.Info("Running update check...");
 
         // Update section

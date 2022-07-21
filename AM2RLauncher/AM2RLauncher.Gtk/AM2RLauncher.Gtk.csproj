@@ -6,6 +6,12 @@
     <ApplicationIcon>icon64.ico</ApplicationIcon>
     <RollForward>LatestMajor</RollForward>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;NoAutoUpdate</Configurations>
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+	
+  <PropertyGroup Condition=" '$(Configuration)' == 'NoAutoUpdate' ">
+    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

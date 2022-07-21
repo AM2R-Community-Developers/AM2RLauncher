@@ -1,7 +1,6 @@
 ﻿using log4net;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
@@ -148,7 +147,7 @@ public static class HelperMethods
     public static bool IsConnectedToInternet()
     {
         log.Info("Checking internet connection...");
-        PingReply pingReply = new Ping().Send("https://github.com");
+        PingReply pingReply = new Ping().Send("github.com");
         if (pingReply?.Status != IPStatus.Success)
         {
             log.Info("Internet connection failed.");
