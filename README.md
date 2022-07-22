@@ -38,6 +38,8 @@ The AM2RLauncher stores its files in the following places:
 The AM2RLauncher data can get quite big, so if you wish to change where it stores it, you can do so with the `AM2RLAUNCHERDATA` environment variable (i.e `$env:AM2RLAUNCHERDATA="D:\MyLauncherData"` or `AM2RLAUNCHERDATA="/mnt/bigDrive/launcherData"`). 
 **Data files are different for each OS, you cannot mix and match them!**
 
+If you wish to redistribute the AM2RLauncher to some Linux distro, you can use the `NoAutoUpdate` configuration, in order to build the AM2RLauncher with the auto-updating features disabled. Further assets (.desktop file, icon, appdata) can also be found in this directory: `./AM2RLauncher/distribution/linux`.
+
 # Compiling Instructions:
 ## Dependencies
 For compiling for Windows .Net Framework 4.8 SDK is needed. For Linux and Mac .Net Core 5.0 SDK or later is needed.
