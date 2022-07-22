@@ -274,7 +274,7 @@
     <value>Am downloaden . . .</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">
-    <value>Benötigte Patchdaten downloaden.</value>
+    <value>Benötigte Patchdaten herunterladen.</value>
   </data>
   <data name="PlayButtonInstallingToolTip" xml:space="preserve">
     <value>Am installieren . . .</value>
