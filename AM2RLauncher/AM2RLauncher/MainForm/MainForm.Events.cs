@@ -390,8 +390,8 @@ public partial class MainForm : Form
                         return;
                     }
                     Progress<int> progressIndicator = new Progress<int>(UpdateProgressBar);
-                    bool useHqMusic = hqMusicPCCheck.Checked.Value;
-                    await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHqMusic, progressIndicator));
+                    bool useHQMusic = hqMusicPCCheck.Checked.Value;
+                    await Task.Run(() => Profile.InstallProfile(profileList[profileIndex.Value], useHQMusic, progressIndicator));
                     // This is just for visuals because the average windows end user will ask why it doesn't go to the end otherwise.
                     if (OS.IsWindows)
                         Thread.Sleep(500);
@@ -493,10 +493,10 @@ public partial class MainForm : Form
         UpdateStateMachine();
 
         EnableProgressBar();
-        bool useHqMusic = hqMusicAndroidCheck.Checked.Value;
+        bool useHQMusic = hqMusicAndroidCheck.Checked.Value;
 
         Progress<int> progressIndicator = new Progress<int>(UpdateProgressBar);
-        await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHqMusic, progressIndicator));
+        await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHQMusic, progressIndicator));
 
         SetApkButtonState(ApkButtonState.Create);
         DisableProgressBar();
@@ -570,14 +570,14 @@ public partial class MainForm : Form
     }
 
     /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>
-    private void HqMusicPCCheckChanged(object sender, EventArgs e)
+    private void HQMusicPCCheckChanged(object sender, EventArgs e)
     {
         log.Info("PC HQ Music option has been changed to " + hqMusicPCCheck.Checked);
         WriteToConfig("MusicHQPC", hqMusicPCCheck.Checked);
     }
 
     /// <summary>Gets called when <see cref="hqMusicAndroidCheck"/> gets clicked and writes its new value to the config.</summary>
-    private void HqMusicAndroidCheckChanged(object sender, EventArgs e)
+    private void HQMusicAndroidCheckChanged(object sender, EventArgs e)
     {
         log.Info("Android HQ Music option has been changed to " + hqMusicAndroidCheck.Checked);
         WriteToConfig("MusicHQAndroid", hqMusicAndroidCheck.Checked);

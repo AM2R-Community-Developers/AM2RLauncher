@@ -314,7 +314,7 @@ public partial class MainForm : Form
         
         //TODO: this needs a new tooltip
         Bitmap matrixIcon = new Bitmap(Resources.matrixIcon48);
-        var matrixButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = matrixIcon };
+        var matrixButton = new ImageButton { ToolTip = Text.MatrixToolTip, Image = matrixIcon };
         matrixButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://matrix.to/#/#am2r-space:matrix.org");
 
 
@@ -782,8 +782,8 @@ public partial class MainForm : Form
         languageDropDown.SelectedIndexChanged += LanguageDropDownSelectedIndexChanged;
         autoUpdateAM2RCheck.CheckedChanged += AutoUpdateAM2RCheckChanged;
         autoUpdateLauncherCheck.CheckedChanged += AutoUpdateLauncherCheckChanged;
-        hqMusicAndroidCheck.CheckedChanged += HqMusicAndroidCheckChanged;
-        hqMusicPCCheck.CheckedChanged += HqMusicPCCheckChanged;
+        hqMusicAndroidCheck.CheckedChanged += HQMusicAndroidCheckChanged;
+        hqMusicPCCheck.CheckedChanged += HQMusicPCCheckChanged;
         customMirrorCheck.CheckedChanged += CustomMirrorCheckChanged;
         apkButton.Click += ApkButtonClickEvent;
         apkButton.LoadComplete += (_, _) => UpdateApkState();

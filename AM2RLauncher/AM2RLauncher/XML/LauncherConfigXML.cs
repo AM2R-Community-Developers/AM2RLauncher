@@ -23,7 +23,6 @@ public class LauncherConfigXML
     [XmlAttribute("Language")]
     public string Language
     { get; set; }
-    //TODO: use of "HQ" capitalization should be consistent within project!
     /// <summary>Indicates whether or not to use High-quality music when patching to PC. Used for <see cref="MainForm.hqMusicPCCheck"/></summary>
     [XmlAttribute("MusicHQPC")]
     public bool MusicHQPC
