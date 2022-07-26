@@ -136,4 +136,7 @@
   <data name="youtubeIcon48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\youtube_social_circle_red 48.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="matrixIcon48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\matrix.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

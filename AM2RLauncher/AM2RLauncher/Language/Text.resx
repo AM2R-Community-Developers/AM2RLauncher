@@ -202,7 +202,7 @@
     <value>Error</value>
   </data>
   <data name="GithubToolTip" xml:space="preserve">
-    <value>The Community-Developers Github Page</value>
+    <value>The Community-Developers GitHub Page</value>
   </data>
   <data name="HighQualityAndroid" xml:space="preserve">
     <value>Use high quality music when patching to Android</value>
@@ -387,5 +387,8 @@ Proceed with caution.</value>
   </data>
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>This is an archive of a previously installed Mod. It cannot be re-installed and will remove itself if its game files are deleted.</value>
+  </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>The Official AM2R Matrix Space</value>
   </data>
 </root>

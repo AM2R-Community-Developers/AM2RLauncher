@@ -202,7 +202,7 @@
     <value>Ошибка</value>
   </data>
   <data name="GithubToolTip" xml:space="preserve">
-    <value>Страница разработчиков сообщества на Github</value>
+    <value>Страница разработчиков сообщества на GitHub</value>
   </data>
   <data name="HighQualityAndroid" xml:space="preserve">
     <value>Использовать музыку высокого качества при создании патча на Android</value>

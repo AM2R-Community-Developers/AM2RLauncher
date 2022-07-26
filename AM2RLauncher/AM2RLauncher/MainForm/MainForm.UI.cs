@@ -311,6 +311,11 @@ public partial class MainForm : Form
         Bitmap discordIcon = new Bitmap(Resources.discordIcon48);
         var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
         discordButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
+        
+        //TODO: this needs a new tooltip
+        Bitmap matrixIcon = new Bitmap(Resources.matrixIcon48);
+        var matrixButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = matrixIcon };
+        matrixButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://matrix.to/#/#am2r-space:matrix.org");
 
 
         // Social button panel
@@ -320,6 +325,7 @@ public partial class MainForm : Form
         socialPanel.AddRow(githubButton);
         socialPanel.AddRow(youtubeButton);
         socialPanel.AddRow(discordButton);
+        socialPanel.AddRow(matrixButton);
         socialPanel.EndVertical();
 
 

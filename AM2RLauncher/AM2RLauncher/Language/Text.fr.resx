@@ -204,7 +204,7 @@ ce profil !</value>
     <value>Erreur</value>
   </data>
   <data name="GithubToolTip" xml:space="preserve">
-    <value>La page Github des développeurs de la communauté</value>
+    <value>La page GitHub des développeurs de la communauté</value>
   </data>
   <data name="HighQualityAndroid" xml:space="preserve">
     <value>Utilisez de la musique de haute qualité lors du patchage vers Android</value>
