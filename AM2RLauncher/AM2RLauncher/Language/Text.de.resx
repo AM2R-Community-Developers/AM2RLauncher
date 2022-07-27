@@ -154,7 +154,7 @@
     <value>Launcher kann während der Installation nicht geschlossen werden! Bitte warten bis der Prozess beendet ist.</value>
   </data>
   <data name="CorruptPatchData" xml:space="preserve">
-    <value>Es gab ein Problem mit dem PatchData Ordner. Er wurde gelöscht, bitte erneut downloaden.</value>
+    <value>Es gab ein Problem mit dem PatchData Ordner. Er wurde gelöscht, bitte erneut herunterladen.</value>
   </data>
   <data name="CreateAPK" xml:space="preserve">
     <value>APK ERSTELLEN</value>
@@ -268,7 +268,7 @@
     <value>SPIELEN</value>
   </data>
   <data name="PlayButtonDownloadingToolTip" xml:space="preserve">
-    <value>Am downloaden . . .</value>
+    <value>Am herunterladen . . .</value>
   </data>
   <data name="PlayButtonDownloadToolTip" xml:space="preserve">
     <value>Benötigte Patchdaten herunterladen.</value>
