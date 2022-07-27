@@ -141,12 +141,6 @@ namespace AM2RLauncher.Language {
             }
         }
         
-        public static string CustomEnvVarLabel {
-            get {
-                return ResourceManager.GetString("CustomEnvVarLabel", resourceCulture);
-            }
-        }
-        
         public static string CustomMirrorCheck {
             get {
                 return ResourceManager.GetString("CustomMirrorCheck", resourceCulture);

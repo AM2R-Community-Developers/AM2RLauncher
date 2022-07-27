@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>現在のプロファイル：</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>ゲームのカスタム環境変数の入力：</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>ダウンロードするサイトを指定</value>
   </data>

@@ -167,9 +167,6 @@ ce profil !</value>
   <data name="CurrentProfile" xml:space="preserve">
     <value>Profil actuel :</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Entrez des variables d'environnement de jeu personnalisées :</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Utiliser un mirroir personnalisé</value>
   </data>
@@ -387,5 +384,8 @@ Soyez prudent.</value>
   </data>
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>Il s'agit d'une archive d'un mod précédemment installé. Il ne peut pas être réinstallé et se supprimera de lui-même si ses fichiers de jeu sont supprimés.</value>
+  </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>Le Matrix Space AM2R officiel</value>
   </data>
 </root>

@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>Текущий профиль:</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Введите пользовательские переменные игры:</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Использовать пользовательское зеркало для загрузки</value>
   </data>

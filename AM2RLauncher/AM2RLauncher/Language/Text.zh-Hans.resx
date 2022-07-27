@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>当前游戏实例：</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>输入自定义的游戏环境变量：</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>使用自定义的下载镜像</value>
   </data>
@@ -387,5 +384,8 @@
   </data>
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>此为以前安装过的 Mod 的归档，无法重新安装，若对应的游戏文件被删除，该归档也会自行删除。</value>
+  </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>AM2R 官方 Matrix 空间</value>
   </data>
 </root>

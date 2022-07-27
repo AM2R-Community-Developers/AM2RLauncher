@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>Aktuelles Profil:</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Benutzerdefinierte Spielumgebungsvariablen eingeben:</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Nutze benutzerdefinierten Spiegelserver</value>
   </data>

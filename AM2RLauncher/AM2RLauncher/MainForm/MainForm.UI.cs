@@ -542,31 +542,7 @@ public partial class MainForm : Form
             Text = Text.ProfileDebugCheckBox,
             TextColor = colorGreen
         };
-
-        //TODO: potentially make this on all platforms?
-        // Custom environment variables label
-        Label customEnvVarLabel = new Label();
-        if (OS.IsLinux)
-        {
-            customEnvVarLabel = new Label
-            {
-                Text = Text.CustomEnvVarLabel,
-                TextColor = colorGreen
-            };
-        }
-
-        // Custom environment variables textbox
-        customEnvVarTextBox = null;
-        if (OS.IsLinux)
-        {
-            customEnvVarTextBox = new TextBox
-            {
-                Text = ReadFromConfig("CustomEnvVar"),
-                BackgroundColor = colorBGNoAlpha,
-                TextColor = colorGreen
-            };
-        }
-
+        
         // Mirror list
         mirrorLabel = new Label
         {
@@ -617,9 +593,7 @@ public partial class MainForm : Form
             autoUpdateLauncherCheck, 
             hqMusicPCCheck, 
             hqMusicAndroidCheck, 
-            profileDebugLogCheck, 
-            customEnvVarLabel, 
-            (Control)customEnvVarTextBox ?? new Label(),
+            profileDebugLogCheck,
             mirrorLabel, 
             mirrorDropDown, 
             customMirrorCheck, 
@@ -800,8 +774,6 @@ public partial class MainForm : Form
         deleteModButton.Click += DeleteModButtonClicked;
         updateModButton.Click += UpdateModButtonClicked;
         profileDebugLogCheck.CheckedChanged += ProfileDebugLogCheckedChanged;
-        if (OS.IsLinux)
-            customEnvVarTextBox.LostFocus += CustomEnvVarTextBoxLostFocus;
 
         //TODO: Retest if these now work on mac
         newsWebView.DocumentLoaded += (_, _) => ChangeToEmptyPageOnNoInternet(newsPage, newsNoConnectionLabel);
@@ -901,8 +873,6 @@ public partial class MainForm : Form
 
     /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>
     private readonly TextBox customMirrorTextBox;
-    /// <summary>A <see cref="TextBox"/>, where the user can input their custom environment variables.</summary>
-    private readonly TextBox customEnvVarTextBox;
 
     /// <summary>A <see cref="TextArea"/>, where the notes from the current selected profile in <see cref="modSettingsProfileDropDown"/> are displayed.</summary>
     private readonly TextArea profileNotesTextArea;

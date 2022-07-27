@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>Profilo corrente:</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Inserisci variabili personalizzate dell'ambiente di gioco:</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Usa un mirror di download personalizzato.</value>
   </data>
@@ -385,5 +382,8 @@ Procedi con cautela.</value>
   </data>
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>Questo è un archivio di una Mod precedentemente installata. Non può essere re-installata e si rimuoverà da sola se i suoi file di gioco vengono rimossi.</value>
+  </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>La Matrix Space ufficiale di AM2R</value>
   </data>
 </root>

@@ -651,8 +651,7 @@ public static class Profile
     /// </summary>
     /// <param name="profile">The <see cref="ProfileXML"/> that should be run.</param>
     /// <param name="useLogging">Whether game logging should take place.</param>
-    /// <param name="envVars">Environment variables with which the game should be launched. Linux only.</param>
-    public static void RunGame(ProfileXML profile, bool useLogging, string envVars = "")
+    public static void RunGame(ProfileXML profile, bool useLogging)
     {
         // These are used on all OS for game logging
         string savePath = OS.IsWindows ? Environment.ExpandEnvironmentVariables(profile.SaveLocation)
@@ -707,25 +706,6 @@ public static class Profile
         else if (OS.IsLinux)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            log.Info($"User does {(String.IsNullOrWhiteSpace(envVars) ? "not" : "")} have custom environment variables set.");
-
-            // Set environment variables to startInfo
-            if (!String.IsNullOrWhiteSpace(envVars))
-            {
-                // All env vars are of format "myVar=myValue foo=bar" etc., so split them by space
-                string[] providedVariables = envVars.Split(' ');
-                foreach (string providedVariable in providedVariables)
-                {
-                    // After that, we split by '=' where the left is the variable and right is the value
-                    // If there is a malformed env var, this will throw.
-                    string[] variableAsArray = providedVariable.Split('=');
-                    string variable = variableAsArray[0];
-                    string value = variableAsArray[1];
-
-                    log.Info($"Adding user variable \"{variable}\" with value \"{value}\"");
-                    startInfo.EnvironmentVariables[variable] = value;
-                }
-            }
 
             startInfo.UseShellExecute = false;
             startInfo.WorkingDirectory = gameDirectory;

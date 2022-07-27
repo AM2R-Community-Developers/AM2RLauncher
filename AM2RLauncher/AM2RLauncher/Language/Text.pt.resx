@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>Perfil atual:</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Insira variáveis de ambiente customizadas para o jogo:</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Usar link de download customizado</value>
   </data>

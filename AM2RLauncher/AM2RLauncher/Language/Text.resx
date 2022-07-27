@@ -165,9 +165,6 @@
   <data name="CurrentProfile" xml:space="preserve">
     <value>Current profile:</value>
   </data>
-  <data name="CustomEnvVarLabel" xml:space="preserve">
-    <value>Enter custom game environment variables:</value>
-  </data>
   <data name="CustomMirrorCheck" xml:space="preserve">
     <value>Use custom download mirror</value>
   </data>

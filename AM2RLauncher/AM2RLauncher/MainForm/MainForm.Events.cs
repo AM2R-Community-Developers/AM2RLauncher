@@ -136,7 +136,7 @@ public partial class MainForm : Form
     {
         //Only pull if Patchdata is cloned and user wants it updated
         LoadProfilesAndAdjustLists();
-        if (!Profile.IsPatchDataCloned() || !(bool)autoUpdateAM2RCheck.Checked)
+        if (!Profile.IsPatchDataCloned() || !autoUpdateAM2RCheck.Checked.Value)
             return;
 
         SetPlayButtonState(PlayButtonState.Downloading);
@@ -427,13 +427,12 @@ public partial class MainForm : Form
                 trayIndicator.Visible = true;
                 WindowState windowStateBeforeLaunching = WindowState;
                 Minimize();
-
-                string envVarText = customEnvVarTextBox?.Text;
+                
                 bool createDebugLogs = profileDebugLogCheck.Checked.Value;
 
                 try
                 {
-                    await Task.Run(() => Profile.RunGame(profile, createDebugLogs, envVarText));
+                    await Task.Run(() => Profile.RunGame(profile, createDebugLogs));
                 }
                 catch
                 {
@@ -559,14 +558,14 @@ public partial class MainForm : Form
     private void AutoUpdateAM2RCheckChanged(object sender, EventArgs e)
     {
         log.Info("Auto Update AM2R has been set to " + autoUpdateAM2RCheck.Checked + ".");
-        WriteToConfig("AutoUpdateAM2R", (bool)autoUpdateAM2RCheck.Checked);
+        WriteToConfig("AutoUpdateAM2R", autoUpdateAM2RCheck.Checked.Value);
     }
 
     /// <summary>Gets called when <see cref="autoUpdateLauncherCheck"/> gets clicked and writes its new value to the config.</summary>
     private void AutoUpdateLauncherCheckChanged(object sender, EventArgs e)
     {
         log.Info("Auto Update Launcher has been set to " + autoUpdateAM2RCheck.Checked + ".");
-        WriteToConfig("AutoUpdateLauncher", (bool)autoUpdateAM2RCheck.Checked);
+        WriteToConfig("AutoUpdateLauncher", autoUpdateAM2RCheck.Checked.Value);
     }
 
     /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>
@@ -624,12 +623,12 @@ public partial class MainForm : Form
     private void CustomMirrorCheckChanged(object sender, EventArgs e)
     {
         log.Info("Use Custom Mirror option has been set to " + customMirrorCheck.Checked + ".");
-        WriteToConfig("CustomMirrorEnabled", (bool)customMirrorCheck.Checked);
+        WriteToConfig("CustomMirrorEnabled", customMirrorCheck.Checked.Value);
 
         EnableMirrorControlsAccordingly();
 
         // Create warning dialog when enabling
-        if ((bool)customMirrorCheck.Checked)
+        if (customMirrorCheck.Checked.Value)
         {
             MessageBox.Show(this, Text.WarningWindowText, Text.WarningWindowTitle, MessageBoxType.Warning);
             currentMirror = customMirrorTextBox.Text;
@@ -671,16 +670,7 @@ public partial class MainForm : Form
 
         log.Info("Custom Mirror has been set to " + currentMirror + ".");
     }
-
-    /// <summary>
-    /// If <see cref="customEnvVarTextBox"/> has lost focus, we write its text to the config.
-    /// </summary>
-    private void CustomEnvVarTextBoxLostFocus(object sender, EventArgs e)
-    {
-        log.Info("Custom Environment variables have been set to \"" + customEnvVarTextBox.Text + "\".");
-        WriteToConfig("CustomEnvVar", customEnvVarTextBox.Text);
-    }
-
+    
     #endregion
 
     #region MOD SETTINGS

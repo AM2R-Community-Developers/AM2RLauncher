@@ -51,10 +51,6 @@ public class LauncherConfigXML
     [XmlAttribute("ProfileDebugLog")]
     public bool ProfileDebugLog
     { get; set; }
-    /// <summary>Indicates the custom environment variable(s) as text. Used for <see cref="MainForm.customEnvVarTextBox"/></summary>
-    [XmlAttribute("CustomEnvVar")]
-    public string CustomEnvVar
-    { get; set; }
     /// <summary>Indicates the Width of the Launcher.</summary>
     [XmlAttribute("Width")]
     public int Width
@@ -108,7 +104,6 @@ public class LauncherConfigXML
         CustomMirrorEnabled = false;
         CustomMirrorText = "";
         ProfileDebugLog = true;
-        CustomEnvVar = "";
         Width = 600;
         Height = 600;
         IsMaximized = false;
@@ -124,7 +119,6 @@ public class LauncherConfigXML
     /// <param name="musicHQAndroid">Parameter that indicates if <see cref="MainForm.hqMusicAndroidCheck"/> is enabled or not.</param>
     /// <param name="profileIndex">Parameter that saves the index of the selected profile of <see cref="MainForm.profileDropDown"/>.</param>
     /// <param name="mirrorIndex">Parameter that saves the index of the selected mirror in <see cref="MainForm.mirrorDropDown"/>.</param>
-    /// <param name="customEnvVar">Parameter that saves custom Environment variables that will be used on Linux for launching a game.</param>
     /// <param name="customMirrorEnabled">Parameter that indicates if <see cref="MainForm.customMirrorCheck"/> is enabled or not.</param>
     /// <param name="profileDebugLog">Parameter that indicates if <see cref="MainForm.profileDebugLogCheck"/> is enabled or not.</param>
     /// <param name="customMirrorText">Parameter that's used for <see cref="MainForm.customMirrorTextBox"/>.</param>
@@ -132,7 +126,7 @@ public class LauncherConfigXML
     /// <param name="height">Parameter that indicates the height of <see cref="MainForm"/>.</param>
     /// <param name="isMaximized">Parameter that indicates if <see cref="MainForm"/> has been set to fullscreen or not.</param>
     public LauncherConfigXML(bool autoUpdateAM2R, bool autoUpdateLauncher, string language, bool musicHQPC, bool musicHQAndroid,
-                             string profileIndex, int mirrorIndex, bool profileDebugLog, string customEnvVar, bool customMirrorEnabled,
+                             string profileIndex, int mirrorIndex, bool profileDebugLog, bool customMirrorEnabled,
                              string customMirrorText, int width, int height, bool isMaximized)
     {
         AutoUpdateAM2R = autoUpdateAM2R;
@@ -145,7 +139,6 @@ public class LauncherConfigXML
         CustomMirrorEnabled = customMirrorEnabled;
         CustomMirrorText = customMirrorText;
         ProfileDebugLog = profileDebugLog;
-        CustomEnvVar = customEnvVar;
         Width = width;
         Height = height;
         IsMaximized = isMaximized;
