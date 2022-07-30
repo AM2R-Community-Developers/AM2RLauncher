@@ -147,14 +147,18 @@ public static class HelperMethods
     public static bool IsConnectedToInternet()
     {
         log.Info("Checking internet connection...");
-        PingReply pingReply = new Ping().Send("github.com");
-        if (pingReply?.Status != IPStatus.Success)
+        try
         {
-            log.Info("Internet connection failed.");
-            return false;
+            PingReply pingReply = new Ping().Send("github.com");
+            if (pingReply?.Status == IPStatus.Success)
+            {
+                log.Info("Internet connection established!");
+                return true;
+            }
         }
-        log.Info("Internet connection established!");
-        return true;
+        catch { /* ignoring exceptions */ }
+        log.Info("Internet connection failed.");
+        return false;
     }
 
     /// <summary>

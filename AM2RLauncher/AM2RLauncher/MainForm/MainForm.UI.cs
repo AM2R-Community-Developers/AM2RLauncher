@@ -654,7 +654,8 @@ public partial class MainForm : Form
         if (OS.IsLinux)
             modSettingsProfileDropDown = new DropDown();
 
-        modSettingsProfileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
+        modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;   // It's actually more comfortable if it's outside, because of GTK shenanigans
+        modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
 
         profileButton = new ColorButton
         {

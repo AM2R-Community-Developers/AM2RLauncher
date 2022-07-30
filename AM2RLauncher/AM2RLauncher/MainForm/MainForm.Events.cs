@@ -791,12 +791,8 @@ public partial class MainForm : Form
         profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
         saveButton.Enabled = true;
         saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
-
-        if (modSettingsProfileDropDown.SelectedIndex < 0 || modSettingsProfileDropDown.Items.Count == 0)
-            return;
         profileNotesTextArea.TextColor = colorGreen;
         profileNotesTextArea.Text = Text.ProfileNotes + "\n" + profileList[modSettingsProfileDropDown.SelectedIndex].ProfileNotes;
-
     }
 
     /// <summary>

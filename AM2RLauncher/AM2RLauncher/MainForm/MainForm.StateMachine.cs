@@ -357,8 +357,6 @@ public partial class MainForm
         }
 
         // Update stored profiles in the Profile Settings tab
-        modSettingsProfileDropDown.Items.Clear();
-        modSettingsProfileDropDown.Items.AddRange(profileDropDown.Items);
         modSettingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
 
         // Refresh the author and version label on the main tab
