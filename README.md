@@ -28,6 +28,8 @@ For more detailed instructions check out the [installation process wiki page](ht
 ## Downloads
 Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
 
+For Linux users, a [Flatpak](https://aur.archlinux.org/packages/am2rlauncher/) can be installed with all above dependecies bundled. This method is the reccomended way for [Steam Deck](https://www.steamdeck.com/en/) users.
+
 Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
 
 ## Configuration and Data Files
