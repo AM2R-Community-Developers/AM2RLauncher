@@ -1,6 +1,7 @@
 ﻿using log4net;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
@@ -146,7 +147,25 @@ public static class HelperMethods
     /// <returns><see langword="true"/> if we have internet, <see langword="false"/> if not.</returns>
     public static bool IsConnectedToInternet()
     {
+        // TODO: For some reason, using the below approach creates zombie process when checking for Xdelta
+        // I have no idea why, but I also can't be bothered to troubleshoot why that is the case right now.
+        // Until someone figures out why that is the case, and makes the below approach not create zombie processes
+        // it will stay commented out.
         log.Info("Checking internet connection...");
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
+        try
+        {
+            request.GetResponse();
+        }
+        catch (WebException)
+        {
+            log.Info("Internet connection failed.");
+            return false;
+        }
+        log.Info("Internet connection established!");
+        return true;
+        
+        /*log.Info("Checking internet connection...");
         try
         {
             PingReply pingReply = new Ping().Send("github.com");
@@ -156,9 +175,9 @@ public static class HelperMethods
                 return true;
             }
         }
-        catch { /* ignoring exceptions */ }
+        catch { /* ignoring exceptions */ /*}
         log.Info("Internet connection failed.");
-        return false;
+        return false;*/
     }
 
     /// <summary>
