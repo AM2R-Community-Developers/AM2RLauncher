@@ -15,7 +15,7 @@ public static class Core
     public static readonly ILog Log = LogManager.GetLogger(typeof(Core));
 
     /// <summary>The Version that identifies this current release.</summary>
-    public const string Version = "2.2.0";
+    public const string Version = "2.3.0";
 
     /// <summary>
     /// Indicates whether or not we have established an internet connection.
