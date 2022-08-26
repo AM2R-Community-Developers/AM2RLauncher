@@ -18,7 +18,7 @@
     <PackageLicenseExpression>GNU General Public License v3.0</PackageLicenseExpression>
     <Description>A Launcher for AM2R that with mod capabilities.</Description>
     <LangVersion>latest</LangVersion>
-    <Configurations>Debug;Release;NoAutoUpdate</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
@@ -29,11 +29,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'NoAutoUpdate' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
   </PropertyGroup>
   
   <ItemGroup>

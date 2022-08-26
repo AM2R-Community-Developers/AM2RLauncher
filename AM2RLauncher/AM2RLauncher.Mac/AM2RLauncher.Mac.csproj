@@ -5,16 +5,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
     <RollForward>LatestMajor</RollForward>
-    <Configurations>Debug;Release;NoAutoUpdate</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-	
-  <PropertyGroup Condition=" '$(Configuration)' == 'NoAutoUpdate' ">
-    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AM2RLauncher\AM2RLauncher.csproj" />
