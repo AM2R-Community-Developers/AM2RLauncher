@@ -383,4 +383,7 @@
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>Это архив, содержащий ранее установленный мод. Он не может быть переустановлен, и, при удалении файлов игры, так же будет удалён.</value>
   </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>Официальное Matrix-пространство по AM2R</value>
+  </data>
 </root>

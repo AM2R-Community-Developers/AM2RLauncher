@@ -705,6 +705,13 @@ public static class Profile
         }
         else if (OS.IsLinux)
         {
+            // HACK: GMS1.4 has issues on Linux / Steam Deck if Fullscreen is disabled
+            // If the user never launched AM2R before, we create an almost empty config that just
+            // has fullscreen set to false, so they don't run into any issues. Game will handle the rest.
+            string am2rConfigPath = profile.SaveLocation.Replace("~", CrossPlatformOperations.Home) + "/config.ini";
+            if (!File.Exists(am2rConfigPath))
+                File.WriteAllText(am2rConfigPath, "[Screen]\nFullscreen=\"0\"\nScale=\"3\"");
+            
             ProcessStartInfo startInfo = new ProcessStartInfo();
 
             startInfo.UseShellExecute = false;

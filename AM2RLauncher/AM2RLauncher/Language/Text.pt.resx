@@ -383,4 +383,7 @@ Prossiga com cuidado.</value>
   <data name="ArchiveNotesMods" xml:space="preserve">
     <value>Isso é uma versão arquivada de um Mod previamente instalado. Ele não pode ser reinstalado e será removido se seus arquivos de jogo forem deletados.</value>
   </data>
+  <data name="MatrixToolTip" xml:space="preserve">
+    <value>O espaço Matrix oficial do AM2R</value>
+  </data>
 </root>
