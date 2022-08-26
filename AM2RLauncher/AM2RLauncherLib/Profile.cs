@@ -469,7 +469,10 @@ public static class Profile
                 if (file.Name.EndsWith(".ogg") && !File.Exists($"{file.DirectoryName}/{file.Name.ToLower()}"))
                     File.Move(file.FullName, $"{file.DirectoryName}/{file.Name.ToLower()}");
             }
+            
+            log.Info("Linux specific formatting finished.");
 
+            #if !NOAPPIMAGE
             // Copy AppImage template to here
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{profilePath}/AM2R.AppDir/");
 
@@ -482,8 +485,7 @@ public static class Profile
             File.Copy($"{profilePath}/{exe}", $"{profilePath}/AM2R.AppDir/usr/bin/{exe}");
 
             progress.Report(66);
-            log.Info("Linux specific formatting finished.");
-
+            
             // Temp save the currentWorkingDirectory and STDERR, change it to profilePath and null, call the tool, and change it back.
             // Reason why STDERR is changed is because the tool prints some output to there that we don't want
             string workingDir = Directory.GetCurrentDirectory();
@@ -496,11 +498,13 @@ public static class Profile
             Console.SetError(cliError);
 
             // Clean files
-            Directory.Delete($"{profilePath}/AM2R.AppDir", true);
             Directory.Delete(assetsPath, true);
             File.Delete($"{profilePath}/{exe}");
+            Directory.Delete($"{profilePath}/AM2R.AppDir", true);
             if (File.Exists($"{profilePath}/AM2R.AppImage")) File.Delete($"{profilePath}/AM2R.AppImage");
             File.Move($"{profilePath}/AM2R-x86_64.AppImage", $"{profilePath}/AM2R.AppImage");
+            log.Info("AppImage created!");
+            #endif
         }
         // Mac post-process
         else if (OS.IsMac)
@@ -545,7 +549,14 @@ public static class Profile
     public static bool IsProfileInstalled(ProfileXML profile)
     {
         if (OS.IsWindows) return File.Exists($"{Core.ProfilesPath}/{profile.Name}/AM2R.exe");
-        if (OS.IsLinux) return File.Exists($"{Core.ProfilesPath}/{profile.Name}/AM2R.AppImage");
+        if (OS.IsLinux)
+        {
+            #if NOAPPIMAGE
+            return File.Exists($"{Core.ProfilesPath}/{profile.Name}/runner");
+            #else
+            return File.Exists($"{Core.ProfilesPath}/{profile.Name}/AM2R.AppImage");
+            #endif
+        }
         if (OS.IsMac) return Directory.Exists($"{Core.ProfilesPath}/{profile.Name}/AM2R.app");
 
         log.Error($"{OS.Name} can't have profiles installed!");
@@ -716,7 +727,11 @@ public static class Profile
 
             startInfo.UseShellExecute = false;
             startInfo.WorkingDirectory = gameDirectory;
+            #if NOAPPIMAGE
+            startInfo.FileName = $"{gameDirectory}/runner";
+            #else
             startInfo.FileName = $"{gameDirectory}/AM2R.AppImage";
+            #endif
 
             log.Info($"CWD of Profile is {startInfo.WorkingDirectory}");
 
