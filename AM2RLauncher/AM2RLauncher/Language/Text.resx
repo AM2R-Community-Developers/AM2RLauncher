@@ -388,4 +388,7 @@ Proceed with caution.</value>
   <data name="MatrixToolTip" xml:space="preserve">
     <value>The Official AM2R Matrix Space</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>CREATE SHORTCUT ON DESKTOP</value>
+  </data>
 </root>

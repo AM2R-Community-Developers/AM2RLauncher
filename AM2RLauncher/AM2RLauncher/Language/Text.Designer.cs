@@ -578,5 +578,11 @@ namespace AM2RLauncher.Language {
                 return ResourceManager.GetString("MatrixToolTip", resourceCulture);
             }
         }
+        
+        public static string CreateShortcut {
+            get {
+                return ResourceManager.GetString("CreateShortcut", resourceCulture);
+            }
+        }
     }
 }

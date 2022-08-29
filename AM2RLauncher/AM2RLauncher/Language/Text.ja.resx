@@ -386,4 +386,7 @@
   <data name="MatrixToolTip" xml:space="preserve">
     <value>公式AM2Rマトリクススペース</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>ショートカットをデスクトップに作成</value>
+  </data>
 </root>

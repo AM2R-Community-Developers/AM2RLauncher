@@ -657,6 +657,18 @@ public partial class MainForm : Form
         modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;   // It's actually more comfortable if it's outside, because of GTK shenanigans
         modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
 
+        desktopShortcutButton = profileButton = new ColorButton
+        {
+            Text = Text.CreateShortcut,
+            Font = smallButtonFont,
+            Height = 30,
+            Width = 275,
+            TextColor = colorGreen,
+            BackgroundColor = colorBG,
+            FrameColor = colorGreen,
+            BackgroundColorHover = colorBGHover
+        }; 
+        
         profileButton = new ColorButton
         {
             Text = Text.OpenProfileFolder,
@@ -717,7 +729,7 @@ public partial class MainForm : Form
 
         modSettingsLayout.BeginHorizontal();
         modSettingsLayout.AddSpace();
-        modSettingsLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, modSettingsProfileDropDown, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
+        modSettingsLayout.AddColumn(null, addModButton, modSpacer, settingsProfileLabel, modSettingsProfileDropDown, desktopShortcutButton, profileButton, saveButton, updateModButton, deleteModButton, profileNotesTextArea, null);
         modSettingsLayout.AddSpace();
 
         TabPage modSettingsPage = new TabPage
@@ -769,6 +781,7 @@ public partial class MainForm : Form
         mirrorDropDown.SelectedIndexChanged += MirrorDropDownSelectedIndexChanged;
         modSettingsLayout.LoadComplete += ProfileLayoutLoadComplete;
         addModButton.Click += AddModButtonClicked;
+        desktopShortcutButton.Click += DesktopShortcutButtonClicked;
         profileButton.Click += ProfileDataButtonClickEvent;
         saveButton.Click += SaveButtonClickEvent;
         modSettingsProfileDropDown.SelectedIndexChanged += ModSettingsProfileDropDownSelectedIndexChanged;
@@ -825,6 +838,8 @@ public partial class MainForm : Form
     private readonly ColorButton apkButton;
     /// <summary>A <see cref="ColorButton"/> that is used to add mods.</summary>
     private readonly ColorButton addModButton;
+    /// <summary>A <see cref="ColorButton"/> that will create a desktop shortcut of the current profile.</summary>
+    private readonly ColorButton desktopShortcutButton;
     /// <summary>A <see cref="ColorButton"/> that will open the game files directory for the selected mod.</summary>
     private readonly ColorButton profileButton;
     /// <summary>A <see cref="ColorButton"/> that will open the save directory for the selected mod.</summary>

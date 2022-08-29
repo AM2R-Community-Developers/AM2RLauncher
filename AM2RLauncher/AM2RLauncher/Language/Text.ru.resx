@@ -386,4 +386,7 @@
   <data name="MatrixToolTip" xml:space="preserve">
     <value>Официальное Matrix-пространство по AM2R</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>СОЗДАТЬ ЯРЛЫК НА РАБОЧЕМ СТОЛЕ</value>
+  </data>
 </root>

@@ -388,4 +388,7 @@
   <data name="MatrixToolTip" xml:space="preserve">
     <value>AM2R 官方 Matrix 空间</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>创建桌面快捷方式</value>
+  </data>
 </root>

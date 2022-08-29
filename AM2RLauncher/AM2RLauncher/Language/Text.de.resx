@@ -386,4 +386,7 @@ Bitte äußerste Vorsicht walten lassen.</value>
   <data name="MatrixToolTip" xml:space="preserve">
     <value>Der offizielle AM2R Matrix Space</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>DESKTOPVERKNÜPFUNG ERTELLEN</value>
+  </data>
 </root>
