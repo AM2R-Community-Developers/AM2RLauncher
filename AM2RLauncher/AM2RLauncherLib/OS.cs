@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 
 namespace AM2RLauncherLib;
 
@@ -53,6 +54,11 @@ public static class OS
     public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
 
     /// <summary>
+    /// Checks if this is run via Flatpak.
+    /// </summary>
+    public static readonly bool IsThisRunningFromFlatpak = CheckIfRunFromFlatpak();
+
+    /// <summary>
     /// Checks if the Launcher is ran from WINE.
     /// </summary>
     /// <returns><see langword="true"/> if run from WINE, <see langword="false"/> if not.</returns>
@@ -63,6 +69,20 @@ public static class OS
         if (IsWindows && (Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Wine") != null))
             return true;
 
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the Launcher is ran from a Flatpak.
+    /// </summary>
+    /// <returns>see langword="true"/> if run from a Flatpak, <see langword="false"/> if not.</returns>
+    private static bool CheckIfRunFromFlatpak()
+    {
+        if (!IsLinux) return false;
+        
+        // This file is present in all flatpaks
+        if (File.Exists("/.flatpak-info"))
+            return true;
         return false;
     }
 }

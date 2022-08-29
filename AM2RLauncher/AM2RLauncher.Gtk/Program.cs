@@ -62,6 +62,14 @@ internal static class MainClass
         else
             log.Error("Couldn't determine the currently running distro!");
 
+        if (OS.IsThisRunningFromFlatpak)
+            log.Info("Running from Flatpak!");
+        
+        #if NOAPPIMAGE
+        log.Info("On \"No AppImage\" configuration.");
+        #else
+        log.Info("On AppImage configuration.");
+        #endif
 
         try
         {
