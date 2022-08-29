@@ -389,4 +389,8 @@ Procede con cautela.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>CREAR ACCESO DIRECTO EN EL ESCRITORIO</value>
   </data>
+  <data name="ShortcutWarning" xml:space="preserve">
+    <value>¡Ejecutar las Actualizaciones de la Comunidad desde el acceso directo ignorará el Launcher evitando actualizaciones automáticas!
+¡AM2R y el Launcher solo pueden actualizarse abriendo el Launcher directamente!</value>
+  </data>
 </root>

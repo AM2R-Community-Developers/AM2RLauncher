@@ -773,6 +773,7 @@ public partial class MainForm : Form
         log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
         if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
         {
+            desktopShortcutButton.Enabled = false;
             deleteModButton.Enabled = false;
             deleteModButton.ToolTip = null;
             updateModButton.Enabled = false;
@@ -781,6 +782,7 @@ public partial class MainForm : Form
         }
         else
         {
+            desktopShortcutButton.Enabled = true;
             deleteModButton.Enabled = true;
             deleteModButton.ToolTip = HelperMethods.GetText(Text.DeleteModButtonToolTip, profileName);
             // On non-installable profiles we want to disable updating
@@ -804,7 +806,14 @@ public partial class MainForm : Form
         ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
         log.Info($"User wants to create a desktop shortcut for {profile.Name}.");
         
-        //TODO: warning if used on community updates
+        // We want to give a warning to users, so they don't complain with "why didn't I get 2.0???"
+        if (profile.Name == "Community Updates (Latest)")
+        {
+            Application.Instance.Invoke(() =>
+            {
+                MessageBox.Show(Text.ShortcutWarning, Text.WarningWindowTitle, MessageBoxType.Warning);
+            });
+        }
         
         string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop, Environment.SpecialFolderOption.Create);
         string shortcutFile = "";
@@ -832,7 +841,7 @@ public partial class MainForm : Form
             
             // Replace values
             desktopEntryText = desktopEntryText.Replace("PROFILENAME", $"{profile.Name}");
-            desktopEntryText = desktopEntryText.Replace("PROFILEDESCRIPTION", $"{profile.ProfileNotes}");
+            desktopEntryText = desktopEntryText.Replace("PROFILEDESCRIPTION", $"A shortcut for {profile.Name}.");
             desktopEntryText = desktopEntryText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
 
             string gameName;

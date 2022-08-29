@@ -657,6 +657,7 @@ public partial class MainForm : Form
         modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;   // It's actually more comfortable if it's outside, because of GTK shenanigans
         modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
 
+        //TODO: this is copy pasted too often, make custom class for our buttons so we can just call *one* constructor.
         desktopShortcutButton = profileButton = new ColorButton
         {
             Text = Text.CreateShortcut,

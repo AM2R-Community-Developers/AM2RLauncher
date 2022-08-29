@@ -389,4 +389,8 @@
   <data name="CreateShortcut" xml:space="preserve">
     <value>ショートカットをデスクトップに作成</value>
   </data>
+  <data name="ShortcutWarning" xml:space="preserve">
+    <value>ショートカットからコミュニティアップデートを起動するとランチャーがパスされるため自動更新されません。
+AM2Rやランチャーの更新は、ランチャーを直接起動することで実行されます。</value>
+  </data>
 </root>

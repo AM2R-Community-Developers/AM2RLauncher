@@ -584,5 +584,11 @@ namespace AM2RLauncher.Language {
                 return ResourceManager.GetString("CreateShortcut", resourceCulture);
             }
         }
+        
+        public static string ShortcutWarning {
+            get {
+                return ResourceManager.GetString("ShortcutWarning", resourceCulture);
+            }
+        }
     }
 }

@@ -197,6 +197,7 @@ public partial class MainForm
         // Only enable these, when we're not on the community updates
         if (modSettingsProfileDropDown.SelectedIndex > 0)
         {
+            desktopShortcutButton.Enabled = enabled;
             updateModButton.Enabled = profileList[modSettingsProfileDropDown.SelectedIndex].Installable;
             updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, selectedProfileName);
             deleteModButton.Enabled = enabled;

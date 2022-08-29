@@ -391,4 +391,8 @@ Proceed with caution.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>CREATE SHORTCUT ON DESKTOP</value>
   </data>
+  <data name="ShortcutWarning" xml:space="preserve">
+    <value>Launching the Community Updates through the shortcut will bypass the Launcher and thus avoid automatic updates!
+Updating AM2R or the Launcher can only be done by opening the Launcher directly!</value>
+  </data>
 </root>

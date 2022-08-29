@@ -387,6 +387,10 @@ Bitte äußerste Vorsicht walten lassen.</value>
     <value>Der offizielle AM2R Matrix Space</value>
   </data>
   <data name="CreateShortcut" xml:space="preserve">
-    <value>DESKTOPVERKNÜPFUNG ERTELLEN</value>
+    <value>DESKTOPVERKNÜPFUNG ERSTELLEN</value>
+  </data>
+  <data name="ShortcutWarning" xml:space="preserve">
+    <value>Das Starten der Community Updates durch Verknüpfungen umgeht den Launcher und dadurch auch automatische Updates.
+Das Updaten von AM2R oder des Launchers kann nur durch das direkte Starten des Launchers passieren!</value>
   </data>
 </root>
