@@ -773,7 +773,6 @@ public partial class MainForm : Form
         log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
         if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
         {
-            desktopShortcutButton.Enabled = false;
             deleteModButton.Enabled = false;
             deleteModButton.ToolTip = null;
             updateModButton.Enabled = false;
@@ -790,6 +789,7 @@ public partial class MainForm : Form
             updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
         }
 
+        desktopShortcutButton.Enabled = Directory.Exists(Core.ProfilesPath + "/" + profileName);
         profileButton.Enabled = Directory.Exists(Core.ProfilesPath + "/" + profileName);
         profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
         saveButton.Enabled = true;
