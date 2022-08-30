@@ -811,7 +811,7 @@ public partial class MainForm : Form
         {
             Application.Instance.Invoke(() =>
             {
-                MessageBox.Show(Text.ShortcutWarning, Text.WarningWindowTitle, MessageBoxType.Warning);
+                MessageBox.Show(this, Text.ShortcutWarning, Text.WarningWindowTitle, MessageBoxType.Warning);
             });
         }
         
@@ -876,7 +876,7 @@ public partial class MainForm : Form
         {
             Application.Instance.Invoke(() =>
             {
-                MessageBox.Show(exception.Message, Text.UnhandledException, MessageBoxType.Error);
+                MessageBox.Show(this, exception.Message, Text.UnhandledException, MessageBoxType.Error);
             });
         }
     }
