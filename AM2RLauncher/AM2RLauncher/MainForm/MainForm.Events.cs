@@ -817,57 +817,68 @@ public partial class MainForm : Form
         
         string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop, Environment.SpecialFolderOption.Create);
         string shortcutFile = "";
-        
-        if (OS.IsWindows)
-        {
-            //TODO: implement this
-        }
-        else if (OS.IsLinux)
-        {
-            shortcutFile = $"{desktopFolder}/{profile.Name}.desktop";
-            
-            const string desktopEntryTemplate =
-                "[Desktop Entry]\n" +
-                "Type=Application\n" +
-                "Categories=Game\n" +
-                "Encoding=UTF-8\n" +
-                "Name=PROFILENAME\n" +
-                "Comment=PROFILEDESCRIPTION\n" +
-                "Exec=EXECUTABLE\n" +
-                "Icon=ICONPATH\n" +
-                "Terminal=false";
 
-            string desktopEntryText = desktopEntryTemplate;
-            
-            // Replace values
-            desktopEntryText = desktopEntryText.Replace("PROFILENAME", $"{profile.Name}");
-            desktopEntryText = desktopEntryText.Replace("PROFILEDESCRIPTION", $"A shortcut for {profile.Name}.");
-            desktopEntryText = desktopEntryText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
+        try 
+        { 
+            if (OS.IsWindows)
+            {
+                //TODO: implement this
+            }
+            else if (OS.IsLinux)
+            {
+                shortcutFile = $"{desktopFolder}/{profile.Name}.desktop";
+                
+                const string desktopEntryTemplate =
+                    "[Desktop Entry]\n" +
+                    "Type=Application\n" +
+                    "Categories=Game\n" +
+                    "Encoding=UTF-8\n" +
+                    "Name=PROFILENAME\n" +
+                    "Comment=PROFILEDESCRIPTION\n" +
+                    "Exec=EXECUTABLE\n" +
+                    "Icon=ICONPATH\n" +
+                    "Terminal=false";
 
-            string gameName;
-            #if !NOAPPIMAGE
-            gameName = "runner";
-            #else
-            gameName = "AM2R.AppImage";
-            #endif
-            if (OS.IsThisRunningFromFlatpak)
-                desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"flatpak run \"--command={Core.ProfilesPath}/{profile.Name}/{gameName}\" io.github.am2r_community_developers.AM2RLauncher");
+                string desktopEntryText = desktopEntryTemplate;
+                
+                // Replace values
+                desktopEntryText = desktopEntryText.Replace("PROFILENAME", $"{profile.Name}");
+                desktopEntryText = desktopEntryText.Replace("PROFILEDESCRIPTION", $"A shortcut for {profile.Name}.");
+                desktopEntryText = desktopEntryText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
+
+                string gameName;
+                #if !NOAPPIMAGE
+                gameName = "runner";
+                #else
+                gameName = "AM2R.AppImage";
+                #endif
+                if (OS.IsThisRunningFromFlatpak)
+                    desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"flatpak run \"--command={Core.ProfilesPath}/{profile.Name}/{gameName}\" io.github.am2r_community_developers.AM2RLauncher");
+                else
+                    desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"{Core.ProfilesPath}/{profile.Name}/{gameName}");
+                
+                File.WriteAllText(shortcutFile, desktopEntryText);
+            }
+            else if (OS.IsMac)
+            {
+                throw new NotImplementedException("Creating Desktop Shortcuts on Mac has currently not been implemented!");
+            }
             else
-                desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"{Core.ProfilesPath}/{profile.Name}/{gameName}");
+            {
+                log.Error($"{OS.Name} has no way of creating shortcuts");
+                return;
+            }
             
-            File.WriteAllText(shortcutFile, desktopEntryText);
+            CrossPlatformOperations.OpenFolderAndSelectFile(shortcutFile);
         }
-        else if (OS.IsMac)
+        // We only care about io exceptions (file not readable, drive not available etc.) The rest should throw normally
+        catch (IOException exception)
         {
-            throw new NotImplementedException("Creating Desktop Shortcuts on Mac has currently not been implemented!");
+            Application.Instance.Invoke(() =>
+            {
+                MessageBox.Show(exception.Message, Text.UnhandledException, MessageBoxType.Error);
+            });
         }
-        else
-        {
-            log.Error($"{OS.Name} has no way of creating shortcuts");
-            return;
-        }
-        
-        CrossPlatformOperations.OpenFolderAndSelectFile(shortcutFile);
     }
     
     /// <summary>
