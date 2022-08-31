@@ -566,8 +566,8 @@ public partial class MainForm : Form
     /// <summary>Gets called when <see cref="autoUpdateLauncherCheck"/> gets clicked and writes its new value to the config.</summary>
     private void AutoUpdateLauncherCheckChanged(object sender, EventArgs e)
     {
-        log.Info("Auto Update Launcher has been set to " + autoUpdateAM2RCheck.Checked + ".");
-        WriteToConfig("AutoUpdateLauncher", autoUpdateAM2RCheck.Checked.Value);
+        log.Info("Auto Update Launcher has been set to " + autoUpdateLauncherCheck.Checked + ".");
+        WriteToConfig("AutoUpdateLauncher", autoUpdateLauncherCheck.Checked.Value);
     }
 
     /// <summary>Gets called when <see cref="hqMusicPCCheck"/> gets clicked and writes its new value to the config.</summary>

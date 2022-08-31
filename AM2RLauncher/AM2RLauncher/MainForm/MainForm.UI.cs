@@ -475,52 +475,17 @@ public partial class MainForm : Form
             languageDropDown.SelectedIndex = 0;
         else
             languageDropDown.SelectedIndex = languageDropDown.Items.IndexOf(languageDropDown.Items.FirstOrDefault(x => x.Text.Equals(tmpLanguage)));
-
         if (languageDropDown.SelectedIndex == -1)
         {
             log.Info($"User has tried to use {tmpLanguage} as a Language, but it was not found. Reverting to System Language");
             languageDropDown.SelectedIndex = 0;
         }
 
-        // autoUpdateAM2R checkbox
-        autoUpdateAM2RCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("AutoUpdateAM2R")),
-            Text = Text.AutoUpdateAM2R,
-            TextColor = LauncherColors.Green
-        };
-        
-        // autoUpdateLauncher checkbox
-        autoUpdateLauncherCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("AutoUpdateLauncher")),
-            Text = Text.AutoUpdateLauncher,
-            TextColor = LauncherColors.Green
-        };
-
-        // HQ music, PC
-        hqMusicPCCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("MusicHQPC")),
-            Text = Text.HighQualityPC,
-            TextColor = LauncherColors.Green
-        };
-
-        // HQ music, Android
-        hqMusicAndroidCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("MusicHQAndroid")),
-            Text = Text.HighQualityAndroid,
-            TextColor = LauncherColors.Green
-        };
-
-        // Create game debug logs
-        profileDebugLogCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("ProfileDebugLog")),
-            Text = Text.ProfileDebugCheckBox,
-            TextColor = LauncherColors.Green
-        };
+        autoUpdateAM2RCheck = new LauncherCheckbox(Text.AutoUpdateAM2R, Boolean.Parse(ReadFromConfig("AutoUpdateAM2R")));
+        autoUpdateLauncherCheck = new LauncherCheckbox(Text.AutoUpdateLauncher, Boolean.Parse(ReadFromConfig("AutoUpdateLauncher")));
+        hqMusicPCCheck = new LauncherCheckbox(Text.HighQualityPC, Boolean.Parse(ReadFromConfig("MusicHQPC")));
+        hqMusicAndroidCheck = new LauncherCheckbox(Text.HighQualityAndroid, Boolean.Parse(ReadFromConfig("MusicHQAndroid")));
+        profileDebugLogCheck = new LauncherCheckbox(Text.ProfileDebugCheckBox, Boolean.Parse(ReadFromConfig("ProfileDebugLog")));
         
         // Mirror list
         mirrorLabel = new Label
@@ -545,12 +510,7 @@ public partial class MainForm : Form
         currentMirror = mirrorList[mirrorDropDown.SelectedIndex];
 
         // Custom mirror
-        customMirrorCheck = new CheckBox
-        {
-            Checked = Boolean.Parse(ReadFromConfig("CustomMirrorEnabled")),
-            Text = Text.CustomMirrorCheck,
-            TextColor = LauncherColors.Green
-        };
+        customMirrorCheck = new LauncherCheckbox(Text.CustomMirrorCheck, Boolean.Parse(ReadFromConfig("CustomMirrorEnabled")));
 
         customMirrorTextBox = new TextBox
         {
@@ -660,13 +620,9 @@ public partial class MainForm : Form
             Pages =
             {
                 mainPage,
-
                 changelogPage,
-
                 newsPage,
-
                 settingsPage,
-
                 modSettingsPage
             }
         };
