@@ -180,9 +180,9 @@ public partial class MainForm : Form
 
         centerInterface.AddRow(playButton);
 
-        //TODO: consider making the spacers global?
-        // 2px spacer between playButton and apkButton (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = LauncherColors.BG, Height = 2 });
+        // TODO: consider unifying most spacers to the same unit?
+        // 2px spacer between playButton and apkButton
+        centerInterface.AddRow(new Spacer(2));
 
         // APK button
         apkButton = new BigColorButton(Text.CreateAPK);
@@ -195,8 +195,8 @@ public partial class MainForm : Form
             Height = 15
         };
 
-        // 4px spacer between APK button and progressBar (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = LauncherColors.BG, Height = 4 });
+        // 4px spacer between APK button and progressBar
+        centerInterface.AddRow(new Spacer(4));
 
         centerInterface.AddRow(progressBar);
 
@@ -211,8 +211,8 @@ public partial class MainForm : Form
 
         centerInterface.AddRow(progressLabel);
 
-        // 3px spacer between progressBar and profile label (Windows only)
-        if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = LauncherColors.BG, Height = 3 });
+        // 3px spacer between progressBar and profile label
+        centerInterface.AddRow(new Spacer(3));
 
         profileLabel = new Label
         {
@@ -601,10 +601,7 @@ public partial class MainForm : Form
 
         addModButton = new SmallColorButton(Text.AddNewMod);
 
-        Label modSpacer = new Label
-        {
-            Height = 14
-        };
+        Label modSpacer = new Spacer(14);
 
         settingsProfileLabel = new Label
         {
