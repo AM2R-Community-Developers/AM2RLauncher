@@ -533,7 +533,7 @@ public partial class MainForm : Form
     /// <param name="errorLabel">The <see cref="Label"/> that should be displayed.</param>
     private void ChangeToEmptyPageOnNoInternet(TabPage tabPage, Label errorLabel)
     {
-        if (isInternetThere)
+        if (Core.IsInternetThere)
             return;
 
         tabPage.Content = new TableLayout

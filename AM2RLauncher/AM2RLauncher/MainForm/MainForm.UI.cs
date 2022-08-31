@@ -51,16 +51,6 @@ public partial class MainForm : Form
     private static string currentMirror;
 
     /// <summary>
-    /// Indicates whether or not we have established an internet connection.
-    /// </summary>
-    private static readonly bool isInternetThere = Core.IsInternetThere;
-
-    /// <summary>
-    /// Checks if the Launcher is run via WINE.
-    /// </summary>
-    private static readonly bool isThisRunningFromWine = OS.IsThisRunningFromWine;
-
-    /// <summary>
     /// Used for Mutex, checks if there's only a single instance of the Launcher running.
     /// </summary>
     private static bool singleInstance;
@@ -73,7 +63,7 @@ public partial class MainForm : Form
     public MainForm()
     {
         // Exit if we're already running the AM2RLauncher
-        // Thanks, StackOverflow! https://stackoverflow.com/questions/184084/how-to-force-c-sharp-net-app-to-run-only-one-instance-in-windows
+        // Thanks, StackOverflow! https://stackoverflow.com/q/184084
         if (!singleInstance)
         {
             // If on Windows, set the original app to the foreground window to prevent confusion
@@ -272,8 +262,7 @@ public partial class MainForm : Form
         };
 
         centerInterface.AddRow(saveWarningLabel);
-
-
+        
         // Social buttons
         Bitmap redditIcon = new Bitmap(Resources.redditIcon48);
         var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
@@ -295,8 +284,7 @@ public partial class MainForm : Form
         Bitmap matrixIcon = new Bitmap(Resources.matrixIcon48);
         var matrixButton = new ImageButton { ToolTip = Text.MatrixToolTip, Image = matrixIcon };
         matrixButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://matrix.to/#/#am2r-space:matrix.org");
-
-
+        
         // Social button panel
         DynamicLayout socialPanel = new DynamicLayout();
         socialPanel.BeginVertical();
@@ -307,11 +295,10 @@ public partial class MainForm : Form
         socialPanel.AddRow(matrixButton);
         socialPanel.EndVertical();
 
-
         // Version number label
         Label versionLabel = new Label
         {
-            Text = $"v{VERSION}{(isThisRunningFromWine ? "-WINE" : "")}",
+            Text = $"v{VERSION}{(OS.IsThisRunningFromWine ? "-WINE" : "")}",
             Width = 48, TextAlignment = TextAlignment.Right, TextColor = LauncherColors.Green,
             Font = new Font(SystemFont.Default, 12)
         };
@@ -327,7 +314,8 @@ public partial class MainForm : Form
         mainLayout.AddSpace();
 
         // Yes, I'm hard-coding this string. Linux users can english.
-        mainLayout.AddColumn(versionLabel, isThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = LauncherColors.Red, TextAlignment = TextAlignment.Right } : null);
+        Label wineLabel = OS.IsThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = LauncherColors.Red, TextAlignment = TextAlignment.Right } : null;
+        mainLayout.AddColumn(versionLabel, wineLabel);
 
         drawable.Content = mainLayout;
 
@@ -350,7 +338,7 @@ public partial class MainForm : Form
         Uri changelogUri = new Uri("https://am2r-community-developers.github.io/DistributionCenter/changelog.html");
         WebView changelogWebView = new WebView { Url = changelogUri };
 
-        if (OS.IsUnix && !isInternetThere)
+        if (OS.IsUnix && !Core.IsInternetThere)
             changelogWebView = new WebView();
 
         Label changelogNoConnectionLabel = new Label
@@ -383,7 +371,7 @@ public partial class MainForm : Form
         WebView newsWebView = new WebView { Url = newsUri };
 
         //TODO: why exactly is this check necessary?
-        if (OS.IsUnix && !isInternetThere)
+        if (OS.IsUnix && !Core.IsInternetThere)
             newsWebView = new WebView();
 
         Label newsNoConnectionLabel = new Label
@@ -408,7 +396,7 @@ public partial class MainForm : Form
         };
 
         //TODO: this is hack because on linux / mac the other way doesn't work. eto issue?
-        if (OS.IsUnix && !isInternetThere)
+        if (OS.IsUnix && !Core.IsInternetThere)
         {
             changelogPage.Content = new TableLayout
             {
@@ -445,7 +433,6 @@ public partial class MainForm : Form
         };
 
         // Language DropDown menu
-
         List<ListItem> languageList = new List<ListItem>
         {
             Text.SystemLanguage,
