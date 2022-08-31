@@ -178,17 +178,7 @@ public partial class MainForm : Form
         DynamicLayout centerInterface = new DynamicLayout();
 
         // PLAY button
-        playButton = new ColorButton
-        {
-            BackgroundColorHover = LauncherColors.BGHover,
-            Height = 40,
-            Width = 250,
-            TextColor = LauncherColors.Green,
-            TextColorDisabled = LauncherColors.Inactive,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            FrameColorDisabled = LauncherColors.Inactive
-        };
+        playButton = new BigColorButton(Text.Play);
 
         centerInterface.AddRow(playButton);
 
@@ -197,16 +187,7 @@ public partial class MainForm : Form
         if (OS.IsWindows) centerInterface.AddRow(new Label { BackgroundColor = LauncherColors.BG, Height = 2 });
 
         // APK button
-        apkButton = new ColorButton
-        {
-            Text = Text.CreateAPK,
-            Height = 40,
-            Width = 250,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
+        apkButton = new BigColorButton(Text.CreateAPK);
 
         centerInterface.AddRow(apkButton);
 
@@ -624,7 +605,7 @@ public partial class MainForm : Form
         {
             Text = Text.AddNewMod,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,
@@ -662,7 +643,7 @@ public partial class MainForm : Form
         {
             Text = Text.CreateShortcut,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,
@@ -674,7 +655,7 @@ public partial class MainForm : Form
         {
             Text = Text.OpenProfileFolder,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,
@@ -686,7 +667,7 @@ public partial class MainForm : Form
         {
             Text = Text.OpenSaveFolder,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,
@@ -698,7 +679,7 @@ public partial class MainForm : Form
         {
             Text = Text.UpdateModButtonText,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,
@@ -710,7 +691,7 @@ public partial class MainForm : Form
         {
             Text = Text.DeleteModButtonText,
             Font = smallButtonFont,
-            Height = 30,
+            Height = 40,
             Width = 275,
             TextColor = LauncherColors.Green,
             BackgroundColor = LauncherColors.BG,

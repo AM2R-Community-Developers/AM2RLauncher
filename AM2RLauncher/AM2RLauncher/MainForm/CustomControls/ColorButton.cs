@@ -7,7 +7,7 @@ namespace AM2RLauncher;
 /// <summary>
 /// Extension of <see cref="CustomButton"/> that allows for advanced color settings.
 /// </summary>
-class ColorButton : CustomButton
+public class ColorButton : CustomButton
 {
     /// <summary>The <see cref="Color"/> to draw the background with when <see cref="CustomButton.Hover"/> is true.</summary>
     public Color BackgroundColorHover { get; set; }
