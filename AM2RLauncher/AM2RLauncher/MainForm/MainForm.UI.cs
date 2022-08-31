@@ -601,17 +601,7 @@ public partial class MainForm : Form
         // [MOD SETTINGS]
         DynamicLayout modSettingsLayout = new DynamicLayout();
 
-        addModButton = new ColorButton
-        {
-            Text = Text.AddNewMod,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
+        addModButton = new SmallColorButton(Text.AddNewMod);
 
         Label modSpacer = new Label
         {
@@ -637,67 +627,12 @@ public partial class MainForm : Form
 
         modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;   // It's actually more comfortable if it's outside, because of GTK shenanigans
         modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
-
-        //TODO: this is copy pasted too often, make custom class for our buttons so we can just call *one* constructor.
-        desktopShortcutButton = profileButton = new ColorButton
-        {
-            Text = Text.CreateShortcut,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        }; 
         
-        profileButton = new ColorButton
-        {
-            Text = Text.OpenProfileFolder,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
-
-        saveButton = new ColorButton
-        {
-            Text = Text.OpenSaveFolder,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
-
-        updateModButton = new ColorButton
-        {
-            Text = Text.UpdateModButtonText,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
-
-        deleteModButton = new ColorButton
-        {
-            Text = Text.DeleteModButtonText,
-            Font = smallButtonFont,
-            Height = 40,
-            Width = 275,
-            TextColor = LauncherColors.Green,
-            BackgroundColor = LauncherColors.BG,
-            FrameColor = LauncherColors.Green,
-            BackgroundColorHover = LauncherColors.BGHover
-        };
+        desktopShortcutButton = new SmallColorButton(Text.CreateShortcut);
+        profileButton = new SmallColorButton(Text.OpenProfileFolder);
+        saveButton = new SmallColorButton(Text.OpenSaveFolder);
+        updateModButton = new SmallColorButton(Text.UpdateModButtonText);
+        deleteModButton = new SmallColorButton(Text.DeleteModButtonText);
 
         profileNotesTextArea = new TextArea
         {
