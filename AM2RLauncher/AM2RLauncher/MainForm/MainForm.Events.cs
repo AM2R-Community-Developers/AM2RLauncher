@@ -852,6 +852,7 @@ public partial class MainForm : Form
                 #else
                 gameName = "AM2R.AppImage";
                 #endif
+                log.Info($"Game name for shortcut is: {gameName}");
                 if (OS.IsThisRunningFromFlatpak)
                     desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"flatpak run \"--command={Core.ProfilesPath}/{profile.Name}/{gameName}\" io.github.am2r_community_developers.AM2RLauncher");
                 else
