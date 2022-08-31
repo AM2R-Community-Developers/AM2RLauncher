@@ -386,4 +386,11 @@ Prossiga com cuidado.</value>
   <data name="MatrixToolTip" xml:space="preserve">
     <value>O espaço Matrix oficial do AM2R</value>
   </data>
+  <data name="CreateShortcut" xml:space="preserve">
+    <value>Criar atalho na Área de Trabalho</value>
+  </data>
+  <data name="ShortcutWarning" xml:space="preserve">
+    <value>Iniciar as Atualizações da Comunidade através do atalho irá pular o Launcher, evitando que as atualizações automáticas sejam realizadas!  
+A atualização do AM2R ou do launcher só pode ser feita através do próprio launcher.</value>
+  </data>
 </root>
