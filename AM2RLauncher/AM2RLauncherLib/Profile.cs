@@ -472,7 +472,9 @@ public static class Profile
             
             log.Info("Linux specific formatting finished.");
 
-            #if !NOAPPIMAGE
+            #if NOAPPIMAGE
+              // TODO: figure out a way to use patchelf to get rid of deprecated ssl stuff
+            #else
             // Copy AppImage template to here
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{profilePath}/AM2R.AppDir/");
 

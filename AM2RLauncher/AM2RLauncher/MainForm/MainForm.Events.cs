@@ -847,7 +847,7 @@ public partial class MainForm : Form
                 desktopEntryText = desktopEntryText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
 
                 string gameName;
-                #if !NOAPPIMAGE
+                #if NOAPPIMAGE
                 gameName = "runner";
                 #else
                 gameName = "AM2R.AppImage";
