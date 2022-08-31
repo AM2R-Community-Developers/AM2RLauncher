@@ -152,7 +152,7 @@ public partial class MainForm
         }
         if (apkButtonState == ApkButtonState.Creating) profileDropDown.Enabled = false;
 
-        Color col = profileDropDown.Enabled ? colorGreen : colorInactive;
+        Color col = profileDropDown.Enabled ? LauncherColors.Green : LauncherColors.Inactive;
 
         if (OS.IsWindows)
             profileDropDown.TextColor = col;
@@ -185,7 +185,7 @@ public partial class MainForm
 
         string selectedProfileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
 
-        settingsProfileLabel.TextColor = colorGreen;
+        settingsProfileLabel.TextColor = LauncherColors.Green;
         modSettingsProfileDropDown.Enabled = enabled;
         desktopShortcutButton.Enabled = enabled;
         profileButton.Enabled = enabled;
@@ -206,7 +206,7 @@ public partial class MainForm
         
         
 
-        Color col = enabled ? colorGreen : colorInactive;
+        Color col = enabled ? LauncherColors.Green : LauncherColors.Inactive;
 
         if (OS.IsWindows)
             modSettingsProfileDropDown.TextColor = col;
@@ -400,7 +400,7 @@ public partial class MainForm
         // Not sure why the dropdown menu needs this hack, but the textBox does not.
         //TODO: eto feature request
         if (OS.IsWindows)
-            mirrorDropDown.TextColor = mirrorDropDown.Enabled ? colorGreen : colorInactive;
-        mirrorLabel.TextColor = !enabled ? colorGreen : colorInactive;
+            mirrorDropDown.TextColor = mirrorDropDown.Enabled ? LauncherColors.Green : LauncherColors.Inactive;
+        mirrorLabel.TextColor = !enabled ? LauncherColors.Green : LauncherColors.Inactive;
     }
 }
