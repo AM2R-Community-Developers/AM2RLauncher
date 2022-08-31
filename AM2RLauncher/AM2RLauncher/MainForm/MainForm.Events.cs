@@ -5,6 +5,7 @@ using Eto.Forms;
 using LibGit2Sharp;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -859,6 +860,7 @@ public partial class MainForm : Form
                     desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"{Core.ProfilesPath}/{profile.Name}/{gameName}");
                 
                 File.WriteAllText(shortcutFile, desktopEntryText);
+                Process.Start("chmod", $"+x  \"{shortcutFile}\"")?.WaitForExit();
             }
             else if (OS.IsMac)
             {
