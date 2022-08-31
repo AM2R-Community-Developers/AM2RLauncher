@@ -134,8 +134,6 @@ public partial class MainForm : Form
         string splash = Splash.GetSplash();
         log.Info($"Randomly chosen splash: {splash}");
 
-        Font smallButtonFont = new Font(SystemFont.Default, 10);
-
         // Create mirror list
         mirrorList = CrossPlatformOperations.GenerateMirrorList();
 
