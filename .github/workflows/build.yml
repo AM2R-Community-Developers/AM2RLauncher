@@ -22,7 +22,7 @@ jobs:
         include:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
-            ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net5.0/ubuntu.18.04-x64/publish/
+            ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net6.0/ubuntu.18.04-x64/publish/
           - os: macOS-latest
             COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
