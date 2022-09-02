@@ -221,6 +221,7 @@ public partial class MainForm : Form
         // Mac gets a default BackgroundColor because it looks waaaaaaay better.
         profileDropDown = new DropDown
         {
+            
             TextColor = LauncherColors.Green,
             BackgroundColor = OS.IsWindows ? LauncherColors.BGNoAlpha : new Color()
         };
@@ -264,26 +265,11 @@ public partial class MainForm : Form
         centerInterface.AddRow(saveWarningLabel);
         
         // Social buttons
-        Bitmap redditIcon = new Bitmap(Resources.redditIcon48);
-        var redditButton = new ImageButton { ToolTip = Text.RedditToolTip, Image = redditIcon };
-        redditButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.reddit.com/r/AM2R");
-
-        Bitmap githubIcon = new Bitmap(Resources.githubIcon48);
-        var githubButton = new ImageButton { ToolTip = Text.GithubToolTip, Image = githubIcon };
-        githubButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.github.com/AM2R-Community-Developers");
-
-        Bitmap youtubeIcon = new Bitmap(Resources.youtubeIcon48);
-        var youtubeButton = new ImageButton { ToolTip = Text.YoutubeToolTip, Image = youtubeIcon };
-        youtubeButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://www.youtube.com/c/AM2RCommunityUpdates");
-
-        Bitmap discordIcon = new Bitmap(Resources.discordIcon48);
-        var discordButton = new ImageButton { ToolTip = Text.DiscordToolTip, Image = discordIcon };
-        discordButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://discord.gg/nk7UYPbd5u");
-        
-        //TODO: this needs a new tooltip
-        Bitmap matrixIcon = new Bitmap(Resources.matrixIcon48);
-        var matrixButton = new ImageButton { ToolTip = Text.MatrixToolTip, Image = matrixIcon };
-        matrixButton.Click += (_, _) => CrossPlatformOperations.OpenURL("https://matrix.to/#/#am2r-space:matrix.org");
+        var redditButton = new URLImageButton(Resources.redditIcon48, "https://www.reddit.com/r/AM2R", Text.RedditToolTip);
+        var githubButton = new URLImageButton(Resources.githubIcon48, "https://www.github.com/AM2R-Community-Developers", Text.GithubToolTip);
+        var youtubeButton = new URLImageButton(Resources.youtubeIcon48, "https://www.youtube.com/c/AM2RCommunityUpdates", Text.YoutubeToolTip);
+        var discordButton = new URLImageButton(Resources.discordIcon48, "https://discord.gg/nk7UYPbd5u", Text.DiscordToolTip);
+        var matrixButton = new URLImageButton(Resources.matrixIcon48, "https://matrix.to/#/#am2r-space:matrix.org", Text.MatrixToolTip);
         
         // Social button panel
         DynamicLayout socialPanel = new DynamicLayout();
