@@ -837,7 +837,7 @@ public partial class MainForm : Form
                 // When providing an exe, Windows uses its icon. 
                 // And for the URL, we just use the file:// protocol
                 shortcutText = shortcutText.Replace("ICONPATH", $"{Core.ProfilesPath}/{profile.Name}/AM2R.exe");
-                shortcutText = shortcutText.Replace("EXECUTABLE", new Uri($"{Core.ProfilesPath}/{profile.Name}", UriKind.Absolute).AbsoluteUri);
+                shortcutText = shortcutText.Replace("EXECUTABLE", new Uri($"{Core.ProfilesPath}/{profile.Name}/AM2R.exe", UriKind.Absolute).AbsoluteUri);
             }
             else if (OS.IsLinux)
             {
