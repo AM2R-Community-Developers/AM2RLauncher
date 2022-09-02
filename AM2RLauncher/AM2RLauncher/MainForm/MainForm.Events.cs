@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -815,21 +816,34 @@ public partial class MainForm : Form
                 MessageBox.Show(this, Text.ShortcutWarning, Text.WarningWindowTitle, MessageBoxType.Warning);
             });
         }
-        
-        string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop, Environment.SpecialFolderOption.Create);
-        string shortcutFile = "";
 
         try 
-        { 
+        {
+            string desktopFolder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop, Environment.SpecialFolderOption.Create);
+            string shortcutFile;
+            string shortcutText;
             if (OS.IsWindows)
             {
-                //TODO: implement this
+                shortcutFile = $"{desktopFolder}/{profile.Name}.url";
+
+                const string shortcutTemplate =
+                    "[InternetShortcut]\n" +
+                    "IDList=\n" +
+                    "IconIndex=0\n" +
+                    "URL=EXECUTABLE\n" +
+                    "IconFile=ICONPATH";
+
+                shortcutText = shortcutTemplate;
+                // When providing an exe, Windows uses its icon. 
+                // And for the URL, we just use the file:// protocol
+                shortcutText = shortcutText.Replace("ICONPATH", $"{Core.ProfilesPath}/{profile.Name}/AM2R.exe");
+                shortcutText = shortcutText.Replace("EXECUTABLE", new Uri($"{Core.ProfilesPath}/{profile.Name}", UriKind.Absolute).AbsoluteUri);
             }
             else if (OS.IsLinux)
             {
                 shortcutFile = $"{desktopFolder}/{profile.Name}.desktop";
                 
-                const string desktopEntryTemplate =
+                const string shortcutTemplate =
                     "[Desktop Entry]\n" +
                     "Type=Application\n" +
                     "Categories=Game\n" +
@@ -840,12 +854,12 @@ public partial class MainForm : Form
                     "Icon=ICONPATH\n" +
                     "Terminal=false";
 
-                string desktopEntryText = desktopEntryTemplate;
+                shortcutText = shortcutTemplate;
                 
                 // Replace values
-                desktopEntryText = desktopEntryText.Replace("PROFILENAME", $"{profile.Name}");
-                desktopEntryText = desktopEntryText.Replace("PROFILEDESCRIPTION", $"A shortcut for {profile.Name}.");
-                desktopEntryText = desktopEntryText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
+                shortcutText = shortcutText.Replace("PROFILENAME", $"{profile.Name}");
+                shortcutText = shortcutText.Replace("PROFILEDESCRIPTION", $"A shortcut for {profile.Name}.");
+                shortcutText = shortcutText.Replace("ICONPATH", $"{Core.PatchDataPath}/data/files_to_copy/icon.png");
 
                 string gameName;
                 #if NOAPPIMAGE
@@ -855,12 +869,9 @@ public partial class MainForm : Form
                 #endif
                 log.Info($"Game name for shortcut is: {gameName}");
                 if (OS.IsThisRunningFromFlatpak)
-                    desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"flatpak run \"--command={Core.ProfilesPath}/{profile.Name}/{gameName}\" io.github.am2r_community_developers.AM2RLauncher");
+                    shortcutText = shortcutText.Replace("EXECUTABLE", $"flatpak run \"--command={Core.ProfilesPath}/{profile.Name}/{gameName}\" io.github.am2r_community_developers.AM2RLauncher");
                 else
-                    desktopEntryText = desktopEntryText.Replace("EXECUTABLE", $"{Core.ProfilesPath}/{profile.Name}/{gameName}");
-                
-                File.WriteAllText(shortcutFile, desktopEntryText);
-                Process.Start("chmod", $"+x  \"{shortcutFile}\"")?.WaitForExit();
+                    shortcutText = shortcutText.Replace("EXECUTABLE", $"{Core.ProfilesPath}/{profile.Name}/{gameName}");
             }
             else if (OS.IsMac)
             {
@@ -871,7 +882,8 @@ public partial class MainForm : Form
                 log.Error($"{OS.Name} has no way of creating shortcuts");
                 return;
             }
-            
+            File.WriteAllText(shortcutFile, shortcutText);
+            if (OS.IsUnix) Process.Start("chmod", $"+x  \"{shortcutFile}\"")?.WaitForExit();
             CrossPlatformOperations.OpenFolderAndSelectFile(shortcutFile);
         }
         // We only care about io exceptions (file not readable, drive not available etc.) The rest should throw normally

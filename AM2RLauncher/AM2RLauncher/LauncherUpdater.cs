@@ -20,7 +20,7 @@ public static class LauncherUpdater
     // Auto updating is fun!
 
     /// <summary>The Version that identifies this current release.</summary>
-    public const string VERSION = Core.Version;
+    private const string VERSION = Core.Version;
 
     /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
     private static readonly string oldConfigPath = CrossPlatformOperations.CurrentPath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
