@@ -153,6 +153,13 @@ public class CustomButton : Drawable
         Invalidate();
     }
 
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.KeyData == Keys.Enter && HasFocus)
+            OnClick(null);
+    }
+
     /// <summary>
     /// Event raised when the mouse is released over this control's bounding box.
     /// </summary>
