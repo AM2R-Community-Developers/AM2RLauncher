@@ -32,12 +32,11 @@ public class CustomButton : Drawable
         get { return base.Enabled; }
         set
         {
-            if (base.Enabled != value)
-            {
-                base.Enabled = value;
-                if (Loaded)
-                    Invalidate();
-            }
+            if (base.Enabled == value)
+                return;
+            base.Enabled = value;
+            if (Loaded)
+                Invalidate();
         }
     }
 
@@ -88,7 +87,11 @@ public class CustomButton : Drawable
     }
 
     /// <summary>Default constructor. Sets <see cref="Enabled"/> to true.</summary>
-    public CustomButton() { Enabled = true; }
+    public CustomButton()
+    {
+        Enabled = true;
+        CanFocus = true;
+    }
 
     /// <summary>Event raised when this control is resized.</summary>
     /// <param name="e"></param>
@@ -106,11 +109,10 @@ public class CustomButton : Drawable
     protected override void OnMouseDown(MouseEventArgs e)
     {
         base.OnMouseDown(e);
-        if (Enabled)
-        {
-            mouseDown = true;
-            Invalidate();
-        }
+        if (!Enabled)
+            return;
+        mouseDown = true;
+        Invalidate();
     }
 
     /// <summary>
@@ -134,6 +136,20 @@ public class CustomButton : Drawable
         Cursor = new Cursor(CursorType.Default);
         base.OnMouseLeave(e);
         hover = false;
+        Invalidate();
+    }
+
+    protected override void OnGotFocus(EventArgs e)
+    {
+        hover = true;
+        base.OnGotFocus(e);
+        Invalidate();
+    }
+
+    protected override void OnLostFocus(EventArgs e)
+    {
+        hover = false;
+        base.OnLostFocus(e);
         Invalidate();
     }
 

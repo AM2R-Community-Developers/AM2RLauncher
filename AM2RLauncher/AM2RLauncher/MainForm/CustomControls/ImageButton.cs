@@ -99,5 +99,8 @@ public class ImageButton : CustomButton
         var xoffset = (this.Size.Width - size.Width) / 2;
         var yoffset = (this.Size.Height - size.Height) / 2;
         pe.Graphics.DrawImage(image, xoffset, yoffset, size.Width, size.Height);
+        if (Hover)
+            // This can probably be done prettier, but can't be bothered to much with it to be honest.
+            pe.Graphics.DrawRectangle(SystemColors.Highlight, xoffset, yoffset, size.Width, size.Height);
     }
 }
