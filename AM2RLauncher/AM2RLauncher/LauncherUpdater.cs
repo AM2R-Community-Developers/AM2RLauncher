@@ -11,7 +11,7 @@ using System.Reflection;
 namespace AM2RLauncher;
 
 /// <summary>
-/// Class that checks for Updates and then Updates the Launcher.
+/// Class that checks for Updates and then updates the Launcher.
 /// </summary>
 //TODO: Mac support for auto updater in general
 public static class LauncherUpdater

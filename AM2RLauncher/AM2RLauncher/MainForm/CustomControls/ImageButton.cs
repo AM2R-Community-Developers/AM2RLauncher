@@ -42,7 +42,6 @@ public class ImageButton : CustomButton
     /// <summary>
     /// Event raised when this control is loading.
     /// </summary>
-    /// <param name="e"></param>
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
@@ -56,7 +55,6 @@ public class ImageButton : CustomButton
     /// <summary>
     /// Event raised when this control has finished loading.
     /// </summary>
-    /// <param name="e"></param>
     protected override void OnLoadComplete(EventArgs e)
     {
         base.OnLoadComplete(e);
@@ -91,7 +89,6 @@ public class ImageButton : CustomButton
     /// <summary>
     /// Event raised to draw this control.
     /// </summary>
-    /// <param name="pe"></param>
     protected override void OnPaint(Eto.Forms.PaintEventArgs pe)
     {
         var image = this.Enabled ? Image : DisabledImage;

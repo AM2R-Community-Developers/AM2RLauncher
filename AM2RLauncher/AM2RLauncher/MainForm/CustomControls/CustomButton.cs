@@ -17,7 +17,7 @@ public class CustomButton : Drawable
     /// <summary>Whether or not the mouse is hovering over this <see cref="CustomButton"/>.</summary>
     bool hover;
 
-    /// <summary></summary>
+    /// <summary>Whether or not the mouse is pressed down over this <see cref="CustomButton"/>.</summary>
     bool mouseDown;
 
     /// <summary>Gets or sets the disabled color of this control.</summary>
@@ -79,7 +79,6 @@ public class CustomButton : Drawable
     /// <summary>
     /// Event raised when this control is clicked.
     /// </summary>
-    /// <param name="e"></param>
     protected virtual void OnClick(EventArgs e)
     {
         if (Click != null)
@@ -94,7 +93,6 @@ public class CustomButton : Drawable
     }
 
     /// <summary>Event raised when this control is resized.</summary>
-    /// <param name="e"></param>
     protected override void OnSizeChanged(EventArgs e)
     {
         base.OnSizeChanged(e);
@@ -105,7 +103,6 @@ public class CustomButton : Drawable
     /// <summary>
     /// Event raised when the mouse is pressed down over this control's bounding box.
     /// </summary>
-    /// <param name="e"></param>
     protected override void OnMouseDown(MouseEventArgs e)
     {
         base.OnMouseDown(e);
@@ -118,7 +115,6 @@ public class CustomButton : Drawable
     /// <summary>
     /// Event raised when the mouse enters this control's bounding box.
     /// </summary>
-    /// <param name="e"></param>
     protected override void OnMouseEnter(MouseEventArgs e)
     {
         Cursor = new Cursor(CursorType.Pointer);
@@ -130,7 +126,6 @@ public class CustomButton : Drawable
     /// <summary>
     /// Event raised when the mouse leaves this control's bounding box.
     /// </summary>
-    /// <param name="e"></param>
     protected override void OnMouseLeave(MouseEventArgs e)
     {
         Cursor = new Cursor(CursorType.Default);
@@ -139,6 +134,9 @@ public class CustomButton : Drawable
         Invalidate();
     }
 
+    /// <summary>
+    /// Event raised, when this control gets focused.
+    /// </summary>
     protected override void OnGotFocus(EventArgs e)
     {
         hover = true;
@@ -146,6 +144,9 @@ public class CustomButton : Drawable
         Invalidate();
     }
 
+    /// <summary>
+    /// Event raised, when this control looses focus.
+    /// </summary>
     protected override void OnLostFocus(EventArgs e)
     {
         hover = false;
@@ -153,6 +154,9 @@ public class CustomButton : Drawable
         Invalidate();
     }
 
+    /// <summary>
+    /// Event raised, when a key is pressed down.
+    /// </summary>
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
