@@ -461,7 +461,7 @@ public static class Profile
         if (OS.IsLinux)
         {
             string assetsPath = profilePath;
-            profilePath = profilePath.Substring(0, profilePath.LastIndexOf("/"));
+            profilePath = $"{Core.ProfilesPath}/{profile.Name}";
 
             // Rename all songs to lowercase
             foreach (FileInfo file in new DirectoryInfo(assetsPath).GetFiles())
@@ -571,7 +571,7 @@ public static class Profile
     /// <param name="profile"><see cref="ProfileXML"/> to be compiled into an APK.</param>
     /// <param name="useHqMusic">Whether to create the APK with high quality music or not.</param>
     /// <param name="progress">Provides the current progress of this method.</param>
-    public static void CreateAPK(ProfileXML profile, bool useHqMusic, IProgress<int> progress)
+    public static void CreateApk(ProfileXML profile, bool useHqMusic, IProgress<int> progress)
     {
         // Overall safety check just in case of bad situations
         if (!profile.SupportsAndroid)
@@ -695,7 +695,7 @@ public static class Profile
                 // Write log header to file
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append($"AM2RLauncher {Core.Version} log generated at {date}");
-                if (OS.IsThisRunningFromWine)
+                if (OS.IsThisRunningFromWINE)
                     stringBuilder.Append("Using WINE!");
                 File.WriteAllText(logFile, stringBuilder.ToString());
 
@@ -725,15 +725,16 @@ public static class Profile
             if (!File.Exists(am2rConfigPath))
                 File.WriteAllText(am2rConfigPath, "[Screen]\nFullscreen=\"0\"\nScale=\"3\"");
             
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-
-            startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = gameDirectory;
-            #if NOAPPIMAGE
-            startInfo.FileName = $"{gameDirectory}/runner";
-            #else
-            startInfo.FileName = $"{gameDirectory}/AM2R.AppImage";
-            #endif
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                UseShellExecute = false,
+                WorkingDirectory = gameDirectory,
+                #if NOAPPIMAGE
+                FileName = $"{gameDirectory}/runner"
+                #else
+                FileName = $"{gameDirectory}/AM2R.AppImage"
+                #endif
+            };
 
             log.Info($"CWD of Profile is {startInfo.WorkingDirectory}");
 

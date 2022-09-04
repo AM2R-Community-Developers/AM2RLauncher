@@ -5,7 +5,6 @@ using AM2RLauncher.Properties;
 using Eto.Drawing;
 using Eto.Forms;
 using log4net;
-using Pablo.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -284,7 +283,7 @@ public partial class MainForm : Form
         // Version number label
         Label versionLabel = new Label
         {
-            Text = $"v{VERSION}{(OS.IsThisRunningFromWine ? "-WINE" : "")}",
+            Text = $"v{VERSION}{(OS.IsThisRunningFromWINE ? "-WINE" : "")}",
             Width = 48, TextAlignment = TextAlignment.Right, TextColor = LauncherColors.Green,
             Font = new Font(SystemFont.Default, 12)
         };
@@ -300,7 +299,7 @@ public partial class MainForm : Form
         mainLayout.AddSpace();
 
         // Yes, I'm hard-coding this string. Linux users can english.
-        Label wineLabel = OS.IsThisRunningFromWine ? new Label { Text = "Unsupported", TextColor = LauncherColors.Red, TextAlignment = TextAlignment.Right } : null;
+        Label wineLabel = OS.IsThisRunningFromWINE ? new Label { Text = "Unsupported", TextColor = LauncherColors.Red, TextAlignment = TextAlignment.Right } : null;
         mainLayout.AddColumn(versionLabel, wineLabel);
 
         drawable.Content = mainLayout;

@@ -498,7 +498,7 @@ public partial class MainForm : Form
         bool useHQMusic = hqMusicAndroidCheck.Checked.Value;
 
         Progress<int> progressIndicator = new Progress<int>(UpdateProgressBar);
-        await Task.Run(() => Profile.CreateAPK(profileList[profileIndex.Value], useHQMusic, progressIndicator));
+        await Task.Run(() => Profile.CreateApk(profileList[profileIndex.Value], useHQMusic, progressIndicator));
 
         SetApkButtonState(ApkButtonState.Create);
         DisableProgressBar();

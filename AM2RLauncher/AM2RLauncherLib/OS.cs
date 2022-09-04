@@ -51,7 +51,7 @@ public static class OS
     /// <summary>
     /// Checks if this is run via WINE.
     /// </summary>
-    public static readonly bool IsThisRunningFromWine = CheckIfRunFromWINE();
+    public static readonly bool IsThisRunningFromWINE = CheckIfRunFromWINE();
 
     /// <summary>
     /// Checks if this is run via Flatpak.

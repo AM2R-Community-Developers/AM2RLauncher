@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
 namespace AM2RLauncherLib;
