@@ -133,11 +133,19 @@ public static class HelperMethods
             RecursiveRollover(fileName, max);
 
         //TODO: this can fail if one doesn't have permissions to move or delete the file
-        // If index is less than max, rename file.
-        if (index < max)
-            File.Move(logFile, fileName);
-        else // Otherwise, delete the file.
-            File.Delete(logFile);
+        // maybe fixed?
+        try
+        {
+            // If index is less than max, rename file.
+            if (index < max)
+                File.Move(logFile, fileName);
+            else // Otherwise, delete the file.
+                File.Delete(logFile);
+        }
+        catch
+        {
+            //ignore
+        }
     }
 
     /// <summary>
