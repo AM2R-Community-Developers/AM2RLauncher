@@ -408,6 +408,6 @@ Mettre à jour AM2R ou le lanceur ne peut passer que directement par le lanceur!
     <value>Mettre le jeu dans un sous-dossier n'est pas supporté. Pour le corriger, extraire l'archive, puis sélectionnez les fichiers pour recréer une nouvelle archive.</value>
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
-    <value>L'archive est une copie valide de AM2R_11</value>
+    <value>L'archive est une copie valide de AM2R_11.</value>
   </data>
 </root>
