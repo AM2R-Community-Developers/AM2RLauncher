@@ -590,5 +590,35 @@ namespace AM2RLauncher.Language {
                 return ResourceManager.GetString("ShortcutWarning", resourceCulture);
             }
         }
+        
+        public static string AM2R11MissingD3DDescription {
+            get {
+                return ResourceManager.GetString("AM2R11MissingD3DDescription", resourceCulture);
+            }
+        }
+        
+        public static string AM2R11MissingDataDescription {
+            get {
+                return ResourceManager.GetString("AM2R11MissingDataDescription", resourceCulture);
+            }
+        }
+        
+        public static string AM2R11MissingExeDescription {
+            get {
+                return ResourceManager.GetString("AM2R11MissingExeDescription", resourceCulture);
+            }
+        }
+        
+        public static string AM2R11SubfolderDescription {
+            get {
+                return ResourceManager.GetString("AM2R11SubfolderDescription", resourceCulture);
+            }
+        }
+        
+        public static string AM2R11SuccessfulDescription {
+            get {
+                return ResourceManager.GetString("AM2R11SuccessfulDescription", resourceCulture);
+            }
+        }
     }
 }

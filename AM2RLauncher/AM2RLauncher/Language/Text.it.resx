@@ -393,4 +393,19 @@ Procedi con cautela.</value>
     <value>Lanciare Aggiornamenti della Comunità attraverso la scorciatoia bypasserà il Launcher ed eviterà gli aggiornamenti automatici! L'aggiornamento di AM2R o del Launcher può essere solo fatto tramite l'apertura diretta del Launcher!
 </value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>Il file "D3DX9_43.dll" è mancante dal file zip o non è valido. Perfavore assicurati che hai la copia corretta di AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>Il file "data.win" è mancante dal file zip o non è valido. Perfavore assicurati che hai la copia corretta di AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>Il file "AM2R.exe" è mancante dal file zip o non è valido. Perfavore assicurati che hai la copia corretta di AM2R_11.</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>Il gioco si trova su una sottocartella, che non è supportata. Per sistemare il problema estrai il file zip in una cartella, entraci, seleziona tutti i file e poi crea un nuovo zip da essi.</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>Il file zip è una copia valida di AM2R_11.</value>
+  </data>
 </root>

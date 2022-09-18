@@ -395,4 +395,19 @@ Mettre à jour AM2R ou le lanceur ne peut passer que directement par le lanceur!
   <data name="CreateShortcut" xml:space="preserve">
     <value>CREER RACCOURCI BUREAU</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>Le fichier "D3DX9_43.dll" est manquant dans l'archive, ou invalide. Vérifiez que le ficher est une copie correcte de AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>Le fichier "data.win" est manquant dans l'archive, ou invalide. Vérifiez que le ficher est une copie correcte de AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>Le fichier "AM2R.exe" est manquant dans l'archive, ou invalide. Vérifiez que le ficher est une copie correcte de AM2R_11.</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>Mettre le jeu dans un sous-dossier n'est pas supporté. Pour le corriger, extraire l'archive, puis sélectionnez les fichiers pour recréer une nouvelle archive.</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>L'archive est une copie valide de AM2R_11</value>
+  </data>
 </root>

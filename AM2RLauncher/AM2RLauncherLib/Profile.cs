@@ -17,7 +17,6 @@ namespace AM2RLauncherLib;
 /// </summary>
 public enum IsZipAM2R11ReturnCodes
 {
-    //TODO: add meaningful descriptions to here so one can reference these later. Or implement them another way.
     Successful,
     MissingOrInvalidAM2RExe,
     MissingOrInvalidD3DX943Dll,

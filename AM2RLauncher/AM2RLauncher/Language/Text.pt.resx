@@ -393,4 +393,19 @@ Prossiga com cuidado.</value>
     <value>Iniciar as Atualizações da Comunidade através do atalho irá pular o Launcher, evitando que as atualizações automáticas sejam realizadas!  
 A atualização do AM2R ou do launcher só pode ser feita através do próprio launcher.</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>O arquivo "D3DX9_43.dll" está faltando neste zip, ou é inválido. Por favor, garanta que você tem uma cópia válida do AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>O arquivo "data.win" está faltando neste zip, ou é inválido. Por favor, garanta que você tem uma cópia válida do AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>O executável "AM2R.exe" está faltando neste zip, ou é inválido. Por favor, garanta que você tem uma cópia válida do AM2R_11.</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>O jogo está localizado em uma subpasta, o que não é suportado. Isso pode ser corrigido extraindo o zip para uma pasta, navegando até lá, selecionando todos os arquivos e criando um novo zip.</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>Este zip é uma cópia válida do AM2R_11.</value>
+  </data>
 </root>

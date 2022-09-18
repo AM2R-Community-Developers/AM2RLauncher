@@ -395,4 +395,19 @@
     <value>通过快捷方式运行社区更新版本，将会绕过启动器从而避免自动更新！
 更新 AM2R 或者启动器只能通过直接打开启动器来完成！</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>该 Zip 压缩文件缺少“D3DX9_43.dll”，或者所包含的“D3DX9_43.dll”不是有效的文件。请确保使用的 Zip 压缩文件为正确的 AM2R_11 副本。</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>该 Zip 压缩文件缺少“data.win”，或者所包含的“data.win”不是有效的文件。请确保使用的 Zip 压缩文件为正确的 AM2R_11 副本。</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>该 Zip 压缩文件缺少“AM2R.exe”，或者所包含的“AM2R.exe”不是有效的文件。请确保使用的 Zip 压缩文件为正确的 AM2R_11 副本。</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>游戏文件位于子文件夹中，因此不支持该 Zip 压缩文件。可以将该 Zip 压缩文件解压到单独的文件夹中，解压之后打开并进入文件夹，全选文件夹中的所有文件再创建新的 Zip 压缩文件即可解决该问题。</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>该 Zip 压缩文件是有效的 AM2R_11 副本</value>
+  </data>
 </root>

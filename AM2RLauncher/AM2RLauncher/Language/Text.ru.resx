@@ -393,4 +393,19 @@
     <value>Запуск обновлений сообщества через ярлык проигнорирует автоматические обновления лаунчера!
 Обновить AM2R и лаунчер можно только открыв лаунчер напрямую!</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>В архиве отсутствует файл библиотеки "D3DX9_43.dll", либо он непригоден. Пожалуйста, убедитесь, что вы обладаете валидной копией AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>В архиве отсутствует файл библиотеки "D3DX9_43.dll", либо он непригоден. Пожалуйста, убедитесь, что вы обладаете валидной копией AM2R_11.</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>В архиве отсутствует исполняемый файл "AM2R.exe", либо он непригоден. Пожалуйста, убедитесь, что вы обладаете валидной копией AM2R_11.</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>Игра расположена в дочерней папке, что приведёт к ошибкам выполнения. Это можно исправить: распаковав архив в папку, войдите в неё, выберите все файлы и создайте новый архив с ними.</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>Архив AM2R_11 валиден.</value>
+  </data>
 </root>

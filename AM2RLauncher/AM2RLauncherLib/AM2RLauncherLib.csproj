@@ -14,21 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Language\Text.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Text.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Language\Text.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Text.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="System.ComponentModel.Annotations">
       <HintPath>..\..\..\..\..\.cache\NuGet\system.componentmodel.annotations\5.0.0\ref\netstandard2.0\System.ComponentModel.Annotations.dll</HintPath>
     </Reference>

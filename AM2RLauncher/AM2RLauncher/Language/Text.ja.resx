@@ -393,4 +393,19 @@
     <value>ショートカットからコミュニティアップデートを起動するとランチャーがパスされるため自動更新されません。
 AM2Rやランチャーの更新は、ランチャーを直接起動することで実行されます。</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>D3DX9_43.dllファイルが存在しないか、あるいは破損しています。正常なAM2R_11アーカイブであるか確認してください。</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>data.winファイルが存在しないか、あるいは破損しています。正常なAM2R_11アーカイブであるか確認してください。</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>AM2R.exeが存在しないか、あるいは破損しています。正常なAM2R_11アーカイブであるか確認してください。</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>ゲームがサポート外のサブフォルダ内にあります。ZIPアーカイブをフォルダに解凍し、その中身のすべてのファイルを選択し、そこから新たにZIPに圧縮することで修正可能です。</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>これは正常なAM2R_11のZIPアーカイブです。</value>
+  </data>
 </root>

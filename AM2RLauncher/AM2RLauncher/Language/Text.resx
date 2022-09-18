@@ -395,4 +395,20 @@ Proceed with caution.</value>
     <value>Launching the Community Updates through the shortcut will bypass the Launcher and thus avoid automatic updates!
 Updating AM2R or the Launcher can only be done by opening the Launcher directly!</value>
   </data>
+  <data name="AM2R11MissingD3DDescription" xml:space="preserve">
+    <value>The "D3DX9_43.dll" file is missing from the zip, or it is invalid. Please ensure you have a correct AM2R_11 copy.</value>
+  </data>
+  <data name="AM2R11MissingDataDescription" xml:space="preserve">
+    <value>The "data.win" file is missing from the zip, or it is invalid. Please ensure you have a correct AM2R_11 copy.
+</value>
+  </data>
+  <data name="AM2R11MissingExeDescription" xml:space="preserve">
+    <value>The "AM2R.exe" file is missing from the zip, or it is invalid. Please ensure you have a correct AM2R_11 copy.</value>
+  </data>
+  <data name="AM2R11SubfolderDescription" xml:space="preserve">
+    <value>The game is located in a subfolder, which is unsupported. This can be fixed by extracting the zip into a folder, navigating into there, selecting all files and then creating a new zip from it.</value>
+  </data>
+  <data name="AM2R11SuccessfulDescription" xml:space="preserve">
+    <value>The zip is a valid copy of AM2R_11.</value>
+  </data>
 </root>

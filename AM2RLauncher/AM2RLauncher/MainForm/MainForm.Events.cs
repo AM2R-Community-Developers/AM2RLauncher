@@ -358,7 +358,15 @@ public partial class MainForm : Form
                 if (errorCode != IsZipAM2R11ReturnCodes.Successful)
                 {
                     log.Error("User tried to input invalid AM2R_11.zip file (" + errorCode + "). Cancelling import.");
-                    MessageBox.Show(this, Text.ZipIsNotAM2R11 + "\n\nError Code: " + errorCode, Text.ErrorWindowTitle, MessageBoxType.Error);
+                    string errorDescription = errorCode switch
+                    {
+                        IsZipAM2R11ReturnCodes.MissingOrInvalidAM2RExe => Text.AM2R11MissingExeDescription,
+                        IsZipAM2R11ReturnCodes.MissingOrInvalidD3DX943Dll => Text.AM2R11MissingD3DDescription,
+                        IsZipAM2R11ReturnCodes.MissingOrInvalidDataWin => Text.AM2R11MissingDataDescription,
+                        IsZipAM2R11ReturnCodes.GameIsInASubfolder => Text.AM2R11SubfolderDescription,
+                        _ => "Unknown error code!"
+                    };
+                    MessageBox.Show(this, $"{Text.ZipIsNotAM2R11}\n\nError Code: {errorCode}\n\n{errorDescription}", Text.ErrorWindowTitle, MessageBoxType.Error);
                     return;
                 }
 
