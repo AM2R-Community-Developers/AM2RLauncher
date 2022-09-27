@@ -3,7 +3,7 @@ A front-end application that simplifies installing the latest AM2R-Community-Upd
 
 ## What is this?
 AM2R (Another Metroid 2 Remake) is a fan-made remake of *Metroid II: Return of Samus* in the style of *Metroid: Zero Mission*. It was released in 2016 by DoctorM64 and his team, and very soon after, has received a DMCA letter from Nintendo.  
-A few years after, multiple members of the community managed to reverse engineer the game and published unofficial updates, dubbed the AM2R-Community-Updates. Those fixed bugs and added new features like widescreen, added content planned by the original devs before they were struck down, and port it to other platforms.  
+A few years after, multiple members of the community managed to reverse engineer the game and published unofficial updates, dubbed the AM2R-Community-Updates. Those fixed bugs and added new features like widescreen, added content planned by the original devs before they were struck down, and ported it to other platforms.  
 
 The AM2RLauncher lets you conveniently play those Community-Updates, automatically receive updates, install AM2R mods and create APKs to play on your phone.  
 No copyrighted files are shipped, you need to provide your own copy of AM2R_11!
