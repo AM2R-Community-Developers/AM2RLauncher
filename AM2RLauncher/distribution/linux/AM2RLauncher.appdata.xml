@@ -11,7 +11,49 @@
         <category>Game</category>
     </categories>
     <description>
-        <p>A front-end application that simplifies installing the latest AM2R-Community-Updates, creating APKs for Android use, as well as Mods for AM2R.</p>
+        <p>
+            AM2R (Another Metroid 2 Remake) is a fan-made remake of <em>Metroid II: Return of Samus</em> in the style of <em>Metroid: Zero Mission</em>.
+            It was released in 2016 by DoctorM64 and his team, and very soon after, has received a DMCA letter from Nintendo.<br>
+            A few years after, multiple members of the community managed to reverse engineer the game and published unofficial updates, 
+            dubbed the AM2R-Community-Updates. Those fixed bugs and added new features like widescreen, added content planned by the original devs before 
+            they were struck down, and ported it to other platforms.  
+        </p>
+        <p>
+            The AM2RLauncher lets you conveniently play those Community-Updates, automatically receive updates, install AM2R mods and create 
+            APKs to play on your phone.<br>
+            No copyrighted files are shipped, you need to provide your own copy of AM2R_11!
+        </p>
+        <p>
+            For further questions regarding AM2R <a href="https://am2r-community-developers.github.io/DistributionCenter/faq.html">see this FAQ</a>.
+            For further questions regarding the AM2RLauncher <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki">see this Wiki</a>.
+            For further communication, you can reach us on <a href="https://discord.gg/nk7UYPbd5u">Discord</a>, 
+            <a href="https://matrix.to/#/#am2r-space:matrix.org">Matrix</a>, or 
+            <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">GitHub issues</a>.
+        </p>
+    </description>
+    <description xml:lang="es"> 
+        <p>
+            AM2R (<em>Another Metroid 2 Remake</em>, que significa Otro Remake de Metroid 2) es un remake del juego para la Game Boy 
+            <em>Metroid II: Return of Samus</em> hecho por fans, utilizando un estilo similar al de <em>Metroid: Zero Mission</em> para Game Boy Advance. 
+            Lanzado originalmente en 2016 por DoctorM64 y su equipo, al poco tiempo recibió un aviso por parte de Nintendo, indicando que infringía 
+            la Ley de Derechos de Autor de la Era Digital.<br>
+            Unos años más tarde, un grupo de miembros pertenecientes a la comunidad lograron reproducir el funcionamiento del juego mediante ingeniería inversa 
+            y consiguieron publicar actualizaciones no oficiales, apodadas <em>AM2R-Community-Updates</em> (Actualizaciones de la Comunidad de AM2R). 
+            Estas actualizaciones arreglaron algunos bugs y añadieron características nuevas como la posibilidad de jugar en pantalla ancha, 
+            así como otros contenidos extra que los desarrolladores originales tenían planeado lanzar antes de que les cerraran el proyecto. 
+            También han conseguido portear el juego a otros sistemas.
+        </p>
+        <p>
+            El programa AM2RLauncher te permite jugar de forma fácil a esas Actualizaciones de la Comunidad, recibir actualizaciones automáticas, 
+            instalar mods para AM2R y crear archivos APK para poder jugar en tu móvil.<br>
+            ¡No contiene ningún archivo protegido con copyright, deberás proporcionar tu propia copia de AM2R_11!
+        </p>
+        <p>
+            Para más preguntas sobre AM2R <a href="https://am2r-community-developers.github.io/DistributionCenter/faq.html">visita este FAQ</a>.
+            Para más preguntas sobre AM2RLauncher <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki">visita esta Wiki</a>.
+            Para hablar con nosotros, puedes contactar mediante <a href="https://discord.gg/nk7UYPbd5u">Discord</a>, 
+            <a href="https://matrix.to/#/#am2r-space:matrix.org">Matrix</a>, o <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">GitHub</a>.
+        </p>
     </description>
     <launchable type="desktop-id">io.github.am2rcommunitydevelopers.AM2RLauncher.desktop</launchable>
     <url type="homepage">https://github.com/AM2R-Community-Developers/AM2RLauncher</url>
