@@ -12,6 +12,15 @@ For further questions regarding AM2R [see this FAQ](https://am2r-community-devel
 For further questions regarding the AM2RLauncher [see this Wiki](https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki).  
 For further communication, you can reach us on [Discord](https://discord.gg/nk7UYPbd5u), [Matrix](https://matrix.to/#/#am2r-space:matrix.org), or [GitHub issues](https://github.com/AM2R-Community-Developers/AM2RLauncher/issues).
 
+## Downloads
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/AM2R-Community-Developers/AM2RLauncher?label=GitHub&logo=github&style=flat-square) ![Flathub](https://img.shields.io/flathub/v/io.github.am2r_community_developers.AM2RLauncher?label=FlatHub&logo=flathub&logoColor=white&style=flat-square)
+![AUR version](https://img.shields.io/aur/version/am2rlauncher?label=AUR&style=flat-square)      
+Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
+
+For all Linux users, a [Flatpak](https://flathub.org/apps/details/io.github.am2r_community_developers.AM2RLauncher) is available and can be installed with all above dependencies bundled. This method is the recommended way for Steam Deck users.
+
+Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
+
 ## Dependencies
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
 Linux needs the following dependencies installed:
@@ -32,13 +41,6 @@ As well as these dependencies to run AM2R:
 Optionally, for APK creation any Java runtime is needed.
 
 For more detailed instructions check out the [installation process wiki page](https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki/Installation-Process).
-
-## Downloads
-Downloads can be found at the [Release Page](https://github.com/AM2R-Community-Developers/AM2RLauncher/releases).
-
-For all Linux users, a [Flatpak](https://flathub.org/apps/details/io.github.am2r_community_developers.AM2RLauncher) is available and can be installed with all above dependencies bundled. This method is the recommended way for Steam Deck users.
-
-Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
 
 ## Configuration and Data Files
 The AM2RLauncher stores its files in the following places:
