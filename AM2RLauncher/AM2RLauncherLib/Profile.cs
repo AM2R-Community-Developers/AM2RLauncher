@@ -235,7 +235,7 @@ public static class Profile
 
             // Safety check for non-installable profiles
             // If not installable and isn't installed, remove it
-            if (!profile.Installable && IsProfileInstalled(profile))
+            if (!profile.Installable && !IsProfileInstalled(profile))
                 DeleteProfile(profile);
             else
                 profileList.Add(profile);
@@ -260,7 +260,7 @@ public static class Profile
         // Change name to include version and be unique
         profile.Name += $" ({profile.Version})";
         // if we're archiving community updates, remove the "latest" part
-        profile.Name = profile.Name.Replace("Community Updates Latest", "Community Updates");
+        profile.Name = profile.Name.Replace("Community Updates (Latest)", "Community Updates");
 
         log.Info($"Archiving {profile.Name}");
 
