@@ -5,8 +5,9 @@ using System.Xml.Serialization;
 namespace AM2RLauncher.XML;
 
 /// <summary>
-/// Class that handles how the Launcher settings are saved as XML. Only affects Linux
+/// Class that handles how the Launcher settings are saved as XML.
 /// </summary>
+/// <remarks>Only affects Linux and Mac! Windows settings can be found in the Wpf project in "app.config".</remarks>
 [Serializable]
 [XmlRoot("settings")]
 public class LauncherConfigXML
