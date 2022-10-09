@@ -19,6 +19,7 @@ public static class Splash
         "Speedrun THIS, I dare you.",
         "The broken pipe is a lie.",
         "I am altering the broken pipe. Pray I don't alter it any further.",
+        "How dreadful, Yet Another Launcher to bloat my system.",
         "Over committing to April Fool's since 2018.",
         "Also try Metroid II: Return of Samus!",
         "Also try Metroid: Samus Returns!",
