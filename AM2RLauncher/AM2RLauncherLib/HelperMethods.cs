@@ -155,7 +155,7 @@ public static class HelperMethods
     public static bool IsConnectedToInternet()
     {
         log.Info("Checking internet connection...");
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com");
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://github.com/site-map");
         try
         {
             request.GetResponse();
