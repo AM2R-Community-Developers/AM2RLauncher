@@ -388,7 +388,7 @@ Soyez prudent.</value>
   <data name="MatrixToolTip" xml:space="preserve">
     <value>Le Matrix Space AM2R officiel</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Lancer les MAJ Communautaires par raccourci sans le lanceur empêchera les MAJ automatique! 
 Mettre à jour AM2R ou le lanceur ne peut passer que directement par le lanceur!</value>
   </data>

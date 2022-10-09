@@ -389,7 +389,7 @@ Bitte äußerste Vorsicht walten lassen.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>DESKTOPVERKNÜPFUNG ERSTELLEN</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Das Starten der Community Updates durch Verknüpfungen umgeht den Launcher und dadurch auch automatische Updates.
 Das Updaten von AM2R oder des Launchers kann nur durch das direkte Starten des Launchers passieren!</value>
   </data>
@@ -407,5 +407,8 @@ Das Updaten von AM2R oder des Launchers kann nur durch das direkte Starten des L
   </data>
   <data name="AM2R11SubfolderDescription" xml:space="preserve">
     <value>Das Spiel befindet sich in einem Unterordner. Dies wird nicht unterstützt. Das Problem kann behoben werden, indem die Zip-Datei entpackt wird, in den Ordner navigiert wird, alle Dateien ausgewählt werden, und eine neue Zip von der Auswahl erstellt wird.</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>Wenn mehrere Instanzen von AM2R gleichzeitig ausgeführt werden, kann dies zu Korruption von Speicherständen führen! Der AM2RLauncher verhindert dies, durch die Nutzung von Verknüpfungen ist es allerdings möglich das Pänomen auszulösen.</value>
   </data>
 </root>

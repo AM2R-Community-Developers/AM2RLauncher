@@ -389,7 +389,7 @@ Prossiga com cuidado.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>Criar atalho na Área de Trabalho</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Iniciar as Atualizações da Comunidade através do atalho irá pular o Launcher, evitando que as atualizações automáticas sejam realizadas!  
 A atualização do AM2R ou do launcher só pode ser feita através do próprio launcher.</value>
   </data>
@@ -407,5 +407,8 @@ A atualização do AM2R ou do launcher só pode ser feita através do próprio l
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>Este zip é uma cópia válida do AM2R_11.</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>Executar múltiplas cópias do AM2R ao mesmo tempo pode corromper seus saves! O launcher evita isso, mas usar um atalho torna possível que você encontre esse problema.</value>
   </data>
 </root>

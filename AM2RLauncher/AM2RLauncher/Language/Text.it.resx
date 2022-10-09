@@ -389,7 +389,7 @@ Procedi con cautela.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>CREA SCORCIATOIA SUL DESKTOP</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Lanciare Aggiornamenti della Comunità attraverso la scorciatoia bypasserà il Launcher ed eviterà gli aggiornamenti automatici! L'aggiornamento di AM2R o del Launcher può essere solo fatto tramite l'apertura diretta del Launcher!
 </value>
   </data>
@@ -407,5 +407,8 @@ Procedi con cautela.</value>
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>Il file zip è una copia valida di AM2R_11.</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>Se multiple copie di AM2R sono in esecuzione allo stesso momento, il salvataggio potrebbe corrompersi! Il launcher lo previene, ma usando una scorciatoia desktop rende possibile attivare questo comportamento.</value>
   </data>
 </root>

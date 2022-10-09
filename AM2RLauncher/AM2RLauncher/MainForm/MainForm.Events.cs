@@ -816,14 +816,15 @@ public partial class MainForm : Form
         ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
         log.Info($"User wants to create a desktop shortcut for {profile.Name}.");
         
-        // We want to give a warning to users, so they don't complain with "why didn't I get 2.0???"
+        // We want to give a warning to users, so they don't complain with "why didn't I get 2.0???" or "why did save broke?"
+        string messageText = Text.ShortcutWarningSaves;
         if (profile.Name == "Community Updates (Latest)")
+            messageText = Text.ShortcutWarningCommunityUpdates + "\n\n" + Text.ShortcutWarningSaves;
+
+        Application.Instance.Invoke(() =>
         {
-            Application.Instance.Invoke(() =>
-            {
-                MessageBox.Show(this, Text.ShortcutWarning, Text.WarningWindowTitle, MessageBoxType.Warning);
-            });
-        }
+            MessageBox.Show(this, messageText, Text.WarningWindowTitle, MessageBoxType.Warning);
+        });
 
         try 
         {

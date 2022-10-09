@@ -391,7 +391,7 @@ Proceed with caution.</value>
   <data name="CreateShortcut" xml:space="preserve">
     <value>CREATE SHORTCUT ON DESKTOP</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Launching the Community Updates through the shortcut will bypass the Launcher and thus avoid automatic updates!
 Updating AM2R or the Launcher can only be done by opening the Launcher directly!</value>
   </data>
@@ -410,5 +410,8 @@ Updating AM2R or the Launcher can only be done by opening the Launcher directly!
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>The zip is a valid copy of AM2R_11.</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>If multiple copies of AM2R are running at once, save corruption may occur! The launcher prevents this, but using a desktop shortcut makes it possible to trigger this behavior.</value>
   </data>
 </root>

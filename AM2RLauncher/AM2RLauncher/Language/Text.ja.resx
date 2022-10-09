@@ -389,7 +389,7 @@
   <data name="CreateShortcut" xml:space="preserve">
     <value>ショートカットをデスクトップに作成</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>ショートカットからコミュニティアップデートを起動するとランチャーがパスされるため自動更新されません。
 AM2Rやランチャーの更新は、ランチャーを直接起動することで実行されます。</value>
   </data>
@@ -407,5 +407,8 @@ AM2Rやランチャーの更新は、ランチャーを直接起動すること�
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>これは正常なAM2R_11のZIPアーカイブです。</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>AM2Rを二重起動するとセーブファイルが破損する可能性があります!　ランチャーにはこれを防ぐ機能がありますが、ショートカットからランチャーを起動すると保護機能が動作しません。</value>
   </data>
 </root>

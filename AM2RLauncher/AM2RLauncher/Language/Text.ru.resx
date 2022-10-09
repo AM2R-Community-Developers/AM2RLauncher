@@ -389,7 +389,7 @@
   <data name="CreateShortcut" xml:space="preserve">
     <value>СОЗДАТЬ ЯРЛЫК НА РАБОЧЕМ СТОЛЕ</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>Запуск обновлений сообщества через ярлык проигнорирует автоматические обновления лаунчера!
 Обновить AM2R и лаунчер можно только открыв лаунчер напрямую!</value>
   </data>

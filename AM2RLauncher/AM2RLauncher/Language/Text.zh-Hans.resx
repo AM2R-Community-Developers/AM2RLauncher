@@ -391,7 +391,7 @@
   <data name="CreateShortcut" xml:space="preserve">
     <value>创建桌面快捷方式</value>
   </data>
-  <data name="ShortcutWarning" xml:space="preserve">
+  <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>通过快捷方式运行社区更新版本，将会绕过启动器从而避免自动更新！
 更新 AM2R 或者启动器只能通过直接打开启动器来完成！</value>
   </data>
@@ -409,5 +409,8 @@
   </data>
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>该 Zip 压缩文件是有效的 AM2R_11 副本</value>
+  </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>如果同时运行多个 AM2R 游戏实例，将有可能导致保存数据损坏！使用启动器可防止出现该情况，但通过桌面快捷方式运行就有可能产生该问题。</value>
   </data>
 </root>

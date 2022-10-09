@@ -585,9 +585,9 @@ namespace AM2RLauncher.Language {
             }
         }
         
-        public static string ShortcutWarning {
+        public static string ShortcutWarningCommunityUpdates {
             get {
-                return ResourceManager.GetString("ShortcutWarning", resourceCulture);
+                return ResourceManager.GetString("ShortcutWarningCommunityUpdates", resourceCulture);
             }
         }
         
@@ -618,6 +618,12 @@ namespace AM2RLauncher.Language {
         public static string AM2R11SuccessfulDescription {
             get {
                 return ResourceManager.GetString("AM2R11SuccessfulDescription", resourceCulture);
+            }
+        }
+        
+        public static string ShortcutWarningSaves {
+            get {
+                return ResourceManager.GetString("ShortcutWarningSaves", resourceCulture);
             }
         }
     }
