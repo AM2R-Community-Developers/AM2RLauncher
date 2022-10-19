@@ -39,7 +39,29 @@
             <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">GitHub issues</a>.
         </p>
     </description>
-    <!--TODO: german, french, russian-->
+    <!--TODO: russian-->
+    <description xml:lang="de">
+        <p>
+            AM2R (Another Metroid 2 Remake, Englisch für <em>ein weiteres Metroid 2 Remake</em>) ist ein von Fans entwickeltes Remake von 
+            <em>Metroid II: Return of Samus</em> im Stil von <em>Metroid: Zero Mission</em>. Es wurde 2016 von DoctorM64 und seinem Team veröffentlicht, 
+            erhielten aber kurz darauf rechtliche Klagen von Nintendo.<br>
+            Ein paar Jahre später gelang es mehreren Mitgliedern der Gemeinde, das Spiel zu rekonstruieren und inoffizielle Updates zu veröffentlichen, 
+            die AM2R-Community-Updates genannt werden. Diese behoben Fehler und fügten neue Funktionen wie Breitbild hinzu, 
+            Inhalte die von den ursprünglichen Entwicklern geplant waren, und portierten das Spiel auf andere Betriebsysteme.
+        </p>
+        <p>
+            Mit dem AM2RLauncher ist es möglich diese Community-Updates, als auch AM2R-Mods, bequem zu installieren, automatisch Updates zu erhalten, 
+            und APKs für das Speielen auf dem Handy zu erstellen.<br>
+            Es werden keine urheberrechtlich geschützten Dateien mitgeliefert, es muss eine eigene Kopie von AM2R_11 bereitgestellt werden!
+        </p>
+        <p>
+            Für weitere Fragen zu AM2R <a href="https://am2r-community-developers.github.io/DistributionCenter/faq.html">siehe dieses FAQ</a>.
+            Für weitere Fragen bezüglich des AM2RLauncher <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki">siehe dieses Wiki</a>.
+            Für weitere Kommunikation sind wir auf <a href="https://discord.gg/nk7UYPbd5u">Discord</a>, 
+            <a href="https://matrix.to/#/#am2r-space:matrix.org">Matrix</a>, oder bei Problemen <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">auf GitHub</a> 
+            zu erreichen.
+        </p>
+    </description>
     <description xml:lang="es"> 
         <p>
             AM2R (<em>Another Metroid 2 Remake</em>, que significa Otro Remake de Metroid 2) es un remake del juego para la Game Boy 
@@ -62,6 +84,26 @@
             Para más preguntas sobre AM2RLauncher <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki">visita esta Wiki</a>.
             Para hablar con nosotros, puedes contactar mediante <a href="https://discord.gg/nk7UYPbd5u">Discord</a>, 
             <a href="https://matrix.to/#/#am2r-space:matrix.org">Matrix</a>, o <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">GitHub</a>.
+        </p>
+    </description>
+    <description xml:lang="fr">
+        <p>
+            AM2R (Another Metroid 2 Remake) est un remake fait par des fans de <em>Metroid II: Return of Samus</em> dans le style de <em>Metroid: Zero Mission</em>. 
+            Le jeu fut publié en 2016 par DoctorM64 et son équipe, et peu de temps après, reçut une lettre de DMCA de la part de Nintendo.<br>
+            Quelques années après, plusieurs membre de la communauté réussirent à faire une rétro-ingénierie du jeu et publières des MAJ non-officielles, 
+            appelées AM2R-Community-Updates. Elles corrigent des bugs et ajoutent de nouvelles fonctionalités comme un écran large, 
+            et ajoutent du contenu prévu par les développeurs originaux avant la termination, et incluent des ports pour de nouvelles plateformes.  
+        </p>
+        <p>
+            Le AM2RLauncher vous permet de jouer facilement à ces MAJ communautaires, recevoir les MAJ automatiquement, 
+            installer les mods d&#39;AM2R et créer des APK pour jouer sur téléphone.<br>
+            Aucun fichier sous copyright n&#39;est inclus, vous devez avoir votre propre archive de AM2R_11!
+        </p>
+        <p>
+            Pour plus de questions sur AM2R <a href="https://am2r-community-developers.github.io/DistributionCenter/faq.html">see this FAQ</a>.
+            Pour plus de questions sur le AM2RLauncher <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki">see this Wiki</a>.
+            Pour plus d&#39;informations, vous pouvez nous joindre sur <a href="https://discord.gg/nk7UYPbd5u">Discord</a>, 
+            <a href="https://matrix.to/#/#am2r-space:matrix.org">Matrix</a>, ou <a href="https://github.com/AM2R-Community-Developers/AM2RLauncher/issues">GitHub issues</a>.
         </p>
     </description>
     <description xml:lang="it">
