@@ -410,4 +410,7 @@ Mettre à jour AM2R ou le lanceur ne peut passer que directement par le lanceur!
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>L'archive est une copie valide de AM2R_11.</value>
   </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>Si plusieurs copies d'AM2R fonctionnent en même temps, les sauvegardes peuvent êtres corrompues! Le lanceur empêche cela, mais utiliser un raccourci bureau peut rendre possible cette situation.</value>
+  </data>
 </root>
