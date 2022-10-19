@@ -7,14 +7,14 @@
     <name>AM2RLauncher</name>
     <developer_name>AM2R Community Developers</developer_name>
     <summary>A front-end for dealing with AM2R updates and mods</summary>
-    <summary xml:lang="de">Ein Programm für die Handhabung mit AM2R-Updates und Mods</summmary>
-    <summary xml:lang="es">Un front-end para organizar y controlar las actualizaciones y mods de AM2R</summmary>
-    <summary xml:lang="fr">Une interface pour intéragir avec les mods et MAJ de AM2R</summmary>
-    <summary xml:lang="it">Una front-end per gestire aggiornamenti e mod di AM2R</summmary>
-    <summary xml:lang="pt">Um front-end para gerenciar mods e atualizações do AM2R</summmary>
-    <summary xml:lang="ja">AM2Rの更新やMODを扱うためのフロントエンド</summmary>
-    <summary xml:lang="ru">Клиент для распоряжения обновлениями и модами для AM2R</summmary>
-    <summary xml:lang="zh-Hans">一个负责管理 AM2R 的更新和 Mod 的前端</summmary>
+    <summary xml:lang="de">Ein Programm für die Handhabung mit AM2R-Updates und Mods</summary>
+    <summary xml:lang="es">Un front-end para organizar y controlar las actualizaciones y mods de AM2R</summary>
+    <summary xml:lang="fr">Une interface pour intéragir avec les mods et MAJ de AM2R</summary>
+    <summary xml:lang="it">Una front-end per gestire aggiornamenti e mod di AM2R</summary>
+    <summary xml:lang="pt">Um front-end para gerenciar mods e atualizações do AM2R</summary>
+    <summary xml:lang="ja">AM2Rの更新やMODを扱うためのフロントエンド</summary>
+    <summary xml:lang="ru">Клиент для распоряжения обновлениями и модами для AM2R</summary>
+    <summary xml:lang="zh-Hans">一个负责管理 AM2R 的更新和 Mod 的前端</summary>
     <categories>
         <category>Game</category>
     </categories>
