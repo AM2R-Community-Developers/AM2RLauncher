@@ -408,4 +408,7 @@
   <data name="AM2R11SuccessfulDescription" xml:space="preserve">
     <value>Архив AM2R_11 валиден.</value>
   </data>
+  <data name="ShortcutWarningSaves" xml:space="preserve">
+    <value>Если одновременно запущено несколько копий AM2R, может произойти повреждение сохранений! Программа запуска предотвращает это, но использование ярлыка на рабочем столе позволяет вызвать такое поведение.</value>
+  </data>
 </root>
