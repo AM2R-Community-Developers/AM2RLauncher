@@ -556,7 +556,7 @@ public static class Profile
             #if NOAPPIMAGE
             // Use the exe name based on the desktop file in the AppImage, as that's what has been used for patching
             string desktopContents = File.ReadAllText($"{Core.PatchDataPath}/data/AM2R.AppDir/AM2R.desktop");
-            exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
+            string exe = Regex.Match(desktopContents, @"(?<=Exec=).*").Value;
             return File.Exists($"{Core.ProfilesPath}/{profile.Name}/{exe}");
             #else
             return File.Exists($"{Core.ProfilesPath}/{profile.Name}/AM2R.AppImage");
