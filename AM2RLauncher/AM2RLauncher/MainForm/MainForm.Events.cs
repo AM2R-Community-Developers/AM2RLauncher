@@ -816,6 +816,8 @@ public partial class MainForm : Form
         ProfileXML profile = profileList[modSettingsProfileDropDown.SelectedIndex];
         log.Info($"User wants to create a desktop shortcut for {profile.Name}.");
         
+        //TODO: put most of this into Lib?
+        
         // We want to give a warning to users, so they don't complain with "why didn't I get 2.0???" or "why did save broke?"
         string messageText = Text.ShortcutWarningSaves;
         if (profile.Name == "Community Updates (Latest)")
@@ -884,7 +886,12 @@ public partial class MainForm : Form
             }
             else if (OS.IsMac)
             {
-                throw new NotImplementedException("Creating Desktop Shortcuts on Mac has currently not been implemented!");
+                // TODO: implement this for mac
+                Application.Instance.Invoke(() =>
+                {
+                    MessageBox.Show(this, "Creating Desktop Shortcuts on Mac has currently not been implemented!", Text.ErrorWindowTitle, MessageBoxType.Error);
+                });
+                return;
             }
             else
             {

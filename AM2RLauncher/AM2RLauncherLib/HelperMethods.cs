@@ -168,7 +168,7 @@ public static class HelperMethods
         log.Info("Internet connection established!");
         return true;
         
-        // TODO: For some reason, using the below approach creates zombie process when checking for Xdelta
+        // TODO: For some reason, using the below approach creates zombie process when checking for Xdelta on Linux
         // I have no idea why, but I also can't be bothered to troubleshoot why that is the case right now.
         // Until someone figures out why that is the case, and makes the below approach not create zombie processes
         // it will stay commented out and the slower above approach will be used instead.
