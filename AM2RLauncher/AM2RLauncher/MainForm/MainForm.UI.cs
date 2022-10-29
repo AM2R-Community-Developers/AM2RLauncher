@@ -140,14 +140,14 @@ public partial class MainForm : Form
 
         Icon = new Icon(1f, am2rIcon);
         Title = $"AM2RLauncher {VERSION}: {splash}";
-        MinimumSize = new Size(500, 400);
+        MinimumSize = new Size(550, 500);
         // TODO: for some reason, this doesn't work on Linux. Was reported at eto, stays here until its fixed
         ClientSize = new Size(Int32.Parse(ReadFromConfig("Width")), Int32.Parse(ReadFromConfig("Height")));
         // Workaround for above problem
-        if (OS.IsWindows && (ClientSize.Width < 500))
-            ClientSize = new Size(500, ClientSize.Height);
-        if (OS.IsWindows && (ClientSize.Height < 400))
-            ClientSize = new Size(ClientSize.Width, 400);
+        if (OS.IsWindows && (ClientSize.Width < 550))
+            ClientSize = new Size(550, ClientSize.Height);
+        if (OS.IsWindows && (ClientSize.Height < 500))
+            ClientSize = new Size(ClientSize.Width, 500);
         log.Info($"Start the launcher with Size: {ClientSize.Width}, {ClientSize.Height}");
         if (Boolean.Parse(ReadFromConfig("IsMaximized"))) Maximize();
 
