@@ -1,17 +1,7 @@
-name: Build
+name: Build And Publish
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths-ignore: 
-      - 'README.md'
-      - '.github/**'
-  pull_request:
-    branches: [ main ]
-    paths-ignore: 
-      - 'README.md'
-      - '.github/**'
 
 jobs:
   build:
@@ -45,3 +35,11 @@ jobs:
     - name: Build
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
+    # Steps for uploading artifacts.
+    - name: Zip to Archive
+      run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: ${{ matrix.os }}
+        path: ${{ matrix.os }}.zip
