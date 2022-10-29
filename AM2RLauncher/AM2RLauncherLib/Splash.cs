@@ -88,6 +88,7 @@ public static class Splash
         "Yes, do as I say!",
         "Did you find the penguin yet?"
     };
+    // TODO: add flatpak and wine specific splashes
 
     /// <summary>
     /// Mac only splash strings
