@@ -335,6 +335,7 @@ public static class Profile
     {
         log.Info($"Installing profile {profile.Name}...");
 
+        // TODO: should we patch in some temp path first, and then later move to the profile path?
         string profilePath = $"{Core.ProfilesPath}/{profile.Name}";
 
         // Failsafe for Profiles directory
@@ -588,6 +589,7 @@ public static class Profile
         // Create working dir after some cleanup
         string apktoolPath = $"{Core.PatchDataPath}/utilities/android/apktool.jar";
         string uberPath = $"{Core.PatchDataPath}/utilities/android/uber-apk-signer.jar";
+        // TODO: do we really want to do this in AM2RLauncher path instead of an actual temp path?
         string tempDir = new DirectoryInfo($"{CrossPlatformOperations.CurrentPath}/temp").FullName;
         string dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
 
