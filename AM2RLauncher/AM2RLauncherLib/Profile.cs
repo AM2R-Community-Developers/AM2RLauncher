@@ -335,25 +335,23 @@ public static class Profile
     {
         log.Info($"Installing profile {profile.Name}...");
 
-        // TODO: should we patch in some temp path first, and then later move to the profile path?
         string profilePath = $"{Core.ProfilesPath}/{profile.Name}";
+        string tempPath = $"{Path.GetTempPath()}/AM2RLauncherProfileTemp/";
 
         // Failsafe for Profiles directory
         if (!Directory.Exists(Core.ProfilesPath))
             Directory.CreateDirectory(Core.ProfilesPath);
 
-        // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
-        if (Directory.Exists(profilePath))
-            Directory.Delete(profilePath, true);
-
-        // Create profile directory
-        Directory.CreateDirectory(profilePath);
-
+        // Delete temp if it exists + create it
+        if (Directory.Exists(tempPath))
+            Directory.Delete(tempPath, true);
+        Directory.CreateDirectory(tempPath);
+        
         // Switch profilePath on Linux and Mac, as they need special handling
         if (OS.IsLinux)
         {
-            profilePath += "/assets";
-            Directory.CreateDirectory(profilePath);
+            tempPath += "/assets";
+            Directory.CreateDirectory(tempPath);
         }
         else if (OS.IsMac)
         {
@@ -362,15 +360,15 @@ public static class Profile
             //             |-Frameworks (some libs)
             //             |-MacOS (runner)
             //             |-Resources (asset path)
-            profilePath += "/AM2R.app/Contents";
-            Directory.CreateDirectory(profilePath);
-            Directory.CreateDirectory($"{profilePath}/MacOS");
-            Directory.CreateDirectory($"{profilePath}/Resources");
-            profilePath += "/Resources";
+            tempPath += "/AM2R.app/Contents";
+            Directory.CreateDirectory(tempPath);
+            Directory.CreateDirectory($"{tempPath}/MacOS");
+            Directory.CreateDirectory($"{tempPath}/Resources");
+            tempPath += "/Resources";
         }
 
         // Extract 1.1
-        ZipFile.ExtractToDirectory(Core.AM2R11File, profilePath);
+        ZipFile.ExtractToDirectory(Core.AM2R11File, tempPath);
         progress.Report(33);
         log.Info("Profile folder created and AM2R_11.zip extracted.");
 
@@ -404,42 +402,42 @@ public static class Profile
         }
 
         // Patch runner and data file.
-        log.Info($"Attempting to patch in {profilePath}");
+        log.Info($"Attempting to patch in {tempPath}");
         if (OS.IsWindows)
         {
             if (profile.UsesYYC)
             {
-                CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/data.win", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
+                CrossPlatformOperations.ApplyXdeltaPatch($"{tempPath}/data.win", $"{dataPath}/AM2R.xdelta", $"{tempPath}/{exe}");
 
                 // Delete 1.1's data.win, we don't need it anymore!
                 // TODO: *theoretically* if someone would make some game like serradius in gms2 and push that as a yyc am2r mod, this *will* break!
                 // Becauase GMS2 YYC *does* ship the data.win file, contrary to GMS1.4 
-                File.Delete($"{profilePath}/data.win");
+                File.Delete($"{tempPath}/data.win");
             }
             else
             {
-                CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/data.win", $"{dataPath}/data.xdelta", $"{profilePath}/{dataWin}");
-                CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
+                CrossPlatformOperations.ApplyXdeltaPatch($"{tempPath}/data.win", $"{dataPath}/data.xdelta", $"{tempPath}/{dataWin}");
+                CrossPlatformOperations.ApplyXdeltaPatch($"{tempPath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{tempPath}/{exe}");
             }
         }
         // YYC and VM look exactly the same on Linux and Mac so we're all good here.
         else if (OS.IsUnix)
         {
-            CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/data.win", $"{dataPath}/game.xdelta", $"{profilePath}/{dataWin}");
-            CrossPlatformOperations.ApplyXdeltaPatch($"{profilePath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{profilePath}/{exe}");
+            CrossPlatformOperations.ApplyXdeltaPatch($"{tempPath}/data.win", $"{dataPath}/game.xdelta", $"{tempPath}/{dataWin}");
+            CrossPlatformOperations.ApplyXdeltaPatch($"{tempPath}/AM2R.exe", $"{dataPath}/AM2R.xdelta", $"{tempPath}/{exe}");
             // Just in case the resulting file isn't set as executable...
-            Process.Start("chmod", $"+x  \"{profilePath}/{exe}\"")?.WaitForExit();
+            Process.Start("chmod", $"+x  \"{tempPath}/{exe}\"")?.WaitForExit();
 
             // These are not needed by linux or Mac at all, so we delete them
-            File.Delete($"{profilePath}/data.win");
-            File.Delete($"{profilePath}/AM2R.exe");
-            File.Delete($"{profilePath}/D3DX9_43.dll");
+            File.Delete($"{tempPath}/data.win");
+            File.Delete($"{tempPath}/AM2R.exe");
+            File.Delete($"{tempPath}/D3DX9_43.dll");
 
             // Move exe one directory out on Linux, move to MacOS folder instead on Mac
             if (OS.IsLinux)
-                File.Move($"{profilePath}/{exe}", $"{profilePath}/../{exe}");
+                File.Move($"{tempPath}/{exe}", $"{tempPath}/../{exe}");
             else
-                File.Move($"{profilePath}/{exe}", $"{profilePath.Replace("Resources", "MacOS")}/{exe}");
+                File.Move($"{tempPath}/{exe}", $"{tempPath.Replace("Resources", "MacOS")}/{exe}");
         }
         else
         {
@@ -452,17 +450,17 @@ public static class Profile
         log.Info("xdelta patch(es) applied.");
 
         // Install new datafiles
-        HelperMethods.DirectoryCopy($"{dataPath}/files_to_copy", profilePath);
+        HelperMethods.DirectoryCopy($"{dataPath}/files_to_copy", tempPath);
 
         // HQ music
         if (!profile.UsesCustomMusic && useHqMusic)
-            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", profilePath);
+            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", tempPath);
 
         // Linux post-process
         if (OS.IsLinux)
         {
-            string assetsPath = profilePath;
-            profilePath = $"{Core.ProfilesPath}/{profile.Name}";
+            string assetsPath = tempPath;
+            tempPath = $"{Path.GetTempPath()}/AM2RLauncherProfileTemp/";
 
             // Rename all songs to lowercase
             foreach (FileInfo file in new DirectoryInfo(assetsPath).GetFiles())
@@ -477,15 +475,15 @@ public static class Profile
               // TODO: figure out a way to use patchelf to have users not rely on deprecated insecure ssl deps.
             #else
             // Copy AppImage template to here
-            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{profilePath}/AM2R.AppDir/");
+            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{tempPath}/AM2R.AppDir/");
 
             // Safety checks, in case the folders don't exist
-            Directory.CreateDirectory($"{profilePath}/AM2R.AppDir/usr/bin/");
-            Directory.CreateDirectory($"{profilePath}/AM2R.AppDir/usr/bin/assets/");
+            Directory.CreateDirectory($"{tempPath}/AM2R.AppDir/usr/bin/");
+            Directory.CreateDirectory($"{tempPath}/AM2R.AppDir/usr/bin/assets/");
 
             // Copy game assets to the AppImageDir
-            HelperMethods.DirectoryCopy(assetsPath, $"{profilePath}/AM2R.AppDir/usr/bin/assets/");
-            File.Copy($"{profilePath}/{exe}", $"{profilePath}/AM2R.AppDir/usr/bin/{exe}");
+            HelperMethods.DirectoryCopy(assetsPath, $"{tempPath}/AM2R.AppDir/usr/bin/assets/");
+            File.Copy($"{tempPath}/{exe}", $"{tempPath}/AM2R.AppDir/usr/bin/{exe}");
 
             progress.Report(66);
             
@@ -493,7 +491,7 @@ public static class Profile
             // Reason why STDERR is changed is because the tool prints some output to there that we don't want
             string workingDir = Directory.GetCurrentDirectory();
             TextWriter cliError = Console.Error;
-            Directory.SetCurrentDirectory(profilePath);
+            Directory.SetCurrentDirectory(tempPath);
             Console.SetError(new StreamWriter(Stream.Null));
             Environment.SetEnvironmentVariable("ARCH", "x86_64");
             Process.Start($"{Core.PatchDataPath}/utilities/appimagetool-x86_64.AppImage", "-n AM2R.AppDir")?.WaitForExit();
@@ -502,10 +500,10 @@ public static class Profile
 
             // Clean files
             Directory.Delete(assetsPath, true);
-            File.Delete($"{profilePath}/{exe}");
-            Directory.Delete($"{profilePath}/AM2R.AppDir", true);
-            if (File.Exists($"{profilePath}/AM2R.AppImage")) File.Delete($"{profilePath}/AM2R.AppImage");
-            File.Move($"{profilePath}/AM2R-x86_64.AppImage", $"{profilePath}/AM2R.AppImage");
+            File.Delete($"{tempPath}/{exe}");
+            Directory.Delete($"{tempPath}/AM2R.AppDir", true);
+            if (File.Exists($"{tempPath}/AM2R.AppImage")) File.Delete($"{tempPath}/AM2R.AppImage");
+            File.Move($"{tempPath}/AM2R-x86_64.AppImage", $"{tempPath}/AM2R.AppImage");
             log.Info("AppImage created!");
             #endif
         }
@@ -513,32 +511,39 @@ public static class Profile
         else if (OS.IsMac)
         {
             // Rename all songs to lowercase
-            foreach (FileInfo file in new DirectoryInfo(profilePath).GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(tempPath).GetFiles())
             {
                 if (file.Name.EndsWith(".ogg") && !File.Exists($"{file.DirectoryName}/{file.Name.ToLower()}"))
                     File.Move(file.FullName, $"{file.DirectoryName}/{file.Name.ToLower()}");
             }
 
             // Loading custom fonts crashes on Mac, so we delete those if they exist
-            if (Directory.Exists($"{profilePath}/lang/fonts"))
-                Directory.Delete($"{profilePath}/lang/fonts", true);
+            if (Directory.Exists($"{tempPath}/lang/fonts"))
+                Directory.Delete($"{tempPath}/lang/fonts", true);
 
             // Move Frameworks, Info.plist and PkgInfo over
-            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/Frameworks", profilePath.Replace("Resources", "Frameworks"));
-            File.Copy($"{dataPath}/Info.plist", $"{profilePath.Replace("Resources", "")}/Info.plist", true);
-            File.Copy($"{Core.PatchDataPath}/data/PkgInfo", $"{profilePath.Replace("Resources", "")}/PkgInfo", true);
+            HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/Frameworks", tempPath.Replace("Resources", "Frameworks"));
+            File.Copy($"{dataPath}/Info.plist", $"{tempPath.Replace("Resources", "")}/Info.plist", true);
+            File.Copy($"{Core.PatchDataPath}/data/PkgInfo", $"{tempPath.Replace("Resources", "")}/PkgInfo", true);
 
             //Put profilePath back to what it was before
-            profilePath = $"{Core.ProfilesPath}/{profile.Name}";
+            tempPath = $"{Core.ProfilesPath}/{profile.Name}";
         }
 
         // Copy profile.xml so we can grab data to compare for updates later!
         // check if we're in PatchData or not, as we need to search for profile.xml in different locations.
         if (new DirectoryInfo(dataPath).Parent?.Name == "PatchData")
-            File.Copy($"{dataPath}/../profile.xml", $"{profilePath}/profile.xml");
+            File.Copy($"{dataPath}/../profile.xml", $"{tempPath}/profile.xml");
         else
-            File.Copy($"{dataPath}/profile.xml", $"{profilePath}/profile.xml");
+            File.Copy($"{dataPath}/profile.xml", $"{tempPath}/profile.xml");
+        
+        // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
+        if (Directory.Exists(profilePath))
+            Directory.Delete(profilePath, true);
 
+        HelperMethods.DirectoryCopy(tempPath, profilePath);
+        log.Info("Moved from temp path into the profile path!");
+        
         // Done
         progress.Report(100);
         log.Info($"Successfully installed profile {profile.Name}.");
@@ -589,8 +594,7 @@ public static class Profile
         // Create working dir after some cleanup
         string apktoolPath = $"{Core.PatchDataPath}/utilities/android/apktool.jar";
         string uberPath = $"{Core.PatchDataPath}/utilities/android/uber-apk-signer.jar";
-        // TODO: do we really want to do this in AM2RLauncher path instead of an actual temp path?
-        string tempDir = new DirectoryInfo($"{CrossPlatformOperations.CurrentPath}/temp").FullName;
+        string tempDir = new DirectoryInfo($"{Path.GetTempPath()}/AM2RLauncherAPKTemp/").FullName;
         string dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
 
         // Clean up in case Directory exists already
@@ -654,7 +658,10 @@ public static class Profile
         CrossPlatformOperations.RunJavaJar($"\"{uberPath}\" -a \"{profile.Name}.apk\"", tempDir);
 
         // Extra file cleanup
-        File.Copy($"{tempDir}/{profile.Name}-aligned-debugSigned.apk", $"{CrossPlatformOperations.CurrentPath}/{profile.Name}.apk", true);
+        string apkEndPath = $"{CrossPlatformOperations.CurrentPath}/{profile.Name}.apk";
+        if (File.Exists(apkEndPath))
+            File.Delete(apkEndPath);
+        File.Move($"{tempDir}/{profile.Name}-aligned-debugSigned.apk", apkEndPath);
         log.Info($"{profile.Name}.apk signed and moved to {CrossPlatformOperations.CurrentPath}/{profile.Name}.apk.");
         HelperMethods.DeleteDirectory(tempDir);
 
