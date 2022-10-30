@@ -16,7 +16,7 @@ namespace AM2RLauncher;
 //TODO: Mac support for auto updater in general
 public static class LauncherUpdater
 {
-    // How often this was broken count: 7
+    // How often this was broken count: 8
     // Auto updating is fun!
 
     /// <summary>The Version that identifies this current release.</summary>
@@ -206,7 +206,9 @@ public static class LauncherUpdater
         foreach (FileInfo file in new DirectoryInfo(tmpUpdatePath).GetFiles())
         {
             log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CurrentPath + "/" + file.Name);
-            File.Copy(file.FullName, updatePath + "/" + file.Name, true);
+            if (File.Exists(updatePath + "/" + file.Name))
+                File.Delete(updatePath + "/" + file.Name);
+            File.Move(file.FullName, updatePath + "/" + file.Name);
         }
         // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
         if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/lib"))
@@ -216,7 +218,8 @@ public static class LauncherUpdater
             // Rename all files in lib to *.bak
             foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetFiles())
             {
-                file.CopyTo(file.Directory + "/" + file.Name + ".bak");
+                log.Info("Moving " + file.FullName + " to " + file.Directory + "/" + file.Name + ".bak");
+                file.MoveTo(file.Directory + "/" + file.Name + ".bak");
             }
 
             // Do the same for each sub directory
@@ -224,7 +227,8 @@ public static class LauncherUpdater
             {
                 foreach (FileInfo file in dir.GetFiles())
                 {
-                    file.CopyTo(file.Directory + "/" + file.Name + ".bak");
+                    log.Info("Moving " + file.FullName + " to " + file.Directory + "/" + file.Name + ".bak");
+                    file.MoveTo(file.Directory + "/" + file.Name + ".bak");
                 }
             }
 
