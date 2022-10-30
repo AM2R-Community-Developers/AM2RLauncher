@@ -185,6 +185,7 @@
     <url type="faq">https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki/FAQ</url>
     <url type="help">https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki</url>
     <releases>
+        <release version="2.3.0" date="2022-30-10"/>
         <release version="2.2.0" date="2022-01-07"/>
     </releases>
     <content_rating type="oars-1.1">
