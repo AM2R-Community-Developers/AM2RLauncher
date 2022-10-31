@@ -14,12 +14,15 @@ jobs:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained -o builds/ubuntu-latest
             ARTIFACT: AM2RLauncher/builds/ubuntu-latest
+            POSTBUILD: echo "No post build to do!"
           - os: macOS-latest
             COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained -o builds/macOS-latest
             ARTIFACT: AM2RLauncher/builds/macOS-latest
+            POSTBUILD: echo "No post build to do!"
           - os: windows-latest
             COMMAND: AM2RLauncher.Wpf -r win-x86 
             ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
+            POSTBUILD: mv ${{ matrix.ARTIFACT }}\AM2RLauncher.Wpf.exe ${{ matrix.ARTIFACT }}\AM2RLauncher.exe && mv ${{ matrix.ARTIFACT }}\AM2RLauncher.Wpf.exe.config ${{ matrix.ARTIFACT }}\AM2RLauncher.exe.config && rmdir /s ${{ matrix.ARTIFACT }}\publish
     runs-on: ${{ matrix.os }}
     
 
