@@ -23,7 +23,7 @@ jobs:
             COMMAND: AM2RLauncher.Wpf -r win-x86 
             ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
             # This is very ugly, *please* tell me a better way to do this
-            POSTBUILD: mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe && mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe.config AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe.config && rmdir /s AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\publish
+            POSTBUILD: mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe && mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe.config AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe.config && rmdir AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\publish -Recurse
     runs-on: ${{ matrix.os }}
     
 
