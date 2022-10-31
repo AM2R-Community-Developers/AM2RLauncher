@@ -36,7 +36,7 @@ jobs:
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
     - name: Post-Build
-      run: cp ./LICENSE ./AM2RLauncher/builds/${{ matrix.os }}/
+      run: cp ./LICENSE ./AM2RLauncher/${{ matrix.os }}/
     # Steps for uploading artifacts.
     - name: Zip to Archive
       run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
