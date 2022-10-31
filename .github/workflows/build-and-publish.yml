@@ -12,14 +12,18 @@ jobs:
         configuration: [Release]
         include:
           - os: ubuntu-latest
-            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
-            ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net6.0/ubuntu.18.04-x64/publish/
+            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained -o builds/ubuntu-latest
+            ARTIFACT: AM2RLauncher/builds/ubuntu-latest
+            POSTBUILD: echo "No post build to do!"
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained
-            ARTIFACT: AM2RLauncher/AM2RLauncher.Mac/bin/Release/net6.0/osx-x64/AM2RLauncher.Mac.app/
+            COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained -o builds/macOS-latest
+            ARTIFACT: AM2RLauncher/builds/macOS-latest
+            POSTBUILD: echo "No post build to do!"
           - os: windows-latest
-            COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds\win86 
+            COMMAND: AM2RLauncher.Wpf -r win-x86 
             ARTIFACT: AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\
+            # This is very ugly, *please* tell me a better way to do this
+            POSTBUILD: mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe && mv AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.Wpf.exe.config AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\AM2RLauncher.exe.config && rmdir AM2RLauncher\AM2RLauncher.Wpf\bin\Release\net48\win-x86\publish -Recurse
     runs-on: ${{ matrix.os }}
     
 
@@ -35,6 +39,10 @@ jobs:
     - name: Build
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
+    - name: Post-Build
+      run: | 
+          cp ./LICENSE ./${{ matrix.ARTIFACT }}/
+          ${{ matrix.POSTBUILD }}
     # Steps for uploading artifacts.
     - name: Zip to Archive
       run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
