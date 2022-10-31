@@ -23,7 +23,7 @@ public static class LauncherUpdater
     private const string VERSION = Core.Version;
 
     /// <summary>The Path of the oldConfig. Only gets used Windows-only</summary>
-    private static readonly string oldConfigPath = CrossPlatformOperations.CurrentPath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
+    private static readonly string oldConfigPath = updatePath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg";
 
     /// <summary>The actual Path where the executable is stored, only used for updating.</summary>
     private static string updatePath
@@ -71,28 +71,32 @@ public static class LauncherUpdater
             log.Info(CrossPlatformOperations.LauncherName + ".oldCfg detected. Removing file.");
             File.Delete(oldConfigPath);
         }
-        if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/oldLib"))
+        if (OS.IsWindows && Directory.Exists(updatePath + "/oldLib"))
         {
             log.Info("Old lib folder detected, removing folder.");
-            Directory.Delete(CrossPlatformOperations.CurrentPath + "/oldLib", true);
+            Directory.Delete(updatePath + "/oldLib", true);
         }
 
         // Clean up old update libs
-        if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/lib"))
+        if (OS.IsWindows && Directory.Exists(updatePath + "/lib"))
         {
-            foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(updatePath + "/lib").GetFiles())
             {
-                if (file.Name.EndsWith(".bak"))
-                    file.Delete();
+                if (!file.Name.EndsWith(".bak"))
+                    continue;
+                log.Info("Old bak file detected, deleting " + file.FullName);
+                file.Delete();
             }
 
             // Do the same for each subdirectory
-            foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetDirectories())
+            foreach (DirectoryInfo dir in new DirectoryInfo(updatePath + "/lib").GetDirectories())
             {
                 foreach (FileInfo file in dir.GetFiles())
                 {
-                    if (file.Name.EndsWith(".bak"))
-                        file.Delete();
+                    if (!file.Name.EndsWith(".bak"))
+                        continue;
+                    log.Info("Old bak file detected, deleting " + file.FullName);
+                    file.Delete();
                 }
             }
         }
@@ -124,11 +128,12 @@ public static class LauncherUpdater
         }
         catch (WebException)
         {
-            log.Error("WebException caught! Displaying MessageBox.");
+            log.Error("WebException caught during version request! Displaying MessageBox.");
             MessageBox.Show(Language.Text.NoInternetConnection);
             return;
         }
 
+        // The URL from above redirects to the latest version, which we extract from the new url
         Uri realUri = response.ResponseUri;
         string onlineVersion = realUri.AbsoluteUri.Substring(realUri.AbsoluteUri.LastIndexOf('/') + 1);
         bool isCurrentVersionOutdated = false;
@@ -136,6 +141,7 @@ public static class LauncherUpdater
         string[] localVersionArray = VERSION.Split('.');
         string[] onlineVersionArray = onlineVersion.Split('.');
 
+        // compare the remote version to our local version
         for (int i = 0; i < localVersionArray.Length; i++)
         {
             int onlineNum = Int32.Parse(onlineVersionArray[i]);
@@ -156,7 +162,7 @@ public static class LauncherUpdater
             return;
 
         // For mac, we just show a message box that a new version is available, because I don't want to support it yet.
-        // hardcoded string, since also temporarily until it gets supported one day.
+        // hardcoded string, since also temporarily until it gets supported one day :tm:.
         if (OS.IsMac)
         {
             MessageBox.Show("Your current version is outdated! The newest version is " + onlineVersion + ". " +
@@ -167,14 +173,17 @@ public static class LauncherUpdater
         log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
         string tmpUpdatePath = Path.GetTempPath() + "/AM2RLauncherTmpUpdate/";
-        string zipPath = CrossPlatformOperations.CurrentPath + "/launcher.zip";
+        string zipPath = tmpUpdatePath + "/launcher.zip";
 
-        // Clean tmpupdate
+        // Clean tmpupdate & zippath
         if (Directory.Exists(tmpUpdatePath))
             Directory.Delete(tmpUpdatePath, true);
-        if (!Directory.Exists(tmpUpdatePath))
-            Directory.CreateDirectory(tmpUpdatePath);
+        Directory.CreateDirectory(tmpUpdatePath);
+        
+        if (File.Exists(zipPath))
+            File.Delete(zipPath);
 
+        // Download the new remote version
         try
         {
             using WebClient client = new WebClient();
@@ -198,10 +207,14 @@ public static class LauncherUpdater
         ZipFile.ExtractToDirectory(zipPath, tmpUpdatePath);
         log.Info("Updates successfully extracted to " + tmpUpdatePath);
 
+        // Delete the zip, as we won't need it anymore
         File.Delete(zipPath);
-        File.Move(updatePath + "/" + CrossPlatformOperations.LauncherName, CrossPlatformOperations.CurrentPath + "/AM2RLauncher.bak");
-        if (OS.IsWindows) File.Move(CrossPlatformOperations.LauncherName + ".config", CrossPlatformOperations.LauncherName + ".oldCfg");
+        
+        // Windows won't let us replace files directly, but it will let us rename files. So we start renaming every file with a .bak suffix
+        File.Move(updatePath + "/" + CrossPlatformOperations.LauncherName, updatePath + "/AM2RLauncher.bak");
+        if (OS.IsWindows) File.Move(updatePath + "/" + CrossPlatformOperations.LauncherName + ".config", updatePath + "/" + CrossPlatformOperations.LauncherName + ".oldCfg");
 
+        // Move everything from root tmpupdate to root updatePath
         foreach (FileInfo file in new DirectoryInfo(tmpUpdatePath).GetFiles())
         {
             log.Info("Moving " + file.FullName + " to " + CrossPlatformOperations.CurrentPath + "/" + file.Name);
@@ -232,21 +245,25 @@ public static class LauncherUpdater
             }
 
             // Yes, the above calls could be recursive. No, I can't be bothered to make them as such.
+            // Finally, we put the new lib folder into tmpupdate path
             if (Directory.Exists(tmpUpdatePath + "lib"))
             {
                 log.Info("Moving lib directory from '" + tmpUpdatePath + "' to current path");
                 HelperMethods.DirectoryCopy(tmpUpdatePath + "/lib", updatePath + "/lib");
             }
         }
-
+        
+        // We did everything with the new update, it can now be deleted
         Directory.Delete(tmpUpdatePath, true);
         log.Info("Deleted temporary update path: '" + tmpUpdatePath + "'");
 
+        // Transfer config files
         MainForm.CopyOldConfigToNewConfig();
 
         log.Info("Files extracted. Preparing to restart executable...");
-        if (OS.IsLinux) Process.Start("chmod", "+x " + updatePath + "./AM2RLauncher.Gtk");
+        if (OS.IsLinux) Process.Start("chmod", "+x " + updatePath + "/AM2RLauncher.Gtk");
 
+        // And finally we restart, and boot into the new file
         Process.Start(updatePath + "/" + CrossPlatformOperations.LauncherName);
         Environment.Exit(0);
     }
