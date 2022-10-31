@@ -210,19 +210,19 @@ public static class LauncherUpdater
             File.Move(file.FullName, updatePath + "/" + file.Name);
         }
         // For windows, the actual application is in "AM2RLauncher.dll". Which means, we need to update the lib folder as well.
-        if (OS.IsWindows && Directory.Exists(CrossPlatformOperations.CurrentPath + "/lib"))
+        if (OS.IsWindows && Directory.Exists(updatePath + "/lib"))
         {
             // So, because Windows behavior is dumb...
 
             // Rename all files in lib to *.bak
-            foreach (FileInfo file in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetFiles())
+            foreach (FileInfo file in new DirectoryInfo(updatePath + "/lib").GetFiles())
             {
                 log.Info("Moving " + file.FullName + " to " + file.Directory + "/" + file.Name + ".bak");
                 file.MoveTo(file.Directory + "/" + file.Name + ".bak");
             }
 
             // Do the same for each sub directory
-            foreach (DirectoryInfo dir in new DirectoryInfo(CrossPlatformOperations.CurrentPath + "/lib").GetDirectories())
+            foreach (DirectoryInfo dir in new DirectoryInfo(updatePath + "/lib").GetDirectories())
             {
                 foreach (FileInfo file in dir.GetFiles())
                 {
@@ -233,10 +233,14 @@ public static class LauncherUpdater
 
             // Yes, the above calls could be recursive. No, I can't be bothered to make them as such.
             if (Directory.Exists(tmpUpdatePath + "lib"))
-                HelperMethods.DirectoryCopy(tmpUpdatePath + "lib", CrossPlatformOperations.CurrentPath + "/lib");
+            {
+                log.Info("Moving lib directory from '" + tmpUpdatePath + "' to current path");
+                HelperMethods.DirectoryCopy(tmpUpdatePath + "/lib", updatePath + "/lib");
+            }
         }
 
         Directory.Delete(tmpUpdatePath, true);
+        log.Info("Deleted temporary update path: '" + tmpUpdatePath + "'");
 
         MainForm.CopyOldConfigToNewConfig();
 
