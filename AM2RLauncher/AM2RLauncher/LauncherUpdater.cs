@@ -166,8 +166,7 @@ public static class LauncherUpdater
 
         log.Info("Current version (" + VERSION + ") is outdated! Initiating update for version " + onlineVersion + ".");
 
-        // TODO: do we really want this to be in AM2rlauncherdata path, instead of in an actual temp folder?
-        string tmpUpdatePath = CrossPlatformOperations.CurrentPath + "/tmpupdate/";
+        string tmpUpdatePath = Path.GetTempPath() + "/AM2RLauncherTmpUpdate/";
         string zipPath = CrossPlatformOperations.CurrentPath + "/launcher.zip";
 
         // Clean tmpupdate
