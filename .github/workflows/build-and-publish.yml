@@ -12,14 +12,14 @@ jobs:
         configuration: [Release]
         include:
           - os: ubuntu-latest
-            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained -o ubuntu-latest
-            ARTIFACT: AM2RLauncher/builds/linux64
+            COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained -o builds/ubuntu-latest
+            ARTIFACT: AM2RLauncher/builds/ubuntu-latest
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained -o macOS-latest
-            ARTIFACT: AM2RLauncher/builds/osx64
+            COMMAND: AM2RLauncher.Mac -r osx-x64 --no-self-contained -o builds/macOS-latest
+            ARTIFACT: AM2RLauncher/builds/macOS-latest
           - os: windows-latest
-            COMMAND: AM2RLauncher.Wpf -r win-x86 -o windows-latest
-            ARTIFACT: AM2RLauncher\builds\win86 
+            COMMAND: AM2RLauncher.Wpf -r win-x86 -o builds/windows-latest
+            ARTIFACT: AM2RLauncher\builds\windows-latest
     runs-on: ${{ matrix.os }}
     
 
@@ -36,7 +36,7 @@ jobs:
       working-directory: ./AM2RLauncher
       run: dotnet publish ${{ matrix.COMMAND }} -c "${{ matrix.configuration }}"
     - name: Post-Build
-      run: cp ./LICENSE ./AM2RLauncher/${{ matrix.os }}/
+      run: cp ./LICENSE ./AM2RLauncher/builds/${{ matrix.os }}/
     # Steps for uploading artifacts.
     - name: Zip to Archive
       run: 7z a -tzip ${{ matrix.os }}.zip ./${{ matrix.ARTIFACT }}
