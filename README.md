@@ -25,7 +25,7 @@ Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/p
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
 Linux needs the following dependencies installed:
 
-- [.NET Core 5.0 runtime](https://dotnet.microsoft.com/download/dotnet/6.0) or later. .NET Core 6.0 is preferred.
+- [.NET Core 6.0 runtime](https://dotnet.microsoft.com/download/dotnet/6.0) or later. .NET Core 6.0 is preferred.
 - `xdelta3` 
 - `gtk3`
 - `libappindicator3`
