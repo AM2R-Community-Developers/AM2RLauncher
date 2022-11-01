@@ -261,7 +261,7 @@ public static class LauncherUpdater
         MainForm.CopyOldConfigToNewConfig();
 
         log.Info("Files extracted. Preparing to restart executable...");
-        if (OS.IsLinux) Process.Start("chmod", "+x " + updatePath + "/AM2RLauncher.Gtk");
+        if (OS.IsLinux) Process.Start("chmod", "+x " + updatePath + "/" + CrossPlatformOperations.LauncherName);
 
         // And finally we restart, and boot into the new file
         Process.Start(updatePath + "/" + CrossPlatformOperations.LauncherName);

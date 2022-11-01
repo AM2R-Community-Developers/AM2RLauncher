@@ -137,6 +137,7 @@ public class CustomButton : Drawable
     /// <summary>
     /// Event raised, when this control gets focused.
     /// </summary>
+    //TODO: change focus via keyboard arrow keys
     protected override void OnGotFocus(EventArgs e)
     {
         hover = true;
