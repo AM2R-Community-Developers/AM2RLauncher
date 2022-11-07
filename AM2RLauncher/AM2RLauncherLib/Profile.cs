@@ -446,7 +446,15 @@ public static class Profile
 
         // Applied patch
         if (OS.IsWindows || OS.IsMac) progress.Report(66);
-        else if (OS.IsLinux) progress.Report(44); // Linux will take a bit longer, due to AppImage creation
+        else if (OS.IsLinux) 
+        {
+            // Linux will take a bit longer, due to AppImage creation
+            #if NOAPPIMAGE
+            progress.Report(66);
+            #else
+            progress.Report(44);
+            #endif
+        }
         log.Info("xdelta patch(es) applied.");
 
         // Install new datafiles
@@ -607,7 +615,7 @@ public static class Profile
 
         // Decompile AM2RWrapper.apk
         //TODO: double check if this still works on machines with non-ascii characters. See explanation in CrossPlatformOperations.PatchXdelta
-        CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" d \"{dataPath}/android/AM2RWrapper.apk\"", tempDir);
+        CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" --frame-path \"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/apktool/framework\" d \"{dataPath}/android/AM2RWrapper.apk\"", tempDir);
         log.Info("AM2RWrapper decompiled.");
         progress.Report(28);
 
@@ -650,7 +658,7 @@ public static class Profile
         progress.Report(70);
 
         // Rebuild APK
-        CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" b AM2RWrapper -o \"{profile.Name}.apk\"", tempDir);
+        CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" --frame-path \"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/apktool/framework\" b AM2RWrapper -o \"{profile.Name}.apk\"", tempDir);
         log.Info($"AM2RWrapper rebuilt into {profile.Name}.apk.");
         progress.Report(84);
 
