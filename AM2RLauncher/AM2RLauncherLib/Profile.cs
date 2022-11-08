@@ -615,6 +615,7 @@ public static class Profile
 
         // Decompile AM2RWrapper.apk
         //TODO: double check if this still works on machines with non-ascii characters. See explanation in CrossPlatformOperations.PatchXdelta
+        // HACK: --frame-path required, because the current apktool version we ship (2.5.0) does not respect XDG paths. See https://github.com/iBotPeaches/Apktool/pull/2924
         CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" --frame-path \"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/apktool/framework\" d \"{dataPath}/android/AM2RWrapper.apk\"", tempDir);
         log.Info("AM2RWrapper decompiled.");
         progress.Report(28);
@@ -658,6 +659,7 @@ public static class Profile
         progress.Report(70);
 
         // Rebuild APK
+        // HACK: --frame-path required, because the current apktool version we ship (2.5.0) does not respect XDG paths. See https://github.com/iBotPeaches/Apktool/pull/2924
         CrossPlatformOperations.RunJavaJar($"\"{apktoolPath}\" --frame-path \"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/apktool/framework\" b AM2RWrapper -o \"{profile.Name}.apk\"", tempDir);
         log.Info($"AM2RWrapper rebuilt into {profile.Name}.apk.");
         progress.Report(84);
