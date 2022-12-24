@@ -621,12 +621,34 @@ public static class Profile
         progress.Report(28);
 
         // Add datafiles: 1.1, hq music if wished for, new datafiles, am2r.ini
+        // Also we need to lowercase the songs on android
         string workingDir = $"{tempDir}/AM2RWrapper/assets";
         ZipFile.ExtractToDirectory(Core.AM2R11File, workingDir);
         if (useHqMusic)
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", workingDir);
+
+        void LowercaseAllOggs(string path)
+        {
+            foreach (var file in new DirectoryInfo(path).GetFiles().Where(f => f.Extension.ToLower() == ".ogg"))
+            {
+                if (file.Name.ToLower() == file.Name) continue;
+                
+                var filedir = file.DirectoryName;
+                var origName = file.Name;
+                var finalPath = filedir + "/" + origName.ToLower();
+                file.MoveTo(filedir + "/" + file.Name + "_");
+                if (File.Exists(finalPath))
+                    File.Delete(finalPath);
+                file.MoveTo(finalPath);
+            }
+        }
+        
+        LowercaseAllOggs(workingDir);
         
         HelperMethods.DirectoryCopy($"{dataPath}/files_to_copy", workingDir);
+        
+        // And also once after copying the mod songs, as there may be new ones in there
+        LowercaseAllOggs(workingDir);
         
 
         // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
