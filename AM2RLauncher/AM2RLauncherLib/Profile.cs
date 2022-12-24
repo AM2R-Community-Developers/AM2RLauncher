@@ -97,7 +97,7 @@ public static class Profile
         const string d3dHash = "86e39e9161c3d930d93822f1563c280d";
         const string dataWinHash = "f2b84fe5ba64cb64e284be1066ca08ee";
         const string am2rHash = "15253f7a66d6ea3feef004ebbee9b438";
-        string tmpPath = Path.GetTempPath() + Path.GetFileNameWithoutExtension(zipPath);
+        string tmpPath = Path.GetTempPath() + "/" + Path.GetFileNameWithoutExtension(zipPath);
 
         // Clean up in case folder exists already
         if (Directory.Exists(tmpPath))
@@ -620,13 +620,14 @@ public static class Profile
         log.Info("AM2RWrapper decompiled.");
         progress.Report(28);
 
-        // Add datafiles: 1.1, new datafiles, hq music, am2r.ini
+        // Add datafiles: 1.1, hq music if wished for, new datafiles, am2r.ini
         string workingDir = $"{tempDir}/AM2RWrapper/assets";
         ZipFile.ExtractToDirectory(Core.AM2R11File, workingDir);
-        HelperMethods.DirectoryCopy($"{dataPath}/files_to_copy", workingDir);
-
         if (useHqMusic)
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", workingDir);
+        
+        HelperMethods.DirectoryCopy($"{dataPath}/files_to_copy", workingDir);
+        
 
         // Yes, I'm aware this is dumb. If you've got any better ideas for how to copy a seemingly randomly named .ini from this folder to the APK, please let me know.
         foreach (FileInfo file in new DirectoryInfo(dataPath).GetFiles().Where(f => f.Name.EndsWith("ini")))
