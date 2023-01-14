@@ -25,7 +25,7 @@ public static class CrossPlatformOperations
     /// <summary>
     /// Path to the Home Folder.
     /// </summary>
-    public static readonly string Home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    public static string Home => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.Create);
 
     /// <summary>
     /// Config file path for *nix based systems. <br/>

@@ -133,18 +133,39 @@ public partial class MainForm : Form
     #region MAIN TAB
 
     /// <summary>
-    /// After the <see cref="playButton"/> has been loaded, git pull if a repo has been cloned already.
+    /// After the <see cref="playButton"/> has been loaded, git pull if a repo has been cloned already. Also transfer non-flatpak saves to flatpak
     /// </summary>
     private async void PlayButtonLoadComplete(object sender, EventArgs e)
     {
-        //Only pull if Patchdata is cloned and user wants it updated
         LoadProfilesAndAdjustLists();
+        // Transfer saves on flatpak from non-flatpak save to flatpak save
+        if (OS.IsThisRunningFromFlatpak)
+        {
+            string oldHomePath = CrossPlatformOperations.Home;
+            Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify)}/AM2RProfileSaves");
+            string newHomePath = CrossPlatformOperations.Home;
+
+            // TEMPORARY transfer from main saves into Flatpak saves - TODO: remove in about half a year or so
+            // Only do this if the directory for the new saves does not exist yet.
+            foreach (var profile in profileList)
+            {
+                string oldSavePath = profile.SaveLocation.Replace("~", oldHomePath);
+                string newSavePath = profile.SaveLocation.Replace("~", newHomePath);
+
+                if (Directory.Exists(newSavePath)) continue;
+                
+                log.Info($"Transfering save data for {profile.Name} from {oldSavePath} to {newSavePath} ...");
+                HelperMethods.DirectoryCopy(oldSavePath, newSavePath);
+            }
+        }
+        
+        //Only pull if Patchdata is cloned and user wants it updated
         if (!Profile.IsPatchDataCloned() || !autoUpdateAM2RCheck.Checked.Value)
             return;
 
         SetPlayButtonState(PlayButtonState.Downloading);
         EnableProgressBarAndLabel();
-
+        
         // Try to pull
         try
         {
