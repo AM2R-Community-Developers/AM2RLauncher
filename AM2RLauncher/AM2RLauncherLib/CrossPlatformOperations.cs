@@ -114,11 +114,9 @@ public static class CrossPlatformOperations
         // And on Nix systems, we want to replace ~ with its corresponding env var
         string realPath = OS.IsWindows ? Environment.ExpandEnvironmentVariables(path).Replace("/", "\\")
             : path.Replace("~", Home);
-        if (!Directory.Exists(realPath))
-        {
-            log.Info($"{realPath} did not exist and was created");
-            Directory.CreateDirectory(realPath);
-        }
+        
+        log.Info($"Creating {realPath} if it did not exist before");
+        Directory.CreateDirectory(realPath);
 
         // Needs quotes otherwise paths with space wont open
         if (OS.IsWindows)

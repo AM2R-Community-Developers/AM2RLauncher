@@ -100,8 +100,7 @@ public static class Profile
         string tmpPath = Path.GetTempPath() + "/" + Path.GetFileNameWithoutExtension(zipPath);
 
         // Clean up in case folder exists already
-        if (Directory.Exists(tmpPath))
-            Directory.Delete(tmpPath, true);
+        HelperMethods.DeleteDirectory(tmpPath);
         Directory.CreateDirectory(tmpPath);
 
         // Open archive
@@ -144,7 +143,7 @@ public static class Profile
 
 
         // Clean up
-        Directory.Delete(tmpPath, true);
+        HelperMethods.DeleteDirectory(tmpPath);
 
         // If we didn't exit before, everything is fine
         log.Info("AM2R_11 check successful!");
@@ -217,8 +216,7 @@ public static class Profile
         }
 
         // Safety check to generate the Mods folder if it does not exist
-        if (!Directory.Exists(Core.ModsPath))
-            Directory.CreateDirectory(Core.ModsPath);
+        Directory.CreateDirectory(Core.ModsPath);
 
         // Get Mods folder info
         DirectoryInfo modsDir = new DirectoryInfo(Core.ModsPath);
@@ -307,8 +305,7 @@ public static class Profile
         log.Info($"Attempting to delete profile {profile.Name}...");
 
         // Delete folder in Mods
-        if (Directory.Exists(CrossPlatformOperations.CurrentPath + profile.DataPath))
-            HelperMethods.DeleteDirectory(CrossPlatformOperations.CurrentPath + profile.DataPath);
+        HelperMethods.DeleteDirectory(CrossPlatformOperations.CurrentPath + profile.DataPath);
 
         // Delete the zip file in Mods
         if (File.Exists($"{CrossPlatformOperations.CurrentPath}{profile.DataPath}.zip"))
@@ -319,8 +316,7 @@ public static class Profile
         }
 
         // Delete folder in Profiles
-        if (Directory.Exists($"{Core.ProfilesPath}/{profile.Name}"))
-            HelperMethods.DeleteDirectory($"{Core.ProfilesPath}/{profile.Name}");
+        HelperMethods.DeleteDirectory($"{Core.ProfilesPath}/{profile.Name}");
 
         log.Info($"Successfully deleted profile {profile.Name}.");
     }
@@ -339,12 +335,10 @@ public static class Profile
         string tempPath = $"{Path.GetTempPath()}/AM2RLauncherProfileTemp/";
 
         // Failsafe for Profiles directory
-        if (!Directory.Exists(Core.ProfilesPath))
-            Directory.CreateDirectory(Core.ProfilesPath);
+        Directory.CreateDirectory(Core.ProfilesPath);
 
         // Delete temp if it exists + create it
-        if (Directory.Exists(tempPath))
-            Directory.Delete(tempPath, true);
+        HelperMethods.DeleteDirectory(tempPath);
         Directory.CreateDirectory(tempPath);
         
         // Switch profilePath on Linux and Mac, as they need special handling
@@ -507,10 +501,10 @@ public static class Profile
             Console.SetError(cliError);
 
             // Clean files
-            Directory.Delete(assetsPath, true);
+            HelperMethods.DeleteDirectory(assetsPath);
             File.Delete($"{tempPath}/{exe}");
-            Directory.Delete($"{tempPath}/AM2R.AppDir", true);
-            if (File.Exists($"{tempPath}/AM2R.AppImage")) File.Delete($"{tempPath}/AM2R.AppImage");
+            HelperMethods.DeleteDirectory($"{tempPath}/AM2R.AppDir");
+            File.Delete($"{tempPath}/AM2R.AppImage");
             File.Move($"{tempPath}/AM2R-x86_64.AppImage", $"{tempPath}/AM2R.AppImage");
             log.Info("AppImage created!");
             #endif
@@ -526,8 +520,7 @@ public static class Profile
             }
 
             // Loading custom fonts crashes on Mac, so we delete those if they exist
-            if (Directory.Exists($"{tempPath}/lang/fonts"))
-                Directory.Delete($"{tempPath}/lang/fonts", true);
+            HelperMethods.DeleteDirectory($"{tempPath}/lang/fonts");
 
             // Move Frameworks, Info.plist and PkgInfo over
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/Frameworks", tempPath.Replace("Resources", "Frameworks"));
@@ -546,8 +539,7 @@ public static class Profile
             File.Copy($"{dataPath}/profile.xml", $"{tempPath}/profile.xml");
         
         // This failsafe should NEVER get triggered, but Miepee's broken this too much for me to trust it otherwise.
-        if (Directory.Exists(profilePath))
-            Directory.Delete(profilePath, true);
+        HelperMethods.DeleteDirectory(profilePath);
 
         HelperMethods.DirectoryCopy(tempPath, profilePath);
         log.Info("Moved from temp path into the profile path!");
@@ -606,8 +598,7 @@ public static class Profile
         string dataPath = CrossPlatformOperations.CurrentPath + profile.DataPath;
 
         // Clean up in case Directory exists already
-        if (Directory.Exists(tempDir))
-            Directory.Delete(tempDir, true);
+        HelperMethods.DeleteDirectory(tempDir);
         Directory.CreateDirectory(tempDir);
 
         log.Info("Cleanup, variables, and working directory created.");
@@ -670,8 +661,8 @@ public static class Profile
         File.Delete($"{workingDir}/modifiers.ini");
         File.Delete($"{workingDir}/readme.txt");
         File.Delete($"{workingDir}/data.win");
-        Directory.Delete($"{workingDir}/mods", true);
-        Directory.Delete($"{workingDir}/lang/headers", true);
+        HelperMethods.DeleteDirectory($"{workingDir}/mods");
+        HelperMethods.DeleteDirectory($"{workingDir}/lang/headers");
         if (OS.IsLinux) File.Delete($"{workingDir}/icon.png");
 
         // Modify apktool.yml to NOT compress ogg files
@@ -731,8 +722,7 @@ public static class Profile
                 log.Info($"Performing logging setup for profile {profile.Name}.");
 
                 // Check if directory exists, and roll log file over if necessary
-                if (!Directory.Exists(logDir.FullName))
-                    Directory.CreateDirectory(logDir.FullName);
+                Directory.CreateDirectory(logDir.FullName);
 
                 if (File.Exists(logFile))
                     HelperMethods.RecursiveRollover(logFile, 5);
@@ -802,8 +792,7 @@ public static class Profile
                 log.Info($"Performing logging setup for profile {profile.Name}.");
 
                 // Check if directory exists, and roll log file over if necessary
-                if (!Directory.Exists(logDir.FullName))
-                    Directory.CreateDirectory(logDir.FullName);
+                Directory.CreateDirectory(logDir.FullName);
 
                 if (File.Exists(logFile))
                     HelperMethods.RecursiveRollover(logFile, 5);
@@ -839,8 +828,7 @@ public static class Profile
                 log.Info($"Performing logging setup for profile {profile.Name}.");
 
                 // Check if directory exists, and roll log file over if necessary
-                if (!Directory.Exists(logDir.FullName))
-                    Directory.CreateDirectory(logDir.FullName);
+                Directory.CreateDirectory(logDir.FullName);
 
                 if (File.Exists(logFile))
                     HelperMethods.RecursiveRollover(logFile, 5);

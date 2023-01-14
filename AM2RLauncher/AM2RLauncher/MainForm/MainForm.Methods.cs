@@ -139,11 +139,9 @@ public partial class MainForm : Form
             XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
             // If folder doesn't exist, create it and the config file
-            if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
-            {
-                Directory.CreateDirectory(launcherConfigPath);
+            Directory.CreateDirectory(launcherConfigPath);
+            if (!File.Exists(launcherConfigFilePath))
                 File.WriteAllText(launcherConfigFilePath, Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-            }
 
             // Deserialize the config xml into launcherConfig
             launcherConfig = Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
@@ -186,11 +184,10 @@ public partial class MainForm : Form
             XML.LauncherConfigXML launcherConfig = new XML.LauncherConfigXML();
 
             // If folder doesn't exist, create it and the config file
-            if (!Directory.Exists(launcherConfigPath) || !File.Exists(launcherConfigFilePath))
-            {
-                Directory.CreateDirectory(launcherConfigPath);
+            Directory.CreateDirectory(launcherConfigPath);
+            if (!File.Exists(launcherConfigFilePath))
                 File.WriteAllText(launcherConfigFilePath, Serializer.Serialize<XML.LauncherConfigXML>(launcherConfig));
-            }
+            
             // Deserialize the config xml into launcherConfig
             launcherConfig = Serializer.Deserialize<XML.LauncherConfigXML>(File.ReadAllText(launcherConfigFilePath));
 

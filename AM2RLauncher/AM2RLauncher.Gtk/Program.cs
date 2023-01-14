@@ -33,8 +33,7 @@ internal static class MainClass
         string launcherDataPath = CrossPlatformOperations.CurrentPath;
 
         // Make sure first, ~/.local/share/AM2RLauncher exists
-        if (!Directory.Exists(launcherDataPath))
-            Directory.CreateDirectory(launcherDataPath);
+        Directory.CreateDirectory(launcherDataPath);
 
         // Now, see if log4netConfig exists, if not write it again.
         if (!File.Exists($"{launcherDataPath}/log4net.config"))

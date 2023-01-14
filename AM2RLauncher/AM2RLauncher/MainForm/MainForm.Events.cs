@@ -245,11 +245,8 @@ public partial class MainForm : Form
                 try
                 {
                     // Cleanup invalid PatchData directory if it exists
-                    if (Directory.Exists(Core.PatchDataPath))
-                    {
-                        log.Info("PatchData directory already exists, cleaning up...");
-                        HelperMethods.DeleteDirectory(Core.PatchDataPath);
-                    }
+                    log.Info("Deleting PatchData if it already exists.");
+                    HelperMethods.DeleteDirectory(Core.PatchDataPath);
 
                     // Separate thread so launcher doesn't get locked
                     await Task.Run(() => Repository.Clone(currentMirror, Core.PatchDataPath, cloneOptions));
@@ -274,8 +271,7 @@ public partial class MainForm : Form
                     {
                         log.Error("LibGit2SharpException: " + ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                         MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-                        if (Directory.Exists(Core.PatchDataPath))
-                            HelperMethods.DeleteDirectory(Core.PatchDataPath);
+                        HelperMethods.DeleteDirectory(Core.PatchDataPath);
                     }
                     successful = false;
                 }
@@ -284,9 +280,8 @@ public partial class MainForm : Form
                 {
                     log.Error(ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace);
                     MessageBox.Show(this, ex.Message + "\n*****Stack Trace*****\n\n" + ex.StackTrace, Text.ErrorWindowTitle, MessageBoxType.Error);
-
-                    if (Directory.Exists(CrossPlatformOperations.CurrentPath + " / PatchData"))
-                        HelperMethods.DeleteDirectory(Core.PatchDataPath);
+                    
+                    HelperMethods.DeleteDirectory(Core.PatchDataPath);
                     successful = false;
                 }
 
@@ -445,7 +440,7 @@ public partial class MainForm : Form
                 {
                     await Task.Run(() => Profile.RunGame(profile, createDebugLogs));
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show($"{Text.UnhandledException}\n*****Stack Trace*****\n\n{ex}", Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
@@ -735,7 +730,7 @@ public partial class MainForm : Form
         {
             log.Error(modFile.Name + " does not contain profile.xml! Cancelling mod import.");
             MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, modFileName), Text.ErrorWindowTitle, MessageBoxType.Error);
-            Directory.Delete(extractedModDir, true);
+            HelperMethods.DeleteDirectory(extractedModDir);
             return;
         }
 
@@ -799,8 +794,9 @@ public partial class MainForm : Form
             updateModButton.ToolTip = HelperMethods.GetText(Text.UpdateModButtonToolTip, profileName);
         }
 
-        desktopShortcutButton.Enabled = Directory.Exists(Core.ProfilesPath + "/" + profileName);
-        profileButton.Enabled = Directory.Exists(Core.ProfilesPath + "/" + profileName);
+        bool doesProfilePathExist = Directory.Exists(Core.ProfilesPath + "/" + profileName);
+        desktopShortcutButton.Enabled = doesProfilePathExist;
+        profileButton.Enabled = doesProfilePathExist;
         profileButton.ToolTip = HelperMethods.GetText(Text.OpenProfileFolderToolTip, profileName);
         saveButton.Enabled = true;
         saveButton.ToolTip = HelperMethods.GetText(Text.OpenSaveFolderToolTip, profileName);
@@ -994,8 +990,7 @@ public partial class MainForm : Form
         string extractedModDir = Core.ModsPath + "/" + extractedName;
 
         // If for some reason old files remain, delete them so that extraction doesn't throw
-        if (Directory.Exists(extractedModDir))
-            Directory.Delete(extractedModDir, true);
+        HelperMethods.DeleteDirectory(extractedModDir);
 
         // Directory doesn't exist -> extract!
         ZipFile.ExtractToDirectory(fileFinder.FileName, extractedModDir);
@@ -1005,7 +1000,7 @@ public partial class MainForm : Form
         {
             log.Error(fileFinder.FileName + " does not contain profile.xml! Cancelling mod update.");
             MessageBox.Show(this, HelperMethods.GetText(Text.ModIsInvalidMessage, extractedName), Text.ErrorWindowTitle, MessageBoxType.Error);
-            Directory.Delete(extractedModDir, true);
+            HelperMethods.DeleteDirectory(extractedModDir);
             return;
         }
 
