@@ -772,6 +772,8 @@ public static class Profile
                 FileName = $"{gameDirectory}/AM2R.AppImage"
                 #endif
             };
+            // This may look unnecessary, but it's actually not. In case that the current process has a custom HOME variable,
+            // we want to pass it through to the child process as well as normally it doesn't do that.
             startInfo.EnvironmentVariables["HOME"] = CrossPlatformOperations.Home;
 
             log.Info($"CWD of Profile is {startInfo.WorkingDirectory}");
