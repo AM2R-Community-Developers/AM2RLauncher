@@ -146,7 +146,7 @@ public partial class MainForm : Form
             string newHomePath = CrossPlatformOperations.Home;
 
             // TEMPORARY transfer from main saves into Flatpak saves - TODO: remove in about half a year or so
-            // Only do this if the directory for the new saves does not exist yet.
+            // Only do this if the directory for the new saves does not exist yet and if the directory for old saves exists in the first place.
             foreach (var profile in profileList)
             {
                 string oldSavePath = profile.SaveLocation.Replace("~", oldHomePath);
