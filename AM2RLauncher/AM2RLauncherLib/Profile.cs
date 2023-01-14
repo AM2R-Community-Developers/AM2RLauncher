@@ -628,8 +628,7 @@ public static class Profile
                 var origName = file.Name;
                 var finalPath = filedir + "/" + origName.ToLower();
                 file.MoveTo(filedir + "/" + file.Name + "_");
-                if (File.Exists(finalPath))
-                    File.Delete(finalPath);
+                File.Delete(finalPath);
                 file.MoveTo(finalPath);
             }
         }
@@ -683,8 +682,7 @@ public static class Profile
 
         // Extra file cleanup
         string apkEndPath = $"{CrossPlatformOperations.CurrentPath}/{profile.Name}.apk";
-        if (File.Exists(apkEndPath))
-            File.Delete(apkEndPath);
+        File.Delete(apkEndPath);
         File.Move($"{tempDir}/{profile.Name}-aligned-debugSigned.apk", apkEndPath);
         log.Info($"{profile.Name}.apk signed and moved to {CrossPlatformOperations.CurrentPath}/{profile.Name}.apk.");
         HelperMethods.DeleteDirectory(tempDir);
