@@ -445,9 +445,9 @@ public partial class MainForm : Form
                 {
                     await Task.Run(() => Profile.RunGame(profile, createDebugLogs));
                 }
-                catch
+                catch(Exception ex)
                 {
-                    // ignore any errors that occur.
+                    MessageBox.Show($"{Text.UnhandledException}\n*****Stack Trace*****\n\n{ex}", Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
 
                 ShowInTaskbar = true;

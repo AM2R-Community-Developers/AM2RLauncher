@@ -768,8 +768,11 @@ public static class Profile
             // has fullscreen set to false, so they don't run into any issues. Game will handle the rest.
             string am2rConfigPath = profile.SaveLocation.Replace("~", CrossPlatformOperations.Home) + "/config.ini";
             if (!File.Exists(am2rConfigPath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(am2rConfigPath));
                 File.WriteAllText(am2rConfigPath, "[Screen]\nFullscreen=\"0\"\nScale=\"3\"");
-            
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 UseShellExecute = false,
