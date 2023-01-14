@@ -759,6 +759,7 @@ public static class Profile
             string am2rConfigPath = profile.SaveLocation.Replace("~", CrossPlatformOperations.Home) + "/config.ini";
             if (!File.Exists(am2rConfigPath))
             {
+                log.Info("Save location does not exist yet for Linux! Creating Directory and File for fullscreen workaround...");
                 Directory.CreateDirectory(Path.GetDirectoryName(am2rConfigPath));
                 File.WriteAllText(am2rConfigPath, "[Screen]\nFullscreen=\"0\"\nScale=\"3\"");
             }
