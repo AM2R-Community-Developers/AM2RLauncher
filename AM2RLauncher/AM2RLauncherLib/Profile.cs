@@ -772,6 +772,7 @@ public static class Profile
                 FileName = $"{gameDirectory}/AM2R.AppImage"
                 #endif
             };
+            startInfo.EnvironmentVariables["HOME"] = CrossPlatformOperations.Home;
 
             log.Info($"CWD of Profile is {startInfo.WorkingDirectory}");
 
