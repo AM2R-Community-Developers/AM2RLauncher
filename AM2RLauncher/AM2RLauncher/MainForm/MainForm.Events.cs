@@ -152,7 +152,7 @@ public partial class MainForm : Form
                 string oldSavePath = profile.SaveLocation.Replace("~", oldHomePath);
                 string newSavePath = profile.SaveLocation.Replace("~", newHomePath);
 
-                if (Directory.Exists(newSavePath)) continue;
+                if (Directory.Exists(newSavePath) || !Directory.Exists(oldSavePath)) continue;
                 
                 log.Info($"Transfering save data for {profile.Name} from {oldSavePath} to {newSavePath} ...");
                 HelperMethods.DirectoryCopy(oldSavePath, newSavePath);
