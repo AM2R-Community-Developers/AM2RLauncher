@@ -533,6 +533,7 @@ public static class Profile
 
         // Copy profile.xml so we can grab data to compare for updates later!
         // check if we're in PatchData or not, as we need to search for profile.xml in different locations.
+        // TODO: check if asset dir contains profile.xml. If it does, throw.
         if (new DirectoryInfo(dataPath).Parent?.Name == "PatchData")
             File.Copy($"{dataPath}/../profile.xml", $"{tempPath}/profile.xml");
         else
