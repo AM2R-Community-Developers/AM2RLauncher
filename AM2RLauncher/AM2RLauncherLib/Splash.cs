@@ -88,7 +88,22 @@ public static class Splash
         "Yes, do as I say!",
         "Did you find the penguin yet?"
     };
-    // TODO: add flatpak and wine specific splashes
+    
+    /// <summary>
+    /// Splashes additionally used in Flatpaks
+    /// </summary>
+    private static readonly string[] flatpakSplash =
+    {
+        "All hail Gaben",
+        "Thanks to Flatpak, our bugs are now consistent!",
+        "You're using SteamOS, aren't you?",
+        "Now extra sandboxed, in case of GameMaker jank!",
+        "The next remake? Another Metroid 4 Remake of course!",
+        "What do you mean that there's a number after 2?",
+        "We don't like Sand. It's course, rough, and it gets everywhere.",
+        "This is a sandbox, not a sandy B.O.X.",
+        "Now easily available on an App Store!"
+    };
 
     /// <summary>
     /// Mac only splash strings
@@ -135,6 +150,11 @@ public static class Splash
             totalSplashes = generalSplash.Concat(macSplash).ToArray();
         else
             totalSplashes = generalSplash;
+        
+        // This is seperate, as we want them to be combined with linux
+        if (OS.IsThisRunningFromFlatpak)
+            totalSplashes = totalSplashes.Concat(flatpakSplash).ToArray();
+        
         return totalSplashes;
     }
 }
