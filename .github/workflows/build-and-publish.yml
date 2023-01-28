@@ -16,7 +16,7 @@ jobs:
             ARTIFACT: AM2RLauncher/builds/ubuntu-latest
             POSTBUILD: echo "No post build to do!"
           - os: macOS-latest
-            COMMAND: AM2RLauncher.Mac -r osx-x64 --self-contained -o builds/macOS-latest
+            COMMAND: AM2RLauncher.Mac -r osx-x64;osx-arm64 --self-contained -o builds/macOS-latest
             ARTIFACT: AM2RLauncher/builds/macOS-latest
             POSTBUILD: echo "No post build to do!"
           - os: windows-latest
