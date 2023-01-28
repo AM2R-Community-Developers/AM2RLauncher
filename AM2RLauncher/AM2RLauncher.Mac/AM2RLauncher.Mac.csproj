@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     <RollForward>LatestMajor</RollForward>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
@@ -18,6 +18,7 @@
 	
   <ItemGroup>
     <PackageReference Include="Eto.Platform.macOS" Version="2.7.1" />
+    <PackageReference Include="Eto.Platform.Mac64" Version="2.7.1" />
   </ItemGroup>
 
   <ItemGroup>
