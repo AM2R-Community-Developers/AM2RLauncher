@@ -24,7 +24,7 @@ jobs:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net6.0/ubuntu.18.04-x64/publish/
-           - os: macOS-latest
+          - os: macOS-latest
             COMMAND: AM2RLauncher.Mac -o builds/macOS-latest
             ARTIFACT: AM2RLauncher/builds/macOS-latest
           - os: windows-latest
