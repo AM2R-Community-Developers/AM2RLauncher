@@ -217,6 +217,7 @@ public static class CrossPlatformOperations
     {
         const string process = "xdelta3";
         const string arguments = "-V";
+        // TODO: for mac, we need to embed two xdelta binaries, for x64 and arm
 
         ProcessStartInfo xdeltaStart = new ProcessStartInfo
         {

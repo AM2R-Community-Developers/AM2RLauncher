@@ -12,6 +12,8 @@ using AM2RLauncherLib.XML;
 
 namespace AM2RLauncherLib;
 
+// TODO: grey out create desktop shortcut on download mode
+
 /// <summary>
 /// An enum, that has possible return codes for <see cref="Profile.CheckIfZipIsAM2R11"/>.
 /// </summary>
@@ -50,6 +52,7 @@ public static class Profile
     /// </summary>
     /// <param name="invalidateCache">Determines if the AM2R_11 Cache should be invalidated.</param>
     /// <returns></returns>
+    // TODO: returns ^
     public static bool Is11Installed(bool invalidateCache = false)
     {
         // Only invalidate if we need to
@@ -458,6 +461,10 @@ public static class Profile
         if (!profile.UsesCustomMusic && useHqMusic)
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/HDR_HQ_in-game_music", tempPath);
 
+        // On Unix, everything needs to be lowercased, so we need to fix the AM2R_11 files / HQ songs
+        if (OS.IsUnix)
+            HelperMethods.LowercaseFolder(tempPath);
+        
         // Linux post-process
         if (OS.IsLinux)
         {

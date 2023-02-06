@@ -87,6 +87,36 @@ public static class HelperMethods
 
         Directory.Delete(targetDir, false);
     }
+    
+    /// <summary>
+    /// Recursively lowercases all files and folders from a specified directory.
+    /// </summary>
+    /// <param name="directory">The path to the directory whose contents should be lowercased.</param>
+    public static void LowercaseFolder(string directory)
+    {
+        DirectoryInfo dir = new DirectoryInfo(directory);
+
+        foreach(var file in dir.GetFiles())
+        {
+            if (file.Name == file.Name.ToLower()) continue;
+            // Windows is dumb, thus we need to move in two trips
+            file.MoveTo(file.DirectoryName + "/" + file.Name.ToLower() + "_");
+            string newPath = file.FullName.Substring(0, file.FullName.Length - 1);
+            File.Delete(newPath);
+            file.MoveTo(newPath);
+        }
+
+        foreach(var subDir in dir.GetDirectories())
+        {
+            if (subDir.Name == subDir.Name.ToLower()) continue;
+            // ReSharper disable once PossibleNullReferenceException - since this is a subdirectory, it always has a parent
+            // Windows is dumb, thus we need to move in two trips
+            subDir.MoveTo(subDir.Parent.FullName + "/" + subDir.Name.ToLower() + "_");
+            // -2 because after a moving operation, DirInfo already appends a / 
+            subDir.MoveTo(subDir.FullName.Substring(0, subDir.FullName.Length-2));
+            LowercaseFolder(subDir.FullName);
+        }
+    }
 
     /// <summary>
     /// Calculates an MD5 hash from a given file.
