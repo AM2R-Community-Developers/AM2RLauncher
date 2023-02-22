@@ -52,6 +52,13 @@ The AM2RLauncher data can get quite big, so if you wish to change where it store
 
 If you wish to redistribute the AM2RLauncher to some Linux distro, you can use the `NoAutoUpdate` configuration, in order to build the AM2RLauncher with the auto-updating features disabled. Further assets (.desktop file, icon, appdata) can also be found in this directory: `./AM2RLauncher/distribution/linux`.
 
+# Contributing
+Contributions of any kind are always welcome! Here's possible methods on how you can contribute:  
+- Keep the [Wiki](https://github.com/AM2R-Community-Developers/AM2RLauncher/wiki) up-to date should any changes occur. Or notify us if it isn't.
+- Help us with translating the AM2RLauncher into more languages. You can find the language files [here](https://github.com/AM2R-Community-Developers/AM2RLauncher/tree/main/AM2RLauncher/AM2RLauncher/Language).
+- Test the development builds for any regressions, check any of the [`TODO`s](https://github.com/AM2R-Community-Developers/AM2RLauncher/search?q=todo) that need testing or help with experimental features (like macOS).
+- Submit Pull Requests to fix bugs or implement new features.
+
 # Compiling Instructions:
 ## Dependencies
 For compiling for Windows .Net Framework 4.8 SDK is needed. For Linux and Mac .Net Core 5.0 SDK or later is needed.
