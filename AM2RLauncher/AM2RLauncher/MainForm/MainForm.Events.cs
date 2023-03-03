@@ -768,7 +768,7 @@ public partial class MainForm : Form
         }
 
         // If mod was installed/added by *name* already, throw error and cleanup
-        if (profileList.FirstOrDefault(p => p.Name == profile.Name) != null)
+        if (profileList.FirstOrDefault(p => p.Name.ToLower() == profile.Name.ToLower()) != null)
         {
             log.Error(profile.Name + " is already installed.");
             MessageBox.Show(this, HelperMethods.GetText(Text.ModIsAlreadyInstalledMessage, profile.Name), Text.WarningWindowTitle, MessageBoxType.Warning);
@@ -779,7 +779,7 @@ public partial class MainForm : Form
         // Reload list so mod gets recognized
         LoadProfilesAndAdjustLists();
         // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
-        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name == profile.Name));
+        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name.ToLower() == profile.Name.ToLower()));
         if (modSettingsProfileDropDown.SelectedIndex == -1)
             modSettingsProfileDropDown.SelectedIndex = 0;
 
@@ -1029,7 +1029,7 @@ public partial class MainForm : Form
         ProfileXML profile = Serializer.Deserialize<ProfileXML>(File.ReadAllText(extractedModDir + "/profile.xml"));
 
         // If the selected mod is not installed, tell user that they should add it and cleanup
-        if (profileList.FirstOrDefault(p => p.Name == profile.Name) == null)
+        if (profileList.FirstOrDefault(p => p.Name.ToLower() == profile.Name.ToLower()) == null)
         {
             log.Error("Mod is not installed! Cancelling mod update.");
             MessageBox.Show(this, HelperMethods.GetText(Text.UpdateModButtonWrongMod, currentProfile.Name).Replace("$SELECT", profile.Name),
@@ -1067,7 +1067,7 @@ public partial class MainForm : Form
         // Adjust our lists so it gets recognized
         LoadProfilesAndAdjustLists();
 
-        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name == currentProfile.Name));
+        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name.ToLower() == currentProfile.Name.ToLower()));
         if (modSettingsProfileDropDown.SelectedIndex == -1)
             modSettingsProfileDropDown.SelectedIndex = 0;
 
