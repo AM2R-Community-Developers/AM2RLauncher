@@ -532,7 +532,7 @@ public partial class MainForm : Form
     /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
     private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
     {
-        if ((profileDropDown.SelectedIndex == -1) && (!profileDropDown.DataStore.Any())) return;
+        if ((profileDropDown.SelectedIndex == -1) || (!profileDropDown.DataStore.Any())) return;
 
         profileIndex = profileDropDown.SelectedIndex;
         log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
