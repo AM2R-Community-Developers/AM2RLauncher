@@ -40,7 +40,7 @@ public partial class MainForm : Form
     private void ProfileLayoutLoadComplete(object sender, EventArgs e)
     {
         // Safety check
-        if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.Items.Count != 0)) return;
+        if ((modSettingsProfileDropDown == null) || (modSettingsProfileDropDown.DataStore.Any())) return;
         addModButton.Enabled = false;
         settingsProfileLabel.TextColor = LauncherColors.Inactive;
         modSettingsProfileDropDown.Enabled = false;
@@ -792,12 +792,12 @@ public partial class MainForm : Form
     /// </summary>
     private void ModSettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
     {
-        if (modSettingsProfileDropDown.SelectedIndex == -1 && modSettingsProfileDropDown.Items.Count == 0) return;
+        if (modSettingsProfileDropDown.SelectedIndex == -1 && !modSettingsProfileDropDown.DataStore.Any()) return;
 
-        string profileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
+        string profileName = modSettingsProfileDropDown.SelectedKey;
 
         log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
-        if (modSettingsProfileDropDown.SelectedIndex <= 0 || modSettingsProfileDropDown.Items.Count == 0)
+        if (modSettingsProfileDropDown.SelectedIndex <= 0 || !modSettingsProfileDropDown.DataStore.Any())
         {
             deleteModButton.Enabled = false;
             deleteModButton.ToolTip = null;

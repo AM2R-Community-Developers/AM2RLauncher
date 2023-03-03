@@ -1,5 +1,6 @@
 ﻿using Eto.Drawing;
 using System;
+using System.Linq;
 using AM2RLauncherLib;
 using AM2RLauncherLib.XML;
 using AM2RLauncher.Language;
@@ -167,7 +168,7 @@ public partial class MainForm
     private void UpdateModSettingsState()
     {
         // Safety check
-        if (modSettingsProfileDropDown == null || modSettingsProfileDropDown.Items.Count <= 0) return;
+        if (modSettingsProfileDropDown == null || modSettingsProfileDropDown.DataStore.Any()) return;
 
         bool enabled = false;
         switch (updateState)
@@ -183,7 +184,7 @@ public partial class MainForm
         }
         if (apkButtonState == ApkButtonState.Creating) enabled = false;
 
-        string selectedProfileName = modSettingsProfileDropDown.Items[modSettingsProfileDropDown.SelectedIndex].Text;
+        string selectedProfileName = modSettingsProfileDropDown.SelectedKey;
 
         settingsProfileLabel.TextColor = LauncherColors.Green;
         modSettingsProfileDropDown.Enabled = enabled;
@@ -205,16 +206,12 @@ public partial class MainForm
         }
         
         
-
         Color col = enabled ? LauncherColors.Green : LauncherColors.Inactive;
 
         if (OS.IsWindows)
             modSettingsProfileDropDown.TextColor = col;
 
         settingsProfileLabel.TextColor = col;
-
-        if (enabled)
-            modSettingsProfileDropDown.SelectedIndex = profileDropDown.SelectedIndex;
     }
 
     /// <summary>

@@ -552,7 +552,7 @@ public partial class MainForm : Form
         if (OS.IsLinux)
             modSettingsProfileDropDown = new DropDown();
 
-        modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;   // It's actually more comfortable if it's outside, because of GTK shenanigans
+        modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;
         modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
         
         desktopShortcutButton = new SmallColorButton(Text.CreateShortcut);
