@@ -127,7 +127,7 @@ public partial class MainForm
             case PlayButtonState.Playing: return;
 
             case PlayButtonState.Install:
-            case PlayButtonState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.Items[profileDropDown.SelectedIndex]?.Text ?? ""); break;
+            case PlayButtonState.Play: apkButton.Enabled = true; apkButton.ToolTip = HelperMethods.GetText(Text.ApkButtonEnabledToolTip, profileDropDown?.SelectedKey ?? ""); break;
         }
     }
 
@@ -280,7 +280,7 @@ public partial class MainForm
     /// <returns>The tooltip as a <see cref="String"/>, or <see langword="null"/> if the current State is invalid.</returns>
     private string GetPlayButtonTooltip()
     {
-        string profileName = ((profileDropDown != null) && (profileDropDown.Items.Count > 0)) ? profileDropDown.Items[profileDropDown.SelectedIndex].Text : "";
+        string profileName = ((profileDropDown != null) && (profileDropDown.DataStore.Any())) ? profileDropDown.SelectedKey : "";
         switch (updateState)
         {
             case PlayButtonState.Download: return Text.PlayButtonDownloadToolTip;
@@ -314,15 +314,11 @@ public partial class MainForm
     private void LoadProfilesAndAdjustLists()
     {
         // Reset loaded profiles
-        profileDropDown.Items.Clear();
         profileList.Clear();
         profileIndex = null;
-
-        // Load the profileList
-        profileList = Profile.LoadProfiles();
-
+        
         // Add profile names to the profileDropDown
-        foreach (ProfileXML profile in profileList)
+        foreach (ProfileXML profile in Profile.LoadProfiles())
         {
             // Archive version notes
             if (!profile.Installable)
@@ -333,14 +329,14 @@ public partial class MainForm
                     profile.ProfileNotes = Text.ArchiveNotesMods + "\n\n" + profile.ProfileNotes;
             }
 
-            profileDropDown.Items.Add(profile.Name);
+            profileList.Add(profile);
         }
 
         // Read the value from the config
         string profIndexString = ReadFromConfig("ProfileIndex");
 
         // Check if either no profile was found or the setting says that the last current profile didn't exist
-        if (profileDropDown.Items.Count == 0)
+        if (!profileDropDown.DataStore.Any())
             profileIndex = null;
         else
         {
@@ -351,13 +347,13 @@ public partial class MainForm
             // We parse from the settings, and check if profiles got deleted from the last time the launcher has been selected. if yes, we revert the last selection to 0;
             int intParseResult = Int32.Parse(profIndexString);
             profileIndex = intParseResult;
-            if (profileIndex >= profileDropDown.Items.Count)
+            if (profileIndex >= profileDropDown.DataStore.Count())
                 profileIndex = 0;
             profileDropDown.SelectedIndex = profileIndex.Value;
         }
 
         // Update stored profiles in the Profile Settings tab
-        modSettingsProfileDropDown.SelectedIndex = profileDropDown.Items.Count != 0 ? 0 : -1;
+        modSettingsProfileDropDown.SelectedIndex = profileDropDown.DataStore.Any() ? 0 : -1;
 
         // Refresh the author and version label on the main tab
         if (profileList.Count > 0)

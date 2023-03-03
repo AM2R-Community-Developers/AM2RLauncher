@@ -532,7 +532,7 @@ public partial class MainForm : Form
     /// <summary>Gets called when user selects a different item from <see cref="profileDropDown"/> and changes <see cref="profileAuthorLabel"/> accordingly.</summary>
     private void ProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
     {
-        if ((profileDropDown.SelectedIndex == -1) && (profileDropDown.Items.Count == 0)) return;
+        if ((profileDropDown.SelectedIndex == -1) && (!profileDropDown.DataStore.Any())) return;
 
         profileIndex = profileDropDown.SelectedIndex;
         log.Debug("profileDropDown.SelectedIndex has been changed to " + profileIndex + ".");
@@ -779,7 +779,7 @@ public partial class MainForm : Form
         // Reload list so mod gets recognized
         LoadProfilesAndAdjustLists();
         // Adjust profileIndex to point to newly added mod. if its not found for whatever reason, we default to first community updates
-        modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == profile.Name);
+        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name == profile.Name));
         if (modSettingsProfileDropDown.SelectedIndex == -1)
             modSettingsProfileDropDown.SelectedIndex = 0;
 
@@ -792,11 +792,11 @@ public partial class MainForm : Form
     /// </summary>
     private void ModSettingsProfileDropDownSelectedIndexChanged(object sender, EventArgs e)
     {
-        if (modSettingsProfileDropDown.SelectedIndex == -1 && !modSettingsProfileDropDown.DataStore.Any()) return;
+        if (modSettingsProfileDropDown.SelectedIndex == -1 || !modSettingsProfileDropDown.DataStore.Any()) return;
 
         string profileName = modSettingsProfileDropDown.SelectedKey;
 
-        log.Info("SettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
+        log.Info("ModSettingsProfileDropDown.SelectedIndex has been changed to " + modSettingsProfileDropDown.SelectedIndex + ".");
         if (modSettingsProfileDropDown.SelectedIndex <= 0 || !modSettingsProfileDropDown.DataStore.Any())
         {
             deleteModButton.Enabled = false;
@@ -1067,7 +1067,7 @@ public partial class MainForm : Form
         // Adjust our lists so it gets recognized
         LoadProfilesAndAdjustLists();
 
-        modSettingsProfileDropDown.SelectedIndex = profileList.FindIndex(p => p.Name == currentProfile.Name);
+        modSettingsProfileDropDown.SelectedIndex = profileList.IndexOf(profileList.FirstOrDefault(p => p.Name == currentProfile.Name));
         if (modSettingsProfileDropDown.SelectedIndex == -1)
             modSettingsProfileDropDown.SelectedIndex = 0;
 

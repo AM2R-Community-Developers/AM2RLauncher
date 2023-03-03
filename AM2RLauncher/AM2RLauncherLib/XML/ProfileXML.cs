@@ -95,4 +95,9 @@ public class ProfileXML
         Installable = installable;
         ProfileNotes = profileNotes;
     }
+    
+    public override string ToString()
+    {
+        return Name;
+    }
 }

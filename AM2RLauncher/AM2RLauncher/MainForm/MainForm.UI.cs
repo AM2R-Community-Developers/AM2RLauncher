@@ -7,6 +7,7 @@ using Eto.Forms;
 using log4net;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -110,14 +111,6 @@ public partial class MainForm : Form
         // Create MenuBar with defaults for mac
         if (OS.IsMac)
             Menu = new MenuBar();
-
-        // Create array from validCount
-        profileList = new List<ProfileXML>();
-
-        //TODO: whenever profileDropDown gets rewritten to use a datastore, scrap this
-        List<ListItem> profileNames = new List<ListItem>();
-        foreach (ProfileXML profile in profileList)
-            profileNames.Add(profile.Name);
 
         // Custom splash texts
         string splash = Splash.GetSplash();
@@ -228,7 +221,7 @@ public partial class MainForm : Form
         if (OS.IsLinux)
             profileDropDown = new DropDown();
 
-        profileDropDown.Items.AddRange(profileNames);   // It's actually more comfortable if it's outside, because of GTK shenanigans
+        profileDropDown.DataStore = (profileList);
 
         centerInterface.AddRow(profileDropDown);
 
@@ -646,8 +639,7 @@ public partial class MainForm : Form
     private readonly TrayIndicator trayIndicator;
 
     /// <summary><see cref="List{T}"/> of <see cref="ProfileXML"/>s, used for actually working with profile data.</summary>
-    //TODO: this should be moved into AM2RLauncherLib
-    private List<ProfileXML> profileList;
+    private ObservableCollection<ProfileXML> profileList = new ObservableCollection<ProfileXML>();
 
     /// <summary>The planet Background.</summary>
     private readonly Bitmap formBG = new Bitmap(Resources.bgCentered);
@@ -708,7 +700,6 @@ public partial class MainForm : Form
     /// <summary>A <see cref="DropDown"/> where profiles can be chosen.</summary>
     private readonly DropDown profileDropDown;
     /// <summary>A <see cref="DropDown"/> where profiles can be chosen (located in Profile Settings).</summary>
-    //TODO: Use MVVM bindings: https://github.com/picoe/Eto/wiki/Data-Binding#mvvm-binding
     private readonly DropDown modSettingsProfileDropDown;
 
     /// <summary>A <see cref="TextBox"/>, where the user can input their custom mirror.</summary>
