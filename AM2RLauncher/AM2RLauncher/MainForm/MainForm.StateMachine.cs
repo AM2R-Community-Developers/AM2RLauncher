@@ -353,14 +353,8 @@ public partial class MainForm
         }
 
         // Update stored profiles in the Profile Settings tab
+        // TODO: For some reason this is needed, because if its removed, the selected index goes bonkers
         modSettingsProfileDropDown.SelectedIndex = profileDropDown.DataStore.Any() ? 0 : -1;
-
-        // Refresh the author and version label on the main tab
-        if (profileList.Count > 0)
-        {
-            profileAuthorLabel.Text = Text.Author + " " + profileList[profileDropDown.SelectedIndex].Author;
-            profileVersionLabel.Text = Text.VersionLabel + " " + profileList[profileDropDown.SelectedIndex].Version;
-        }
 
         log.Info("Reloading UI components after loading successful.");
 

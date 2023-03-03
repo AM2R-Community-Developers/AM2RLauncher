@@ -221,7 +221,7 @@ public partial class MainForm : Form
         if (OS.IsLinux)
             profileDropDown = new DropDown();
 
-        profileDropDown.DataStore = (profileList);
+        profileDropDown.DataStore = profileList;
 
         centerInterface.AddRow(profileDropDown);
 
@@ -546,7 +546,7 @@ public partial class MainForm : Form
             modSettingsProfileDropDown = new DropDown();
 
         modSettingsProfileDropDown.DataStore = profileDropDown.DataStore;
-        modSettingsProfileDropDown.Bind(m => m.SelectedIndex, profileDropDown, p => p.SelectedIndex);
+        modSettingsProfileDropDown.SelectedIndexBinding.Bind(profileDropDown, p => p.SelectedIndex);
         
         desktopShortcutButton = new SmallColorButton(Text.CreateShortcut);
         profileButton = new SmallColorButton(Text.OpenProfileFolder);
