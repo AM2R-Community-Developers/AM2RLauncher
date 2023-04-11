@@ -47,7 +47,8 @@ public static class Splash
         "You may only proceed if you wear baggy pants.",
         "Did you know that games take time to develop?",
         "Ask the wombat.",
-        "This isn't complicated enough yet."
+        "This isn't complicated enough yet.",
+        "The broken pipe's destination is left as an exercise for the player."
     };
 
     /// <summary>
@@ -102,7 +103,8 @@ public static class Splash
         "What do you mean that there's a number after 2?",
         "We don't like Sand. It's course, rough, and it gets everywhere.",
         "This is a sandbox, not a sandy B.O.X.",
-        "Now easily available on an App Store!"
+        "Now easily available on an App Store!",
+        "How did you Discover this launcher?"
     };
 
     /// <summary>
@@ -115,7 +117,8 @@ public static class Splash
         "Another Mac 2 Remake",
         "This shouldn't even be possible",
         "How long until this breaks?",
-        "Have fun trying to convince modders to support this!"
+        "Have fun trying to convince modders to support this!",
+        "It's a secret to everybody."
     };
 
     /// <summary>
