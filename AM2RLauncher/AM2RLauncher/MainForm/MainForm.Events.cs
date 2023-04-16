@@ -144,9 +144,7 @@ public partial class MainForm : Form
             log.Info("Checking whether to transfer Flatpak saves...");
             string oldHomePath = CrossPlatformOperations.Home;
             log.Info("Old home path is " + oldHomePath);
-            var option = Environment.SpecialFolderOption.DoNotVerify;
-            log.Info("option is " + option);
-            Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, option)}/AM2RProfileSaves");
+            Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify)}/AM2RProfileSaves");
             string newHomePath = CrossPlatformOperations.Home;
             log.Info("New home path is " + newHomePath);
 
