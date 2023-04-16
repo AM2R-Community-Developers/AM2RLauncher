@@ -141,9 +141,14 @@ public partial class MainForm : Form
         // Transfer saves on flatpak from non-flatpak save to flatpak save
         if (OS.IsThisRunningFromFlatpak)
         {
+            log.Info("Checking whether to transfer Flatpak saves...");
             string oldHomePath = CrossPlatformOperations.Home;
-            Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify)}/AM2RProfileSaves");
+            log.Info("Old home path is " + oldHomePath);
+            var option = Environment.SpecialFolderOption.DoNotVerify;
+            log.Info("option is " + option);
+            Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, option)}/AM2RProfileSaves");
             string newHomePath = CrossPlatformOperations.Home;
+            log.Info("New home path is " + newHomePath);
 
             // TEMPORARY transfer from main saves into Flatpak saves - TODO: remove in about half a year or so
             // Only do this if the directory for the new saves does not exist yet and if the directory for old saves exists in the first place.
@@ -154,7 +159,7 @@ public partial class MainForm : Form
 
                 if (Directory.Exists(newSavePath) || !Directory.Exists(oldSavePath)) continue;
                 
-                log.Info($"Transfering save data for {profile.Name} from {oldSavePath} to {newSavePath} ...");
+                log.Info($"Transferring save data for {profile.Name} from {oldSavePath} to {newSavePath} ...");
                 HelperMethods.DirectoryCopy(oldSavePath, newSavePath);
             }
         }

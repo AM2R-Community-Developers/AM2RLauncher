@@ -408,7 +408,7 @@ public static class Profile
 
                 // Delete 1.1's data.win, we don't need it anymore!
                 // TODO: *theoretically* if someone would make some game like serradius in gms2 and push that as a yyc am2r mod, this *will* break!
-                // Becauase GMS2 YYC *does* ship the data.win file, contrary to GMS1.4 
+                // Because GMS2 YYC *does* ship the data.win file, contrary to GMS1.4 
                 File.Delete($"{tempPath}/data.win");
             }
             else
