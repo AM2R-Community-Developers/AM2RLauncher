@@ -143,6 +143,11 @@ public partial class MainForm : Form
         {
             log.Info("Checking whether to transfer Flatpak saves...");
             string oldHomePath = CrossPlatformOperations.Home;
+            // One can always set environment variables to other environment variables, and dotnet doesn't expand these by default
+            // However, since only Flatpak is majorly affected by this, I only do this workaround for there
+            if (oldHomePath == "$XDG_DATA_HOME")
+                oldHomePath = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+            
             log.Info("Old home path is " + oldHomePath);
             Environment.SetEnvironmentVariable("HOME", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify)}/AM2RProfileSaves");
             string newHomePath = CrossPlatformOperations.Home;
