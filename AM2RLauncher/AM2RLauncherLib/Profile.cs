@@ -535,7 +535,7 @@ public static class Profile
             File.Copy($"{Core.PatchDataPath}/data/PkgInfo", $"{tempPath.Replace("Resources", "")}/PkgInfo", true);
 
             //Put profilePath back to what it was before
-            tempPath = $"{Core.ProfilesPath}/{profile.Name}";
+            tempPath = $"{Path.GetTempPath()}/AM2RLauncherProfileTemp/";
         }
 
         // Copy profile.xml so we can grab data to compare for updates later!
