@@ -502,7 +502,7 @@ public static class Profile
             #endif
 
             File.Move($"{tempPath}/{exe}", $"{tempPath}/.runner-unwrapped");
-            File.Move($"{Core.PatchDataPath}/data/mesa-wrapper.sh", $"{tempPath}/runner");
+            File.Copy($"{Core.PatchDataPath}/data/mesa-wrapper.sh", $"{tempPath}/runner");
             #else
             // Copy AppImage template to here
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{tempPath}/AM2R.AppDir/");

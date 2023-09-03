@@ -70,6 +70,10 @@ internal static class MainClass
         log.Info("On AppImage configuration.");
         #endif
 
+        #if PATCHOPENSSL
+        log.Info("On configuration for patching OpenSSL 1.0.0.");
+        #endif
+
         try
         {
             Application gtkLauncher = new Application(Eto.Platforms.Gtk);
