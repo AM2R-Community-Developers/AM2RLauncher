@@ -481,7 +481,28 @@ public static class Profile
             log.Info("Linux specific formatting finished.");
 
             #if NOAPPIMAGE
-              // TODO: figure out a way to use patchelf to have users not rely on deprecated insecure ssl deps.
+
+            #if PATCHOPENSSL
+            log.Info("Patching openssl 1.0.0...");
+
+            Process patchLibcryptoProcess = new Process();
+            ProcessStartInfo patchLibcryptoStartInfo = new ProcessStartInfo {
+                UseShellExecute = false,
+                WorkingDirectory = tempPath,
+                FileName = "patchelf",
+                Arguments = $"\"{tempPath}/{exe}\" --replace-needed \"libcrypto.so.1.0.0\" \"libcurl.so\" --replace-needed \"libssl.so.1.0.0\" \"libcurl.so\""
+            };
+
+            patchLibcryptoProcess.StartInfo = patchLibcryptoStartInfo;
+            patchLibcryptoProcess.Start();
+            patchLibcryptoProcess.WaitForExit();
+
+            log.Info("Patched openssl.");
+
+            #endif
+
+            File.Move($"{tempPath}/{exe}", $"{tempPath}/.runner-unwrapped");
+            File.Move($"{Core.PatchDataPath}/data/mesa-wrapper.sh", $"{tempPath}/runner");
             #else
             // Copy AppImage template to here
             HelperMethods.DirectoryCopy($"{Core.PatchDataPath}/data/AM2R.AppDir", $"{tempPath}/AM2R.AppDir/");
