@@ -139,7 +139,9 @@ public partial class MainForm : Form
     {
         LoadProfilesAndAdjustLists();
         // Transfer saves on flatpak from non-flatpak save to flatpak save
-        if (OS.IsThisRunningFromFlatpak)
+        // FIXME: This is temporarily stubbed as it needs more testing on the flatpak side to see how to properly 
+        // handle new save dirs in a backwards compatible manner
+        if (OS.IsThisRunningFromFlatpak && false)
         {
             log.Info("Checking whether to transfer Flatpak saves...");
             string oldHomePath = CrossPlatformOperations.Home;
