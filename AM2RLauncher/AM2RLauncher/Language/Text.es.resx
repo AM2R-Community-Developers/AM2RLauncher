@@ -387,7 +387,7 @@ Procede con cautela.</value>
     <value>El Espacio Oficial de Matrix para AM2R</value>
   </data>
   <data name="CreateShortcut" xml:space="preserve">
-    <value>CREAR ACCESO DIRECTO EN EL ESCRITORIO</value>
+    <value>CREAR ACCESO DIRECTO EN ESCRITORIO</value>
   </data>
   <data name="ShortcutWarningCommunityUpdates" xml:space="preserve">
     <value>¡Ejecutar las Actualizaciones de la Comunidad desde el acceso directo ignorará el Launcher evitando actualizaciones automáticas!
