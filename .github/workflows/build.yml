@@ -39,7 +39,7 @@ jobs:
         dotnet-version: 6.x.x
     - name: Install Mac workload 
       working-directory: ./AM2RLauncher
-      run: dotnet workload install macos && dotnet workload restore
+      run: dotnet workload install macos
     - name: Restore dependencies
       working-directory: ./AM2RLauncher
       run: dotnet restore
