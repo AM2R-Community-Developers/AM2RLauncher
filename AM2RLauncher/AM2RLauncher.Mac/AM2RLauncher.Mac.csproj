@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0-macos</TargetFramework>
     <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
-    <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>10.15</SupportedOSPlatformVersion>
     <RollForward>LatestMajor</RollForward>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
