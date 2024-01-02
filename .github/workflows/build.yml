@@ -16,13 +16,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, macos-13, windows-latest]
         configuration: [Release]
         include:
           - os: ubuntu-latest
             COMMAND: AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -r ubuntu.18.04-x64 --no-self-contained
             ARTIFACT: AM2RLauncher/AM2RLauncher.Gtk/bin/Release/net6.0/ubuntu.18.04-x64/publish/
-          - os: macOS-latest
+          - os: macos-13
             COMMAND: AM2RLauncher.Mac -o builds/macOS-latest
             ARTIFACT: AM2RLauncher/builds/macOS-latest
           - os: windows-latest
@@ -36,10 +36,13 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.x.x
     - name: Install Mac workload 
       working-directory: ./AM2RLauncher
-      run: dotnet workload install macos
+      run: dotnet workload install macos && dotnet workload restore
+    - name: Switch XCode
+      run: sudo xcode-select -switch /Applications/Xcode_15.0.1.app/Contents/Developer
+      if: matrix.os == 'macos-13'
     - name: Restore dependencies
       working-directory: ./AM2RLauncher
       run: dotnet restore
