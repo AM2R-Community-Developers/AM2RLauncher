@@ -2,7 +2,7 @@
 	
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-macos</TargetFramework>
+    <TargetFramework>net8.0-macos</TargetFramework>
     <RuntimeIdentifiers>osx-x64;osx-arm64</RuntimeIdentifiers>
     <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
     <RollForward>LatestMajor</RollForward>
