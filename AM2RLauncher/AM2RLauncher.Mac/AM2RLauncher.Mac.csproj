@@ -8,6 +8,7 @@
     <RollForward>LatestMajor</RollForward>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <PublishTrimmed>False</PublishTrimmed>
   </PropertyGroup>
 	
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
