@@ -40,6 +40,9 @@ jobs:
     - name: Install Mac workload 
       working-directory: ./AM2RLauncher
       run: dotnet workload install macos && dotnet workload restore
+    - name: Switch XCode
+      run: xcode-select -switch /Applications/Xcode_15.0.1.app/Contents/Developer
+      if: ${{matrix.os}} == "macos-13"
     - name: Restore dependencies
       working-directory: ./AM2RLauncher
       run: dotnet restore
