@@ -19,7 +19,13 @@ Downloads can be found at the [Release Page](https://github.com/AM2R-Community-D
 
 For all Linux users, a [Flatpak](https://flathub.org/apps/details/io.github.am2r_community_developers.AM2RLauncher) is available and can be installed with all above dependencies bundled. This method is the recommended way for Steam Deck users.
 
-Alternatively, for Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
+### Arch Linux
+
+For Arch Linux users an [AUR Package](https://aur.archlinux.org/packages/am2rlauncher/) also exists. Install it with `makepkg -si` or use your favourite AUR helper.
+
+### NixOS
+
+The launcher has also been packaged for NixOS. It can be run with `nix run nixpkgs#am2rlauncher`.
 
 ## Dependencies
 Windows needs the [.NET Framework 4.8 runtime](https://dotnet.microsoft.com/download/dotnet-framework/net48) installed.  
@@ -70,7 +76,12 @@ Alternatively, build via `dotnet build` /  the `buildAll` batch file.
 ## Linux Instructions
 In order to build for linux, use `dotnet publish AM2RLauncher.Gtk -p:PublishSingleFile=true -p:DebugType=embedded -c release -r ubuntu.18.04-x64 --no-self-contained`, MonoDevelop sadly doesn't work.  
 You *have* to specify it to build for Ubuntu, even on non-Ubuntu distros, because one of our Dependencies, libgit2sharp fails on the `linux-x64` RID.  
-For Arch Linux users, an `am2rlauncher-git` [AUR Package](https://aur.archlinux.org/packages/am2rlauncher-git/) also exists.
+
+### Arch Linux
+An `am2rlauncher-git` [AUR Package](https://aur.archlinux.org/packages/am2rlauncher-git/) also exists.
+
+### NixOS
+On NixOS, the `am2rlauncher` package can be used for installation.
 
 ## Mac Instructions
 You can open the solution with Visual Studio for Mac, but it likely will crash after compliation. Use `dotnet publish AM2RLauncher.Mac -c release` instead.  
