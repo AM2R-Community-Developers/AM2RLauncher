@@ -490,7 +490,7 @@ public static class Profile
                 UseShellExecute = false,
                 WorkingDirectory = tempPath,
                 FileName = "patchelf",
-                Arguments = $"\"{tempPath}/{exe}\" --replace-needed \"libcrypto.so.1.0.0\" \"libcurl.so\" --replace-needed \"libssl.so.1.0.0\" \"libcurl.so\""
+                Arguments = $"\"{tempPath}/{exe}\" --replace-needed \"libcrypto.so.1.0.0\" \"libcurl.so\" --replace-needed \"libssl.so.1.0.0\" \"libcurl.so\" --clear-symbol-version X509_free"
             };
 
             patchLibcryptoProcess.StartInfo = patchLibcryptoStartInfo;
