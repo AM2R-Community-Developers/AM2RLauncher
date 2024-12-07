@@ -265,7 +265,8 @@ public partial class MainForm : Form
                 EnableProgressBarAndLabel();
 
                 // Set up progressBar update method
-                CloneOptions cloneOptions = new CloneOptions { OnTransferProgress = TransferProgressHandlerMethod };
+                FetchOptions fetchOptions = new FetchOptions { OnTransferProgress = TransferProgressHandlerMethod };
+		var cloneOptions = new CloneOptions(fetchOptions);
 
                 // Try to clone
                 try
