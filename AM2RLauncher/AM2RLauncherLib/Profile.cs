@@ -738,6 +738,7 @@ public static class Profile
         string gameDirectory = $"{Core.ProfilesPath}/{profile.Name}";
 
         log.Info($"Launching game profile {profile.Name}.");
+        int exitCode = 0;
         if (OS.IsWindows)
         {
             // Sets the arguments to empty, or to the profiles' logs folder to create time based logs.
@@ -777,6 +778,7 @@ public static class Profile
             process.Start();
             Core.SetForegroundWindow(process.MainWindowHandle);
             process.WaitForExit();
+            exitCode = process.ExitCode;
         }
         else if (OS.IsLinux)
         {
@@ -847,6 +849,7 @@ public static class Profile
                 process.BeginErrorReadLine();
             }
             process.WaitForExit();
+            exitCode = process.ExitCode;
         }
         else if (OS.IsMac)
         {
@@ -882,10 +885,19 @@ public static class Profile
             using Process process = new Process { StartInfo = processStartInfo };
             process.Start();
             process.WaitForExit();
+            exitCode = process.ExitCode;
         }
         else
             log.Error($"{OS.Name} cannot run games!");
 
         log.Info($"Profile {profile.Name} process exited.");
+
+        if (exitCode != 0)
+        {
+            string message = $"Game process for profile \"{profile.Name}\" exited with code {exitCode}, it likely failed to launch.";
+            if (useLogging)
+                message += $" Check the log file for more details: {logFile}";
+            throw new Exception(message);
+        }
     }
 }

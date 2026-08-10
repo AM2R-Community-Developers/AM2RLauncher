@@ -207,6 +207,12 @@ namespace AM2RLauncher.Language {
             }
         }
         
+        public static string GameLaunchFailed {
+            get {
+                return ResourceManager.GetString("GameLaunchFailed", resourceCulture);
+            }
+        }
+        
         public static string GithubToolTip {
             get {
                 return ResourceManager.GetString("GithubToolTip", resourceCulture);

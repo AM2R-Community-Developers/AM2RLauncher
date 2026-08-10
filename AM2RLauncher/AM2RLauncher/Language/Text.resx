@@ -198,6 +198,9 @@
   <data name="ErrorWindowTitle" xml:space="preserve">
     <value>Error</value>
   </data>
+  <data name="GameLaunchFailed" xml:space="preserve">
+    <value>The game failed to launch.</value>
+  </data>
   <data name="GithubToolTip" xml:space="preserve">
     <value>The Community-Developers GitHub Page</value>
   </data>

@@ -469,7 +469,8 @@ public partial class MainForm : Form
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"{Text.UnhandledException}\n*****Stack Trace*****\n\n{ex}", Text.ErrorWindowTitle, MessageBoxType.Error);
+                    log.Error(ex.Message);
+                    MessageBox.Show($"{Text.GameLaunchFailed}\n\n{ex.Message}", Text.ErrorWindowTitle, MessageBoxType.Error);
                 }
 
                 ShowInTaskbar = true;
